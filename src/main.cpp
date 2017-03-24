@@ -249,21 +249,6 @@
 //    // Launch the viewer
 //    viewer.launch();
 //}
-
-#include <igl/readOFF.h>
-#include <igl/viewer/Viewer.h>
-#include <nanogui/formhelper.h>
-#include <nanogui/screen.h>
-#include <iostream>
-#include <algorithm>
-#include "testing_models_path.h"
-#include "settings.h"
-#include "clipper.hpp"
-#include <igl/triangle/triangulate.h>
-
-int present_layer;
-igl::viewer::Viewer viewer;
-
 //void slicing()
 //{
 //    Eigen::MatrixXi tF(std::min(present_layer,(int)F.rows()), 3);
@@ -366,6 +351,8 @@ igl::viewer::Viewer viewer;
 
 #include <igl/viewer/Viewer.h>
 #include <igl/triangle/triangulate.h>
+#include <Eigen/Core>
+
 // Input polygon
 Eigen::MatrixXd V;
 Eigen::MatrixXi E;
@@ -394,7 +381,7 @@ int main(int argc, char *argv[])
     H << 0,0;
 
     // Triangulate the interior
-    igl::triangle::triangulate(V,E,H,"a0.005q",V2,F2);
+    igl::triangle::triangulate<Eigen::MatrixXd, Eigen::MatrixXi, Eigen::MatrixXd, Eigen::MatrixXd,Eigen::MatrixXi>(V,E,H,"a0.005q",V2,F2);
 
     // Plot the generated mesh
     igl::viewer::Viewer viewer;
