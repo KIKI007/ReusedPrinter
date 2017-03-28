@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(supporter)
 
-add_executable(${PROJECT_NAME}_bin main.cpp)
+add_executable(${PROJECT_NAME}_bin main.cpp
+        clipper.hpp
+        clipper.cpp
+        slice.h hash_edge.h
+        normalizing_model.h
+        scene_organizer.h)
         #testing_models_path.h
         #detecting_overhangs.h
         #rendering_tree_support.h

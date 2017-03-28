@@ -258,133 +258,123 @@
 //    viewer.data.clear();
 //    viewer.data.set_mesh(V, tF);
 //}
-//using namespace ClipperLib;
-//// Input polygon
-//Eigen::MatrixXd V;
-//Eigen::MatrixXi E;
-//Eigen::MatrixXd H;
-//
-//// Triangulated interior
-//Eigen::MatrixXd V2;
-//Eigen::MatrixXi F2;
-//void draw()
-//{
-//    Paths subj(2), solution;
-//    subj[0] <<
-//            IntPoint(-100,-100) << IntPoint(100,-100) <<
-//            IntPoint(100,100) << IntPoint(-100,100);
-//    subj[1] <<
-//            IntPoint(-50,-50) << IntPoint(0,50) << IntPoint(50,-50);
-//    Clipper c;
-//    c.AddPaths(subj, ptSubject, true);
-//    c.Execute(ctIntersection, solution, pftEvenOdd, pftEvenOdd);
-////    V.resize(7, 2);
-////    E.resize(7, 2);
-////    H.resize(1, 2);
-////    size_t jd = 0;
-////    for(size_t kd = 0; kd < solution.size(); kd++)
-////    {
-////        for(size_t id = 0;id < solution[kd].size(); id++)
-////        {
-////            IntPoint point = solution[kd][id];
-////            V.row(jd++) = Eigen::RowVector2d(point.X,point.Y);
-////            E.row(jd++) = Eigen::RowVector2i(point.X,point.Y);
-////        }
-////    }
-////    H << 0 , 0;
-////    igl::triangle::triangulate(V,E,H,"a0.005q",V2,F2);
-////    igl::viewer::Viewer viewer;
-////    viewer.data.set_mesh(V2,F2);
-//    V.resize(8,2);
-//    E.resize(8,2);
-//    H.resize(1,2);
-//
-//    V << -1,-1, 1,-1, 1,1, -1, 1,
-//            -2,-2, 2,-2, 2,2, -2, 2;
-//
-//    E << 0,1, 1,2, 2,3, 3,0,
-//            4,5, 5,6, 6,7, 7,4;
-//
-//    H << 0,0;
-//
-//    // Triangulate the interior
-//    igl::triangle::triangulate(V,E,H,"a0.005q",V2,F2);
-//
-//    // Plot the generated mesh
-//    igl::viewer::Viewer viewer;
-//    viewer.data.set_mesh(V2,F2);
-//    viewer.launch();
-//}
-//
-//int main(int argc, char *argv[])
-//{
-//    Settings settings;
-//
-//    // Load a mesh in OFF format
-//    //igl::readOFF(TESTING_MODELS_PATH "/bunny.off", V, F);
-//    //present_layer = F.rows();
-//
-//    // Extend viewer menu
-////    viewer.callback_init = [&](igl::viewer::Viewer& viewer)
-////    {
-////        // Add an additional menu window
-////        viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Print Settings");
-////
-////        // Add new group
-////        viewer.ngui->addGroup("Slicing");
-////
-////        // Expose variable directly ...
-////        viewer.ngui->addVariable("Layer Height",settings.layer_height);
-////
-////        viewer.ngui->addVariable("Present Layer", present_layer);
-////
-////        viewer.ngui->addButton("Slicing",slicing);
-////
-////        // Generate menu
-////        viewer.screen->performLayout();
-////
-////        return false;
-////    };
-//    draw();
-//    viewer.launch();
-//}
-
 #include <igl/viewer/Viewer.h>
 #include <igl/triangle/triangulate.h>
-#include <Eigen/Core>
+#include <nanogui/formhelper.h>
+#include <nanogui/screen.h>
+#include <iostream>
+#include "igl/readOBJ.h"
 
+#include "testing_models_path.h"
+#include "slice.h"
+#include "clipper.hpp"
+#include "normalizing_model.h"
+#include "scene_organizer.h"
+using namespace ClipperLib;
+using std::cout;
+using std::endl;
 // Input polygon
 Eigen::MatrixXd V;
-Eigen::MatrixXi E;
+Eigen::MatrixXi E, F;
 Eigen::MatrixXd H;
 
 // Triangulated interior
 Eigen::MatrixXd V2;
 Eigen::MatrixXi F2;
 
+int layer;
+igl::viewer::Viewer viewer;
+Slice slice;
+
+void loadModel()
+{
+    // Load a mesh in OBJ format
+    igl::readOFF(TESTING_MODELS_PATH "/fert.off", V, F);
+    NormalizingModel normaler;
+    normaler.size_normalize(V);
+}
+
+void slicing()
+{
+    slice.set_mesh(V, F);
+    slice.contour_construction();
+}
+
+void show_slice()
+{
+    if(layer > slice.slice_size() - 1)
+        layer = slice.slice_size() - 1;
+    slice.get_intersecting_surface(layer, V, F);
+    if(F.rows() > 3)
+    {
+        viewer.data.clear();
+        viewer.data.set_mesh(V, F);
+    }
+    return;
+}
+
+bool key_down(igl::viewer::Viewer& viewer, unsigned char key, int modifier)
+{
+    std::cout<<"Key: "<<key<<" "<<(unsigned int)key<<std::endl;
+    if (key == 10)
+    {
+        show_slice();
+    }
+    return false;
+}
+
+void recover()
+{
+    loadModel();
+    viewer.data.clear();
+    viewer.data.set_mesh(V, F);
+    return;
+}
+
+void series_slicing()
+{
+    SceneOrganizer organizer;
+    for(int id = 0; id < slice.slice_size(); id+= 5)
+    {
+        std::cout <<"id:\t" << id << std::endl;
+        slice.get_intersecting_surface(id, V, F);
+        if(F.rows() > 3)
+            organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
+    }
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.clear();
+    viewer.data.set_mesh(V, F);
+    return;
+}
+
 int main(int argc, char *argv[])
 {
-    using namespace Eigen;
-    using namespace std;
+    loadModel();
+    slicing();
+    viewer.callback_init = [&](igl::viewer::Viewer& viewer)
+    {
+        viewer.ngui->addGroup("Slicing Settings");
+        viewer.ngui->addVariable("layer", layer);
+        viewer.ngui->addButton("slice", show_slice);
+        viewer.ngui->addButton("recovery", recover);
+        viewer.ngui->addButton("series slicing", series_slicing);
+        viewer.screen->performLayout();
+        return false;
+    };
 
-    // Create the boundary of a square
-    V.resize(8,2);
-    E.resize(8,2);
-    H.resize(1,2);
-
-    V << -1,-1, 1,-1, 1,1, -1, 1,
-            -2,-2, 2,-2, 2,2, -2, 2;
-
-    E << 0,1, 1,2, 2,3, 3,0,
-            4,5, 5,6, 6,7, 7,4;
-
-    H << 0,0;
-
-    // Triangulate the interior
-    igl::triangle::triangulate<Eigen::MatrixXd, Eigen::MatrixXi, Eigen::MatrixXd, Eigen::MatrixXd,Eigen::MatrixXi>(V,E,H,"a0.005q",V2,F2);
-
-    // Plot the generated mesh
-    igl::viewer::Viewer viewer;
-    viewer.data.set_mesh(V2,F2);
+    viewer.callback_key_down = &key_down;
+//    V.resize(4, 3);
+//    F.resize(4, 3);
+//    V << 0.0, 0.0, 0.0,
+//         1.0, 0.0, 0.0,
+//         0.0, 1.0, 0.0,
+//         0.0, 0.0, 1.0;
+//    F << 0, 2, 1,
+//         0, 1, 3,
+//         0, 3, 2,
+//         1, 2, 3;
+    //draw();
+    viewer.data.set_mesh(V,F);
     viewer.launch();
 }

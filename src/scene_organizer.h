@@ -91,13 +91,13 @@ private:
 
     int num_vertices_single_obj()
     {
-        return 2 * settings_.polygon_vertices_num + 8;
+        return 2 * settings_.circle_vertices_num + 8;
     }
 
     int num_faces_single_obj()
     {
         size_t num_face_cube = 2 * 2 + 4 * 2;
-        size_t num_face_pillar = (settings_.polygon_vertices_num - 2) + 2 * settings_.polygon_vertices_num;
+        size_t num_face_pillar = (settings_.circle_vertices_num - 2) + 2 * settings_.circle_vertices_num;
         return num_face_cube + num_face_pillar;
     }
 
@@ -118,8 +118,8 @@ public:
         {
             for(int ih = 0; ih < height; ih++)
             {
-                px = (iw + 0.5) * settings_.pad_size_;
-                pz = (ih + 0.5) * settings_.pad_size_;
+                px = (iw + 0.5) * settings_.pad_size;
+                pz = (ih + 0.5) * settings_.pad_size;
 
                 Eigen::MatrixXd sV;
                 Eigen::MatrixXi sF;
@@ -150,8 +150,8 @@ public:
         int dx[4] = {-1, -1, 1, 1};
         int dz[4] = {-1, 1, 1, -1};
         for (size_t id = 0; id < 4; id++) {
-            V.row(id) = Eigen::RowVector3d(settings_.pad_size_ / 2 * dx[id], 0, settings_.pad_size_ / 2 * dz[id]);
-            V.row(id + 4) = Eigen::RowVector3d(settings_.pad_size_ / 2 * dx[id], -settings_.pad_thickness_, settings_.pad_size_ / 2 * dz[id]);
+            V.row(id) = Eigen::RowVector3d(settings_.pad_size / 2 * dx[id], 0, settings_.pad_size / 2 * dz[id]);
+            V.row(id + 4) = Eigen::RowVector3d(settings_.pad_size / 2 * dx[id], -settings_.pad_thickness, settings_.pad_size / 2 * dz[id]);
         }
 
         size_t f_id = 0;
@@ -171,28 +171,28 @@ public:
 
 
         //pillar
-        for (size_t id = 0; id < settings_.polygon_vertices_num; id++) {
-            V.row(id + 8) =Eigen::RowVector3d( cos(2.0 * settings_.PI * id / settings_.polygon_vertices_num) * settings_.pillar_radius_,
-                                               -settings_.pad_thickness_,
-                                               sin(2.0 * settings_.PI * id / settings_.polygon_vertices_num) * settings_.pillar_radius_ );
-            V.row(id + settings_.polygon_vertices_num + 8) = Eigen::RowVector3d(cos(2.0 * settings_.PI * id / settings_.polygon_vertices_num) * settings_.pillar_radius_,
-                                                              -settings_.pad_thickness_- settings_.pillar_length_,
-                                                              sin(2.0 * settings_.PI * id / settings_.polygon_vertices_num) * settings_.pillar_radius_);
+        for (size_t id = 0; id < settings_.circle_vertices_num; id++) {
+            V.row(id + 8) = Eigen::RowVector3d( cos(2.0 * settings_.PI * id / settings_.circle_vertices_num) * settings_.pillar_radius,
+                                               -settings_.pad_thickness,
+                                               sin(2.0 * settings_.PI * id / settings_.circle_vertices_num) * settings_.pillar_radius );
+            V.row(id + settings_.circle_vertices_num + 8) = Eigen::RowVector3d(cos(2.0 * settings_.PI * id / settings_.circle_vertices_num) * settings_.pillar_radius,
+                                                              -settings_.pad_thickness - settings_.pillar_length,
+                                                              sin(2.0 * settings_.PI * id / settings_.circle_vertices_num) * settings_.pillar_radius);
         }
 
         // bottom
-        for(size_t id = 1; id < settings_.polygon_vertices_num - 1; id++)
+        for(size_t id = 1; id < settings_.circle_vertices_num - 1; id++)
         {
-            F.row(f_id++) = Eigen::RowVector3i(settings_.polygon_vertices_num + 8, id + settings_.polygon_vertices_num + 8, id + settings_.polygon_vertices_num + 9);
+            F.row(f_id++) = Eigen::RowVector3i(settings_.circle_vertices_num + 8, id + settings_.circle_vertices_num + 8, id + settings_.circle_vertices_num + 9);
         }
 
         //lateral
-        for(size_t id = 0;id < settings_.polygon_vertices_num; id++)
+        for(size_t id = 0;id < settings_.circle_vertices_num; id++)
         {
             unsigned long u0 = 8 + id;
-            unsigned long v0 = 8 + id + settings_.polygon_vertices_num;
-            unsigned long u1 = 8 + (id + 1) % settings_.polygon_vertices_num;
-            unsigned long v1 =  8 + (id + 1) % settings_.polygon_vertices_num + settings_.polygon_vertices_num;
+            unsigned long v0 = 8 + id + settings_.circle_vertices_num;
+            unsigned long u1 = 8 + (id + 1) % settings_.circle_vertices_num;
+            unsigned long v1 =  8 + (id + 1) % settings_.circle_vertices_num + settings_.circle_vertices_num;
             F.row(f_id++) = Eigen::RowVector3i(u0, u1, v1);
             F.row(f_id++) = Eigen::RowVector3i(v1, v0, u0);
         }
