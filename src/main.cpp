@@ -270,6 +270,7 @@
 #include "clipper.hpp"
 #include "normalizing_model.h"
 #include "scene_organizer.h"
+#include "slice_overhang_detector.h"
 using namespace ClipperLib;
 using std::cout;
 using std::endl;
@@ -285,11 +286,12 @@ Eigen::MatrixXi F2;
 int layer;
 igl::viewer::Viewer viewer;
 Slice slice;
+Slice_Overhang_Detector overhang_slicer;
 
 void loadModel()
 {
     // Load a mesh in OBJ format
-    igl::readOFF(TESTING_MODELS_PATH "/fert.off", V, F);
+    igl::readOFF(TESTING_MODELS_PATH "/torus.off", V, F);
     NormalizingModel normaler;
     normaler.size_normalize(V);
 }
@@ -298,12 +300,15 @@ void slicing()
 {
     slice.set_mesh(V, F);
     slice.contour_construction();
+
+    overhang_slicer.set_mesh(V, F);
+    overhang_slicer.contour_construction();
 }
 
 void show_slice()
 {
-    if(layer > slice.slice_size() - 1)
-        layer = slice.slice_size() - 1;
+    if(layer > slice.number_layer() - 1)
+        layer = slice.number_layer() - 1;
     slice.get_intersecting_surface(layer, V, F);
     if(F.rows() > 3)
     {
@@ -334,7 +339,7 @@ void recover()
 void series_slicing()
 {
     SceneOrganizer organizer;
-    for(int id = 0; id < slice.slice_size(); id+= 5)
+    for(int id = 0; id < slice.number_layer(); id+= 5)
     {
         std::cout <<"id:\t" << id << std::endl;
         slice.get_intersecting_surface(id, V, F);
@@ -343,6 +348,25 @@ void series_slicing()
     }
     Eigen::MatrixXd C;
     organizer.get_mesh(V, F, C);
+    viewer.data.clear();
+    viewer.data.set_mesh(V, F);
+    return;
+}
+
+void overhang_slicing()
+{
+    SceneOrganizer organizer;
+    overhang_slicer.removing_overlap();
+    for(int id = 0; id < overhang_slicer.number_layer(); id++)
+    {
+        std::cout <<"id:\t" << id << std::endl;
+        overhang_slicer.get_intersecting_surface(id, V, F);
+        if(F.rows() > 3)
+            organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
+    }
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    std::cout << V.rows() << ", " << F.rows() << std::endl;
     viewer.data.clear();
     viewer.data.set_mesh(V, F);
     return;
@@ -359,6 +383,7 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("slice", show_slice);
         viewer.ngui->addButton("recovery", recover);
         viewer.ngui->addButton("series slicing", series_slicing);
+        viewer.ngui->addButton("overhang slicing", overhang_slicing);
         viewer.screen->performLayout();
         return false;
     };

@@ -22,6 +22,9 @@ public:
         //slice
         layer_height = 0.2;
 
+        //sampling
+        sample_distance = 0.2;
+
         //rendering
         maximum_model_heigh = 50; //mm
 
@@ -60,7 +63,7 @@ public:
 
     inline double int2mm(long long INT)
     {
-        return INT * UNIT;
+        return (double)INT * UNIT;
     }
 
 
@@ -83,6 +86,9 @@ public:
     double pad_thickness;
     double pillar_radius;
     double pillar_length;
+
+    //sampling
+    double sample_distance;
 
     //rendering
     double maximum_model_heigh; //to shrink the model inside the rendering space

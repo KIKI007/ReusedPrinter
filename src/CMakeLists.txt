@@ -6,7 +6,7 @@ add_executable(${PROJECT_NAME}_bin main.cpp
         clipper.cpp
         slice.h hash_edge.h
         normalizing_model.h
-        scene_organizer.h)
+        scene_organizer.h slice_overhang_detector.h)
         #testing_models_path.h
         #detecting_overhangs.h
         #rendering_tree_support.h
