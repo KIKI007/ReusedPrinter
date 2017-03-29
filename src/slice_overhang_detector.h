@@ -87,7 +87,7 @@ public:
         return;
     }
 
-    void ScanLinePolygonFill(ClipperLib::Paths &poly, std::vector<Eigen::Vector3d> &sample_vertices)
+    void ScanLinePolygonFill(ClipperLib::Paths &poly, std::vector<Eigen::Vector2d> &sample_vertices)
     {
         assert(!poly.empty());
 
@@ -99,9 +99,28 @@ public:
         process_scanline_fill(slNet, sample_vertices ,ymax, ymin);
     }
 
-    void horizon_edge_fill(ClipperLib::Paths &poly, std::vector<Eigen::Vector3d> &sample_vertices)
+    void horizon_edge_fill(ClipperLib::Paths &poly, std::vector<Eigen::Vector2d> &sample_vertices)
     {
-
+        int dx = settings.mm2int(settings.sample_distance);
+        for(int id = 0; id < poly.size(); id++)
+        {
+            int size_poly_id = poly[id].size();
+            for (int jd = 0; jd < poly[id].size(); jd++) {
+                ClipperLib::IntPoint pe, ps, pss, pee;
+                ps = poly[id][jd];
+                pe = poly[id][(jd + 1) % size_poly_id];
+                if (ps.Y == pe.Y)
+                {
+                    int sx;
+                    int partition_size = std::abs((double)(pe.X - ps.X)) / (double) dx + 1;
+                    for(int kd = 0; kd <= partition_size; kd++)
+                    {
+                        sx = (double)(pe.X - ps.X) * kd / partition_size + ps.X;
+                        sample_vertices.push_back(Eigen::Vector2d(sx, ps.Y));
+                    }
+                }
+            }
+        }
     }
 
     void insert_net_into_aet(std::list<EDGE> &net, std::list<EDGE> &aet)
@@ -120,9 +139,23 @@ public:
         return;
     }
 
-    void fill_ate_scanline(std::list<EDGE> &aet, int y, std::vector<Eigen::Vector3d> &sample_vertices)
-    {
 
+
+    void fill_ate_scanline(std::list<EDGE> &aet, int y, std::vector<Eigen::Vector2d> &sample_vertices)
+    {
+        std::list<EDGE>::iterator ait, it0, it1;
+        int dx = settings.mm2int(settings.sample_distance), sx;
+        for(ait = aet.begin(); ait != aet.end();)
+        {
+            it0 = ait++;
+            it1 = ait++;
+            int partition_size = std::abs((double)(it1->xi - it0->xi)) / (double) dx + 1;
+            for(int kd = 0; kd <= partition_size; kd++)
+            {
+                sx = (double)(it1->xi - it0->xi) * kd / partition_size + it0->xi;
+                sample_vertices.push_back(Eigen::Vector2d(sx, y));
+            }
+        }
     }
 
     void remove_non_active_edge_from_aet(std::list<EDGE> &aet, int y)
@@ -152,7 +185,7 @@ public:
         aet.sort(EdgeXiComparator);
     }
 
-    void process_scanline_fill(std::vector< std::list<EDGE> >& slNet, std::vector<Eigen::Vector3d> &sample_vertices, int ymax, int ymin)
+    void process_scanline_fill(std::vector< std::list<EDGE> >& slNet, std::vector<Eigen::Vector2d> &sample_vertices, int ymax, int ymin)
     {
         std::list<EDGE> aet;
         for(int y = ymin; y <= ymax; y++)
