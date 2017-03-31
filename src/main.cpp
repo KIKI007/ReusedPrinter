@@ -294,6 +294,19 @@ void loadModel()
     igl::readOFF(TESTING_MODELS_PATH "/torus.off", V, F);
     NormalizingModel normaler;
     normaler.size_normalize(V);
+//        V.resize(4, 3);®
+//    F.resize(4, 3);
+//    V << 0.0, 0.0, 0.0,
+//         1.0, 0.0, 0.0,
+//         0.0, 1.0, 0.0,
+//         0.0, 0.0, 1.0;
+//    F << 0, 2, 1,
+//         0, 1, 3,
+//         0, 3, 2,
+//         1, 2, 3;
+//    NormalizingModel normaler;
+//    normaler.size_normalize(V);
+
 }
 
 void slicing()
@@ -310,7 +323,8 @@ void show_slice()
     if(layer > slice.number_layer() - 1)
         layer = slice.number_layer() - 1;
     slice.get_intersecting_surface(layer, V, F);
-    if(F.rows() > 3)
+    std::cout << V << F << std::endl;
+    if(V.rows() >= 3)
     {
         viewer.data.clear();
         viewer.data.set_mesh(V, F);
@@ -343,7 +357,7 @@ void series_slicing()
     {
         std::cout <<"id:\t" << id << std::endl;
         slice.get_intersecting_surface(id, V, F);
-        if(F.rows() > 3)
+        if(V.rows() >= 3)
             organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
     }
     Eigen::MatrixXd C;
@@ -361,7 +375,7 @@ void overhang_slicing()
     {
         std::cout <<"id:\t" << id << std::endl;
         overhang_slicer.get_intersecting_surface(id, V, F);
-        if(F.rows() > 3)
+        if(V.rows() >= 3)
             organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
     }
     Eigen::MatrixXd C;
@@ -370,6 +384,17 @@ void overhang_slicing()
     viewer.data.clear();
     viewer.data.set_mesh(V, F);
     return;
+}
+
+void sampling()
+{
+    loadModel();
+    viewer.data.clear();
+    viewer.core.point_size = 5;
+    viewer.data.set_mesh(V, F);
+    Eigen::MatrixXd SP;
+    overhang_slicer.sampling(SP);
+    viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
 }
 
 int main(int argc, char *argv[])
@@ -384,21 +409,13 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("recovery", recover);
         viewer.ngui->addButton("series slicing", series_slicing);
         viewer.ngui->addButton("overhang slicing", overhang_slicing);
+        viewer.ngui->addButton("sampling", sampling);
         viewer.screen->performLayout();
         return false;
     };
 
     viewer.callback_key_down = &key_down;
-//    V.resize(4, 3);
-//    F.resize(4, 3);
-//    V << 0.0, 0.0, 0.0,
-//         1.0, 0.0, 0.0,
-//         0.0, 1.0, 0.0,
-//         0.0, 0.0, 1.0;
-//    F << 0, 2, 1,
-//         0, 1, 3,
-//         0, 3, 2,
-//         1, 2, 3;
+
     //draw();
     viewer.data.set_mesh(V,F);
     viewer.launch();

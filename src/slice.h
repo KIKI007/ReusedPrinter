@@ -143,7 +143,7 @@ void Slice::compute_intersection(int fd, int Y, Eigen::MatrixXi &mat)
     n = (p[1] - p[0]).cross(p[2] - p[0]);
     n /= n.norm();
     dy = Eigen::RowVector3d(0, 1, 0);
-    dq = dy.cross(n);
+    dq = n.cross(dy);
     mat.resize(2, 2);
     if((q[1] - q[0]).dot(dq) > 0)
     {
@@ -225,21 +225,23 @@ void Slice::contour_construction()
                 Eigen::RowVector2i last = S[id][jd].row(0);
                 Eigen::RowVector2i u = S[id][jd].row(0), v;
                 ClipperLib::Path path;
+                bool flag = false;
                 do
                 {
                     int idx;
-                    bool flag = hash.find(u, v, idx);
-                    assert(flag);
+                    flag = hash.find(u, v, idx);
+                    if(!flag) break;
                     //std::cout << u << "," << v << std::endl;
                     path.push_back(ClipperLib::IntPoint(v(0), v(1)));
                     u = v;
                     visited[idx] = true;
                 }while(u != last);
-                paths.push_back(path);
+                if(flag) paths.push_back(path);
             }
         }
         layer_slices[id] = paths;
     }
+
 }
 
 void Slice::get_intersecting_surface(int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2) {
@@ -252,25 +254,30 @@ void Slice::get_intersecting_surface(int layer, Eigen::MatrixXd &V2, Eigen::Matr
     ClipperLib::Paths solution;
     ClipperLib::Clipper clipper;
     clipper.AddPaths(layer_slices[layer], ClipperLib::ptClip, true);
-    clipper.Execute(ClipperLib::ctUnion, solution, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+    clipper.Execute(ClipperLib::ctUnion, solution, ClipperLib::pftPositive, ClipperLib::pftPositive);
 
     std::vector<Eigen::RowVector2i> holes;
     std::vector<Eigen::RowVector2i> vertices;
     std::vector<Eigen::RowVector2i> edges;
 
     int size = 0;
+
     for (size_t id = 0; id < solution.size(); id++) {
-        Eigen::RowVector2i hole(0, 0);
+        Eigen::RowVector2d center(0, 0), hole(0, 0);
         for (size_t jd = 0; jd < solution[id].size(); jd++) {
             Eigen::RowVector2i pt(solution[id][jd].X, solution[id][jd].Y);
             Eigen::RowVector2i edge(size + jd, size + (jd + 1) % solution[id].size());
             vertices.push_back(pt);
             edges.push_back(edge);
-            hole = hole + pt;
+            hole[0] = pt[0];
+            hole[1] = pt[1];
+            center += hole;
         }
+
         if (!ClipperLib::Orientation(solution[id])) {
-            hole = hole / solution[id].size();
-            holes.push_back(hole);
+            center /= solution[id].size();
+            hole = (hole - center) * 0.999f + center;
+            holes.push_back(Eigen::RowVector2i(hole[0], hole[1]));
         }
         size += solution[id].size();
     }

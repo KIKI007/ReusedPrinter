@@ -23,7 +23,7 @@ public:
         layer_height = 0.2;
 
         //sampling
-        sample_distance = 0.2;
+        sample_distance = 2;
 
         //rendering
         maximum_model_heigh = 50; //mm
