@@ -285,13 +285,12 @@ Eigen::MatrixXi F2;
 
 int layer;
 igl::viewer::Viewer viewer;
-Slice slice;
-Slice_Overhang_Detector overhang_slicer;
+Slice_Overhang_Detector slicer;
 
 void loadModel()
 {
     // Load a mesh in OBJ format
-    igl::readOFF(TESTING_MODELS_PATH "/torus.off", V, F);
+    igl::readOFF(TESTING_MODELS_PATH "/arch2.off", V, F);
     NormalizingModel normaler;
     normaler.size_normalize(V);
 //        V.resize(4, 3);®
@@ -311,18 +310,15 @@ void loadModel()
 
 void slicing()
 {
-    slice.set_mesh(V, F);
-    slice.contour_construction();
-
-    overhang_slicer.set_mesh(V, F);
-    overhang_slicer.contour_construction();
+    slicer.set_mesh(V, F);
+    slicer.contour_construction();
 }
 
 void show_slice()
 {
-    if(layer > slice.number_layer() - 1)
-        layer = slice.number_layer() - 1;
-    slice.get_intersecting_surface(layer, V, F);
+    if(layer > slicer.number_layer() - 1)
+        layer = slicer.number_layer() - 1;
+    slicer.get_intersecting_surface(layer, V, F);
     std::cout << V << F << std::endl;
     if(V.rows() >= 3)
     {
@@ -353,10 +349,10 @@ void recover()
 void series_slicing()
 {
     SceneOrganizer organizer;
-    for(int id = 0; id < slice.number_layer(); id+= 5)
+    for(int id = 0; id < slicer.number_layer(); id+= 5)
     {
         std::cout <<"id:\t" << id << std::endl;
-        slice.get_intersecting_surface(id, V, F);
+        slicer.get_intersecting_surface(id, V, F);
         if(V.rows() >= 3)
             organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
     }
@@ -370,11 +366,12 @@ void series_slicing()
 void overhang_slicing()
 {
     SceneOrganizer organizer;
-    overhang_slicer.removing_overlap();
-    for(int id = 0; id < overhang_slicer.number_layer(); id++)
+    std::vector<ClipperLib::Paths> slices;
+    slicer.removing_overlap(slices);
+    for(int id = 0; id < slicer.number_layer(); id++)
     {
         std::cout <<"id:\t" << id << std::endl;
-        overhang_slicer.get_intersecting_surface(id, V, F);
+        slicer.get_intersecting_surface(slices, id, V, F);
         if(V.rows() >= 3)
             organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
     }
@@ -393,7 +390,7 @@ void sampling()
     viewer.core.point_size = 5;
     viewer.data.set_mesh(V, F);
     Eigen::MatrixXd SP;
-    overhang_slicer.sampling(SP);
+    slicer.sampling(SP);
     viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
 }
 

@@ -29,6 +29,7 @@ public:
         maximum_model_heigh = 50; //mm
 
         //support generation
+        overhang_offset = 0.2; //mm
         face_overhang_angle = 50 * PI / 180;
         expected_sample_num = 2000;
         printing_max_angle = 45 * PI / 180;
@@ -94,6 +95,7 @@ public:
     double maximum_model_heigh; //to shrink the model inside the rendering space
 
     //support generation
+    double overhang_offset;
     double face_overhang_angle;
     double expected_sample_num;
     double printing_max_angle;

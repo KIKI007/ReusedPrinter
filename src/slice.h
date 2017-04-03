@@ -40,10 +40,11 @@ protected:
     void build_triangle_list(std::vector<std::vector<int>> &L);
     void compute_intersection(int fd, int Y, Eigen::MatrixXi &mat);
     void incremental_slicing(std::vector< std::vector<Eigen::MatrixXi>> &S);
-
 public:
     void contour_construction();
-    void get_intersecting_surface(int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2);
+    void get_intersecting_surface(std::vector< ClipperLib::Paths> &slices, int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2);
+    void get_intersecting_surface(int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2)
+    { get_intersecting_surface(layer_slices, layer, V2, F2);}
 
 protected:
     Eigen::MatrixXi V;
@@ -141,7 +142,7 @@ void Slice::compute_intersection(int fd, int Y, Eigen::MatrixXi &mat)
     //std::cout << q[0](0) << ", " << q[0](1) << ", " << q[0](2) << std::endl
     //          << q[1](0) << ", " << q[1](1) << ", " << q[1](2) << std::endl;
     n = (p[1] - p[0]).cross(p[2] - p[0]);
-    n /= n.norm();
+    //n /= n.norm();
     dy = Eigen::RowVector3d(0, 1, 0);
     dq = n.cross(dy);
     mat.resize(2, 2);
@@ -207,6 +208,7 @@ void Slice::contour_construction()
     for(int id = 0; id < S.size(); id++)
     {
         std::cout << "slice :" << id << "/" << S.size() << " layer" << std::endl;
+
         ClipperLib::Paths paths;
         visited.clear();
         visited.resize(S[id].size(), false);
@@ -218,8 +220,10 @@ void Slice::contour_construction()
             hash.build_connection(u, v, jd);
         }
 
+
         for (int jd = 0; jd < S[id].size(); jd++)
         {
+
             if(!visited[jd])
             {
                 Eigen::RowVector2i last = S[id][jd].row(0);
@@ -244,16 +248,16 @@ void Slice::contour_construction()
 
 }
 
-void Slice::get_intersecting_surface(int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2) {
+void Slice::get_intersecting_surface(std::vector< ClipperLib::Paths> &slices, int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2) {
 
     assert(!V.isZero());
-    if(layer_slices.empty())
+    if(slices.empty())
         contour_construction();
-    assert(0 <= layer && layer < layer_slices.size());
+    assert(0 <= layer && layer < slices.size());
 
     ClipperLib::Paths solution;
     ClipperLib::Clipper clipper;
-    clipper.AddPaths(layer_slices[layer], ClipperLib::ptClip, true);
+    clipper.AddPaths(slices[layer], ClipperLib::ptClip, true);
     clipper.Execute(ClipperLib::ctUnion, solution, ClipperLib::pftPositive, ClipperLib::pftPositive);
 
     std::vector<Eigen::RowVector2i> holes;

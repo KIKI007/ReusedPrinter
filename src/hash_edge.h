@@ -18,7 +18,7 @@ public:
 
     HashEdge()
     {
-        prime_n = 3001;
+        prime_n = 5003;
         source.resize(prime_n);
         target.resize(prime_n);
         edge.resize(prime_n);
