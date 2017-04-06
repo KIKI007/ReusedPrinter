@@ -21,17 +21,19 @@ bool EdgeXiComparator(EDGE& e1, EDGE& e2)
     return (e1.xi <= e2.xi);
 }
 
+
 class Slice_Overhang_Detector: public Slice
 {
 public:
     Slice_Overhang_Detector():Slice() { }
 
-private:
+protected:
     int num_rows(int ymax, int ymin) {  return (double)(ymax - ymin) / settings.mm2int(settings.sample_distance) + 2; }
     int row_y(int row) { return row * settings.mm2int(settings.sample_distance); }
     int y_rows(int y, int ymax, int ymin);
     double anti_clockwise_angle(Eigen::Vector2d p0, Eigen::Vector2d p1);
-private:
+
+protected:
     void get_bounding_box(ClipperLib::Paths &poly, int &ymax, int &ymin);
     void init_scanline_new_edgetable(std::vector< std::list<EDGE> >& slNet, ClipperLib::Paths &poly, int ymax, int ymin);
     void scanline_polygon_fill(ClipperLib::Paths &poly, std::vector<Eigen::Vector2d> &sample_vertices);
@@ -41,13 +43,13 @@ private:
     void remove_non_active_edge_from_aet(std::list<EDGE> &aet, int y);
     void update_and_resort_aet(std::list<EDGE>& aet, int dy);
     void process_scanline_fill(std::vector< std::list<EDGE> >& slNet, std::vector<Eigen::Vector2d> &sample_vertices, int ymax, int ymin);
-    int  get_winding_number(double x, double y, ClipperLib::Paths poly);
+    bool point_on_polygons_edges(double x, double y, ClipperLib::Paths &poly);
 
 public:
     void removing_overlap(std::vector<ClipperLib::Paths> &slices);
     void sampling(Eigen::MatrixXd &SP);
-
-private:
+    void sampling(std::vector<std::vector<Eigen::Vector2d>> &sample_vertices);
+protected:
 };
 
 int Slice_Overhang_Detector::y_rows(int y, int ymax, int ymin)
@@ -78,8 +80,11 @@ double Slice_Overhang_Detector::anti_clockwise_angle(Eigen::Vector2d p0, Eigen::
     if(p0.norm() < settings.ZERO_EPS || p1.norm() < settings.ZERO_EPS) return 0;
     p0 /= p0.norm();
     p1 /= p1.norm();
-    double sign = p0.x() * p1.y() - p0.y() * p1.x();
-    if(sign > 0)
+
+    double dot = p0.dot(p1);
+    double cross = p0.x() * p1.y() - p0.y() * p1.x();
+    if(-1 > dot || dot > 1) return 0;
+    if(cross > 0)
         return std::acos(p0.dot(p1));
     else
         return -std::acos(p0.dot(p1));
@@ -190,7 +195,7 @@ void Slice_Overhang_Detector::fill_ate_scanline(std::list<EDGE> &aet, int y, std
         for(int kd = 1; kd <= partition_size; kd++)
         {
             sx = (double)(it1->xi - it0->xi) * (double) kd / (double) (partition_size + 1) + it0->xi;
-            sample_vertices.push_back(Eigen::Vector2d(sx, y));
+            sample_vertices.push_back(Eigen::Vector2d(sx * settings.UNIT, y * settings.UNIT));
         }
     }
 }
@@ -242,7 +247,7 @@ void Slice_Overhang_Detector::process_scanline_fill(std::vector< std::list<EDGE>
     }
 }
 
-int Slice_Overhang_Detector::get_winding_number(double x, double y, ClipperLib::Paths poly)
+bool Slice_Overhang_Detector::point_on_polygons_edges(double x, double y, ClipperLib::Paths &poly)
 {
     Eigen::Vector3d center(x, y, 0);
     double wing_angle = 0;
@@ -257,22 +262,21 @@ int Slice_Overhang_Detector::get_winding_number(double x, double y, ClipperLib::
             if((center - p0).norm() < settings.ZERO_EPS || (center - p1).norm() < settings.ZERO_EPS)
                 return 1;
 
-            if((center - p0).cross(center - p1)[2] < settings.ZERO_EPS)
+            if(std::abs((center - p0).cross(center - p1)[2]) < settings.ZERO_EPS)
             {
                 if((center - p0).dot(center - p1) < 0)
-                    return 1;
+                    return true;
             }
         }
     }
 //    std::cout << std::round(wing_angle / (2 * settings.PI)) << std::endl;
 //    return std::round(wing_angle / (2 * settings.PI));
-    return 0;
+    return false;
 }
 
-void Slice_Overhang_Detector::sampling(Eigen::MatrixXd &SP)
+void Slice_Overhang_Detector::sampling(std::vector<std::vector<Eigen::Vector2d>> &sample_vertices)
 {
-    std::vector<Eigen::RowVector3d> sample_vertices;
-
+    sample_vertices.resize(layer_slices.size());
     //inner points which require support
     std::vector<ClipperLib::Paths> overlap_removed_slices;
     removing_overlap(overlap_removed_slices);
@@ -284,7 +288,7 @@ void Slice_Overhang_Detector::sampling(Eigen::MatrixXd &SP)
             std::vector<Eigen::Vector2d> vlist;
             scanline_polygon_fill(poly, vlist);
             for(int kd = 0; kd < vlist.size(); kd++)
-                sample_vertices.push_back(Eigen::RowVector3d(vlist[kd][0] * settings.UNIT,settings.int2mm(P[id]), vlist[kd][1] * settings.UNIT));
+                sample_vertices[id].push_back(vlist[kd]);
         }
     }
 
@@ -332,24 +336,24 @@ void Slice_Overhang_Detector::sampling(Eigen::MatrixXd &SP)
                 for (int kd = 0; kd < intensive_slices[id][jd].size(); kd++)
                 {
                     ClipperLib::IntPoint p0 = intensive_slices[id][jd][kd];
-                    int winding_number = get_winding_number(
+                    if(!point_on_polygons_edges(
                             settings.int2mm(p0.X),
                             settings.int2mm(p0.Y),
                             poly
-                    );
-                    if(winding_number == 0)
+                    ))
                         supported[kd] = true;
                 }
 
                 for (int kd = 0; kd < intensive_slices[id][jd].size(); kd++)
                 {
-                    ClipperLib::IntPoint p0 = intensive_slices[id][jd][kd];
+                    Eigen::Vector2d p0(intensive_slices[id][jd][kd].X * settings.UNIT,
+                                       intensive_slices[id][jd][kd].Y * settings.UNIT);
                     if(supported[kd] == false)
                     {
                         if(supported[(kd + 1) % poly_size] == false
                            && supported[(kd - 1 + poly_size) % poly_size] == false)
                         {
-                            sample_vertices.push_back(Eigen::Vector3d(settings.int2mm(p0.X), settings.int2mm(P[id]), settings.int2mm(p0.Y)));
+                            sample_vertices[id].push_back(p0);
                         }
                     }
                 }
@@ -357,10 +361,32 @@ void Slice_Overhang_Detector::sampling(Eigen::MatrixXd &SP)
         }
     }
 
-    SP.resize(sample_vertices.size(), 3);
-    for(int id = 0; id < sample_vertices.size(); id++)
-        SP.row(id) = sample_vertices[id];
     return;
+}
+
+
+void Slice_Overhang_Detector::sampling(Eigen::MatrixXd &SP)
+{
+    std::vector<std::vector<Eigen::Vector2d>> sample_vertices;
+    sampling(sample_vertices);
+    int size = 0;
+    for(int id = 0; id < sample_vertices.size(); id++)
+    {
+        size += sample_vertices[id].size();
+    }
+
+    SP.resize(size, 3);
+    int kd = 0;
+    for(int id = 0; id < sample_vertices.size(); id++)
+    {
+        for(int jd = 0; jd < sample_vertices[id].size(); jd++)
+        {
+            SP(kd, 0) = sample_vertices[id][jd][0];
+            SP(kd, 1) = settings.int2mm(P[id]);
+            SP(kd, 2) = sample_vertices[id][jd][1];
+            kd++;
+        }
+    }
 }
 
 void Slice_Overhang_Detector::removing_overlap(std::vector<ClipperLib::Paths> &slices)

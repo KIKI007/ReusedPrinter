@@ -26,7 +26,7 @@ public:
         sample_distance = 2;
 
         //rendering
-        maximum_model_heigh = 50; //mm
+        maximum_model_heigh = 40; //mm
 
         //support generation
         overhang_offset = 0.2; //mm
@@ -39,6 +39,9 @@ public:
         pad_thickness = 1.4224; //mm 0.056inch
         pillar_length = 304.8; //mm 12inch
         pillar_radius = 3.175; //mm 0.125 inch
+        pillar_standard_height = 12.7; //mm 0.5inch
+        pillar_row = 9;
+        pillar_column = 11;
     }
 
 public:
@@ -87,6 +90,9 @@ public:
     double pad_thickness;
     double pillar_radius;
     double pillar_length;
+    double pillar_standard_height;
+    int pillar_row;
+    int pillar_column;
 
     //sampling
     double sample_distance;
@@ -99,6 +105,7 @@ public:
     double face_overhang_angle;
     double expected_sample_num;
     double printing_max_angle;
+
 };
 
 #endif //SUPPORTER_SETTINGS_H

@@ -271,6 +271,7 @@
 #include "normalizing_model.h"
 #include "scene_organizer.h"
 #include "slice_overhang_detector.h"
+#include "wall_support_generator.h"
 using namespace ClipperLib;
 using std::cout;
 using std::endl;
@@ -285,7 +286,7 @@ Eigen::MatrixXi F2;
 
 int layer;
 igl::viewer::Viewer viewer;
-Slice_Overhang_Detector slicer;
+Wall_Support_Generator slicer;
 
 void loadModel()
 {
@@ -394,12 +395,158 @@ void sampling()
     viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
 }
 
+void platform_n_mesh()
+{
+    loadModel();
+    viewer.data.clear();
+    SceneOrganizer organizer;
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
+
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
+    Eigen::MatrixXi E;
+    Eigen::MatrixXd SP;
+    slicer.draw_platform(H);
+    slicer.draw_sp(SP);
+    slicer.draw_sp_lines(E);
+
+    std::cout << H << std::endl;
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, H);
+
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+
+    viewer.data.set_colors(C);
+    viewer.core.point_size = 3;
+    viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
+
+    for (int id = 0;id < E.rows(); id++)
+        viewer.data.add_edges(SP.row(E(id, 0)), SP.row(E(id, 1)), Eigen::RowVector3d(1, 0, 0));
+}
+
+void platform()
+{
+    loadModel();
+    viewer.data.clear();
+    SceneOrganizer organizer;
+
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
+    Eigen::MatrixXi E;
+    Eigen::MatrixXd SP;
+    slicer.draw_platform(H);
+    slicer.draw_sp(SP);
+    slicer.draw_sp_lines(E);
+
+    std::cout << H << std::endl;
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, H);
+
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+
+    viewer.data.set_colors(C);
+    viewer.core.point_size = 3;
+    viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
+
+    for (int id = 0;id < E.rows(); id++)
+        viewer.data.add_edges(SP.row(E(id, 0)), SP.row(E(id, 1)), Eigen::RowVector3d(1, 0, 0));
+}
+
+void generating_support()
+{
+    loadModel();
+    viewer.data.clear();
+    SceneOrganizer organizer;
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
+
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
+    Eigen::MatrixXd SP;
+    Eigen::MatrixXi E;
+    slicer.draw_platform(H);
+    slicer.draw_sp(SP);
+    slicer.draw_sp_lines(E);
+    slicer.draw_support(V, F);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 0, 1));
+
+    std::cout << H << std::endl;
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, H);
+
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+
+    viewer.data.set_colors(C);
+    viewer.core.point_size = 3;
+    viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
+
+}
+
+void convex_hull()
+{
+    loadModel();
+    viewer.data.clear();
+    SceneOrganizer organizer;
+    //organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
+
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
+    Eigen::MatrixXd SP;
+    std::vector<std::vector<int>> convex;
+    slicer.draw_platform(H);
+    slicer.draw_sp(SP);
+    slicer.convex_hull(convex);
+
+    std::cout << H << std::endl;
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, H);
+
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+
+    viewer.data.set_colors(C);
+    viewer.core.point_size = 3;
+    viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
+
+    for(int id = 0; id < convex.size(); id++)
+    {
+        for(int jd = 0; jd < convex[id].size(); jd++)
+        {
+            viewer.core.line_width = 2;
+            viewer.data.add_edges(
+                    SP.row(convex[id][jd] + slicer.get_num_vertices_before(id)),
+                    SP.row(convex[id][(jd + 1) % convex[id].size()] + slicer.get_num_vertices_before(id)),
+                    Eigen::RowVector3d(0, 1, 0));
+        }
+    }
+}
+
+
 int main(int argc, char *argv[])
 {
     loadModel();
     slicing();
     viewer.callback_init = [&](igl::viewer::Viewer& viewer)
     {
+        viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Sampling Control");
         viewer.ngui->addGroup("Slicing Settings");
         viewer.ngui->addVariable("layer", layer);
         viewer.ngui->addButton("slice", show_slice);
@@ -407,6 +554,12 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("series slicing", series_slicing);
         viewer.ngui->addButton("overhang slicing", overhang_slicing);
         viewer.ngui->addButton("sampling", sampling);
+
+        viewer.ngui->addWindow(Eigen::Vector2i(400,10),"Support Generation");
+        viewer.ngui->addButton("platform & mesh", platform_n_mesh);
+        viewer.ngui->addButton("platform", platform);
+        viewer.ngui->addButton("support", generating_support);
+        viewer.ngui->addButton("convex hull", convex_hull);
         viewer.screen->performLayout();
         return false;
     };

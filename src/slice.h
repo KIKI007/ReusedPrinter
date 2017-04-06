@@ -12,6 +12,9 @@
 #include "clipper.hpp"
 #include "settings.h"
 #include "hash_edge.h"
+
+
+
 class EdgeHash;
 class Slice
 {
@@ -28,7 +31,6 @@ public:
     }
 
 public:
-
     void set_mesh(Eigen::MatrixXd &in_V, Eigen::MatrixXi &in_F);
     void set_layer_height();
     bool check_polygon(ClipperLib::Path poly);
