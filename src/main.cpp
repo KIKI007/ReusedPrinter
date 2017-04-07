@@ -525,12 +525,12 @@ void convex_hull()
     viewer.data.set_colors(C);
     viewer.core.point_size = 3;
     viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
+    viewer.core.line_width = 2;
 
     for(int id = 0; id < convex.size(); id++)
     {
         for(int jd = 0; jd < convex[id].size(); jd++)
         {
-            viewer.core.line_width = 2;
             viewer.data.add_edges(
                     SP.row(convex[id][jd] + slicer.get_num_vertices_before(id)),
                     SP.row(convex[id][(jd + 1) % convex[id].size()] + slicer.get_num_vertices_before(id)),
@@ -539,6 +539,38 @@ void convex_hull()
     }
 }
 
+void level_set()
+{
+    loadModel();
+    viewer.data.clear();
+    SceneOrganizer organizer;
+    std::vector<Fermat_Level_Set> fermat;
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
+    slicer.level_set(fermat);
+    slicer.draw_platform(H);
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, H);
+
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
+    for(int id = 0; id < fermat.size(); id++)
+        for(int jd = 0; jd < fermat[id].num_level(); jd++)
+        {
+            std::vector<FermatEdge> polygon;
+            fermat[id].get_level(polygon, jd);
+            for(int kd = 0; kd < polygon.size(); kd++)
+            viewer.data.add_edges(
+                    polygon[kd].P0(),
+                    polygon[kd].P1(),
+                    Eigen::RowVector3d(0, 1, 0));
+        }
+}
 
 int main(int argc, char *argv[])
 {
@@ -560,6 +592,7 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("platform", platform);
         viewer.ngui->addButton("support", generating_support);
         viewer.ngui->addButton("convex hull", convex_hull);
+        viewer.ngui->addButton("level set", level_set);
         viewer.screen->performLayout();
         return false;
     };

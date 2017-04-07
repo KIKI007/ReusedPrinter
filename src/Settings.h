@@ -30,6 +30,10 @@ public:
 
         //support generation
         overhang_offset = 0.2; //mm
+        support_width = 0.5; //mm
+        support_center_area = 0.25; //mm
+        fermat_cut_width = 0.5; //mm
+
         face_overhang_angle = 50 * PI / 180;
         expected_sample_num = 2000;
         printing_max_angle = 45 * PI / 180;
@@ -102,9 +106,14 @@ public:
 
     //support generation
     double overhang_offset;
+    double support_width;
+    double support_center_area;
+    double fermat_cut_width;
+
     double face_overhang_angle;
     double expected_sample_num;
     double printing_max_angle;
+
 
 };
 

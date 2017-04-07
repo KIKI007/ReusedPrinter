@@ -6,6 +6,7 @@
 #define SUPPORTER_WALL_SUPPORT_GENERATOR_H
 
 #include "slice_overhang_detector.h"
+#include "fermat_spirals.h"
 #include <algorithm>
 typedef struct tagSprtPoint
 {
@@ -13,28 +14,6 @@ typedef struct tagSprtPoint
     int layer;
     int idx;
 }SprtPoint;
-
-typedef struct tagFermatEdge
-{
-    //edge is in clockwise
-public:
-    tagFermatEdge(ClipperLib::IntPoint in_p0, ClipperLib::IntPoint in_p1)
-    {
-        p0 = Eigen::Vector2d(settings.int2mm(in_p0.X), settings.int2mm(in_p0.Y));
-        p1 = Eigen::Vector2d(settings.int2mm(in_p1.X), settings.int2mm(in_p1.Y));
-    }
-
-public:
-
-    bool on(Eigen::Vector2d p)
-    {
-        double cross = (p - p0)[0] * (p - p1)[1] - (p - p0)[1] * (p - p1)[0];
-        return true;
-    }
-public:
-    Eigen::Vector2d p0, p1;
-    Settings settings;
-}FermatEdge;
 
 bool SprtXiComparatorIncrease(SprtPoint& p1, SprtPoint& p2)
 {
@@ -87,15 +66,15 @@ public:
     void draw_support(Eigen::MatrixXd &V, Eigen::MatrixXi &F);
 
     void convex_hull(std::vector< std::vector< int>> &convex_polys);
-
+    void level_set( std::vector< Fermat_Level_Set> &fermat);
 private:
+
     void projecting_sp_into_pin();
     void setup_platform();
     bool turnLeft(Eigen::Vector2d pA, Eigen::Vector2d pB, Eigen::Vector2d pt);
     void connecting_points(std::list<SprtPoint> &sprt);
 
 private:
-
     std::vector<int> num_vertices_before;
     Eigen::MatrixXd platform;
     int valid_sp_size;
@@ -157,7 +136,7 @@ void Wall_Support_Generator::convex_hull(std::vector<std::vector<int>> &convex_p
         {
 
             int pin_id = row * settings.pillar_column + col;
-            if(sp_pin[pin_id].size() <= 1) continue;
+            if(sp_pin[pin_id].size() <= 2) continue;
 
             std::vector<SprtPoint> sprt_list;
             for(int sp_id = 0; sp_id < sp_pin[pin_id].size(); sp_id++)
@@ -211,6 +190,34 @@ void Wall_Support_Generator::convex_hull(std::vector<std::vector<int>> &convex_p
             for(int id = 0; id < stack.size(); id++)
                 convex_polys[pin_id].push_back(sprt_list[stack[id]].idx);
         }
+    }
+
+    return;
+}
+
+void Wall_Support_Generator::level_set( std::vector<Fermat_Level_Set> &fermat)
+{
+    if(sp_pin.empty())
+        setup_platform();
+
+    std::vector<std::vector<int>> convex_polys;
+    convex_hull(convex_polys);
+    //fermat.resize(convex_polys.size());
+
+    for(int pin_id = 0; pin_id < convex_polys.size(); pin_id++)
+    {
+        ClipperLib::Path outside;
+        for(int id = 0; id < convex_polys[pin_id].size(); id++)
+        {
+            int p0_id = convex_polys[pin_id][id];
+            outside.push_back(ClipperLib::IntPoint(settings.mm2int(sp_pin[pin_id][p0_id].x()),
+                                                 settings.mm2int(sp_pin[pin_id][p0_id].y())));
+        }
+
+        fermat.push_back(
+                Fermat_Level_Set(outside, platform(pin_id / settings.pillar_column, pin_id % settings.pillar_column))
+        );
+
     }
 
     return;
