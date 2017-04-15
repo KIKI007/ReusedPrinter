@@ -291,7 +291,7 @@ Wall_Support_Generator slicer;
 void loadModel()
 {
     // Load a mesh in OBJ format
-    igl::readOFF(TESTING_MODELS_PATH "/arch2.off", V, F);
+    igl::readOFF(TESTING_MODELS_PATH "/arch.off", V, F);
     NormalizingModel normaler;
     normaler.size_normalize(V);
 //        V.resize(4, 3);®
@@ -572,6 +572,37 @@ void level_set()
         }
 }
 
+void fermat_spiral()
+{
+    loadModel();
+    viewer.data.clear();
+    SceneOrganizer organizer;
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
+    std::list< FermatEdge> path;
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
+    slicer.fermat_spiral(path);
+    slicer.draw_platform(H);
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, H);
+
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
+
+    for(std::list<FermatEdge>::iterator it = path.begin(); it != path.end(); ++it)
+    {
+        viewer.data.add_edges(
+                it->P0(),
+                it->P1(),
+                Eigen::RowVector3d(0.5, 0.5, 0));
+    }
+}
+
 int main(int argc, char *argv[])
 {
     loadModel();
@@ -593,6 +624,7 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("support", generating_support);
         viewer.ngui->addButton("convex hull", convex_hull);
         viewer.ngui->addButton("level set", level_set);
+        viewer.ngui->addButton("fermat", fermat_spiral);
         viewer.screen->performLayout();
         return false;
     };

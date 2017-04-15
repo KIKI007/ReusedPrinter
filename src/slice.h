@@ -209,7 +209,7 @@ void Slice::contour_construction()
     layer_slices.resize(S.size());
     for(int id = 0; id < S.size(); id++)
     {
-        std::cout << "slice :" << id << "/" << S.size() << " layer" << std::endl;
+        std::cout << "slice :" << id << "/" << S.size() << " layer: " << S[id].size() << std::endl;
 
         ClipperLib::Paths paths;
         visited.clear();
