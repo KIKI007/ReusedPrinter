@@ -320,7 +320,7 @@ void show_slice()
     if(layer > slicer.number_layer() - 1)
         layer = slicer.number_layer() - 1;
     slicer.get_intersecting_surface(layer, V, F);
-    std::cout << V << F << std::endl;
+//    std::cout << V << F << std::endl;
     if(V.rows() >= 3)
     {
         viewer.data.clear();
@@ -352,7 +352,6 @@ void series_slicing()
     SceneOrganizer organizer;
     for(int id = 0; id < slicer.number_layer(); id+= 5)
     {
-        std::cout <<"id:\t" << id << std::endl;
         slicer.get_intersecting_surface(id, V, F);
         if(V.rows() >= 3)
             organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
@@ -371,14 +370,12 @@ void overhang_slicing()
     slicer.removing_overlap(slices);
     for(int id = 0; id < slicer.number_layer(); id++)
     {
-        std::cout <<"id:\t" << id << std::endl;
         slicer.get_intersecting_surface(slices, id, V, F);
         if(V.rows() >= 3)
             organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
     }
     Eigen::MatrixXd C;
     organizer.get_mesh(V, F, C);
-    std::cout << V.rows() << ", " << F.rows() << std::endl;
     viewer.data.clear();
     viewer.data.set_mesh(V, F);
     return;
@@ -408,8 +405,6 @@ void platform_n_mesh()
     slicer.draw_platform(H);
     slicer.draw_sp(SP);
     slicer.draw_sp_lines(E);
-
-    std::cout << H << std::endl;
 
     GeneratingPlatform platform_builder;
     platform_builder.draw_platform(V, F, H);
@@ -442,8 +437,6 @@ void platform()
     slicer.draw_sp(SP);
     slicer.draw_sp_lines(E);
 
-    std::cout << H << std::endl;
-
     GeneratingPlatform platform_builder;
     platform_builder.draw_platform(V, F, H);
 
@@ -458,8 +451,8 @@ void platform()
     viewer.core.point_size = 3;
     viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
 
-    for (int id = 0;id < E.rows(); id++)
-        viewer.data.add_edges(SP.row(E(id, 0)), SP.row(E(id, 1)), Eigen::RowVector3d(1, 0, 0));
+//    for (int id = 0;id < E.rows(); id++)
+//        viewer.data.add_edges(SP.row(E(id, 0)), SP.row(E(id, 1)), Eigen::RowVector3d(1, 0, 0));
 }
 
 void generating_support()
@@ -477,8 +470,6 @@ void generating_support()
     slicer.draw_sp_lines(E);
     slicer.draw_support(V, F);
     organizer.add_mesh(V, F, Eigen::RowVector3d(1, 0, 1));
-
-    std::cout << H << std::endl;
 
     GeneratingPlatform platform_builder;
     platform_builder.draw_platform(V, F, H);
@@ -509,8 +500,6 @@ void convex_hull()
     slicer.draw_platform(H);
     slicer.draw_sp(SP);
     slicer.convex_hull(convex);
-
-    std::cout << H << std::endl;
 
     GeneratingPlatform platform_builder;
     platform_builder.draw_platform(V, F, H);
@@ -577,16 +566,16 @@ void fermat_spiral()
     loadModel();
     viewer.data.clear();
     SceneOrganizer organizer;
-    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-    std::list< FermatEdge> path;
+    //organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
+    std::vector<std::list<FermatEdge>> path_layer;
     Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
-    slicer.fermat_spiral(path);
+    slicer.fermat_spiral(path_layer);
     slicer.draw_platform(H);
 
     GeneratingPlatform platform_builder;
     platform_builder.draw_platform(V, F, H);
 
-    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+    organizer.add_mesh(V, F, Eigen::RowVector3d(204.0f/255, 204.0/255 ,255.0f/255));
 
     Eigen::MatrixXd C;
     organizer.get_mesh(V, F, C);
@@ -594,13 +583,18 @@ void fermat_spiral()
     viewer.data.set_mesh(V, F);
     viewer.data.set_colors(C);
 
-    for(std::list<FermatEdge>::iterator it = path.begin(); it != path.end(); ++it)
+    for(int id = 0; id < slicer.number_layer(); id+= 2)
     {
-        viewer.data.add_edges(
-                it->P0(),
-                it->P1(),
-                Eigen::RowVector3d(0.5, 0.5, 0));
+        std::list<FermatEdge> path = path_layer[id];
+        for(std::list<FermatEdge>::iterator it = path.begin(); it != path.end(); ++it)
+        {
+            viewer.data.add_edges(
+                    it->P0(),
+                    it->P1(),
+                    Eigen::RowVector3d(1, 0, 0));
+        }
     }
+
 }
 
 int main(int argc, char *argv[])

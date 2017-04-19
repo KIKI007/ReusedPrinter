@@ -93,7 +93,7 @@ double Slice_Overhang_Detector::anti_clockwise_angle(Eigen::Vector2d p0, Eigen::
 
 void Slice_Overhang_Detector::init_scanline_new_edgetable(std::vector< std::list<EDGE> >& slNet, ClipperLib::Paths &poly, int ymax, int ymin)
 {
-    std::cout << num_rows(ymax, ymin) << std::endl;
+
     slNet.resize(num_rows(ymax, ymin));
     for(int id = 0; id < poly.size(); id++)
     {
@@ -134,12 +134,10 @@ void Slice_Overhang_Detector::init_scanline_new_edgetable(std::vector< std::list
 void Slice_Overhang_Detector::scanline_polygon_fill(ClipperLib::Paths &poly, std::vector<Eigen::Vector2d> &sample_vertices)
 {
     assert(!poly.empty());
-
     int ymin, ymax;
     get_bounding_box(poly, ymax, ymin);
     std::vector< std::list<EDGE>> slNet;
     init_scanline_new_edgetable(slNet, poly, ymax, ymin);
-    //polygon_edge_fill(poly, sample_vertices);
     process_scanline_fill(slNet, sample_vertices ,ymax, ymin);
 }
 
@@ -195,7 +193,9 @@ void Slice_Overhang_Detector::fill_ate_scanline(std::list<EDGE> &aet, int y, std
         for(int kd = 1; kd <= partition_size; kd++)
         {
             sx = (double)(it1->xi - it0->xi) * (double) kd / (double) (partition_size + 1) + it0->xi;
-            sample_vertices.push_back(Eigen::Vector2d(sx * settings.UNIT, y * settings.UNIT));
+            sample_vertices.push_back(Eigen::Vector2d(
+                    settings.int2mm(sx),
+                    settings.int2mm(y)));
         }
     }
 }
@@ -234,15 +234,9 @@ void Slice_Overhang_Detector::process_scanline_fill(std::vector< std::list<EDGE>
     int dy = settings.mm2int(settings.sample_distance);
     for(int y = ymin; y < ymax; y += dy)
     {
-        std::cout << "y, " << y << std::endl;
-        std::cout << "insert" << std::endl;
         insert_net_into_aet(slNet[y_rows(y, ymax, ymin)], aet, y);
         remove_non_active_edge_from_aet(aet, y);
-        std::cout << "fill" << std::endl;
-        if(y != ymin)
-            fill_ate_scanline(aet, y, sample_vertices);
-        std::cout << "remove" << std::endl;
-        std::cout << "resort" << std::endl;
+        if(y != ymin) fill_ate_scanline(aet, y, sample_vertices);
         update_and_resort_aet(aet, dy);
     }
 }
@@ -277,6 +271,7 @@ bool Slice_Overhang_Detector::point_on_polygons_edges(double x, double y, Clippe
 void Slice_Overhang_Detector::sampling(std::vector<std::vector<Eigen::Vector2d>> &sample_vertices)
 {
     sample_vertices.resize(layer_slices.size());
+
     //inner points which require support
     std::vector<ClipperLib::Paths> overlap_removed_slices;
     removing_overlap(overlap_removed_slices);
@@ -346,8 +341,8 @@ void Slice_Overhang_Detector::sampling(std::vector<std::vector<Eigen::Vector2d>>
 
                 for (int kd = 0; kd < intensive_slices[id][jd].size(); kd++)
                 {
-                    Eigen::Vector2d p0(intensive_slices[id][jd][kd].X * settings.UNIT,
-                                       intensive_slices[id][jd][kd].Y * settings.UNIT);
+                    Eigen::Vector2d p0( settings.int2mm(intensive_slices[id][jd][kd].X) ,
+                                        settings.int2mm(intensive_slices[id][jd][kd].Y));
                     if(supported[kd] == false)
                     {
                         if(supported[(kd + 1) % poly_size] == false
@@ -369,6 +364,7 @@ void Slice_Overhang_Detector::sampling(Eigen::MatrixXd &SP)
 {
     std::vector<std::vector<Eigen::Vector2d>> sample_vertices;
     sampling(sample_vertices);
+
     int size = 0;
     for(int id = 0; id < sample_vertices.size(); id++)
     {
@@ -399,8 +395,15 @@ void Slice_Overhang_Detector::removing_overlap(std::vector<ClipperLib::Paths> &s
     slices.clear();
     slices.resize(layer_slices.size());
 
+    settings.print_N();
+    settings.print_TsN("REMOVE OVERLAP");
+
     for(int id = 1; id < layer_slices.size(); id++)
     {
+        memset(settings.tmp_str, 0, sizeof(settings.tmp_str));
+        sprintf(settings.tmp_str, "\t layer %d, total %.3f %%...",id,  100.0f * (double)(id) / (layer_slices.size() - 2));
+        settings.print_Ts(settings.tmp_str);
+
         ClipperLib::Clipper clipper;
         ClipperLib::ClipperOffset co;
         ClipperLib::Paths upper = layer_slices[id], lower = layer_slices[id - 1];
@@ -415,6 +418,8 @@ void Slice_Overhang_Detector::removing_overlap(std::vector<ClipperLib::Paths> &s
         clipper.Execute(ClipperLib::ctDifference, slices[id], ClipperLib::pftPositive, ClipperLib::pftPositive);
 
         ClipperLib::SimplifyPolygons(slices[id]);
+
+        settings.print_TsN("done");
     }
 
     slices[0].clear();

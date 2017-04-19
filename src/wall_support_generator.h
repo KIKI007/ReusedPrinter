@@ -8,6 +8,7 @@
 #include "slice_overhang_detector.h"
 #include "fermat_spirals.h"
 #include <algorithm>
+#include <queue>
 
 typedef struct tagSprtPoint
 {
@@ -15,6 +16,17 @@ typedef struct tagSprtPoint
     int layer;
     int idx;
 }SprtPoint;
+
+typedef struct tagHeightMapNode
+{
+    int X;
+    int Y;
+    int Xsize;
+    int Ysize;
+    int layer;
+    bool new_layer;
+    ClipperLib::Paths polys;
+}HeightMapNode;
 
 bool MSTGraphNodeComparator(MSTGraphNode &n0, MSTGraphNode &n1)
 {
@@ -75,13 +87,14 @@ public:
     void draw_sp_lines(Eigen::MatrixXi &E);
     void draw_support(Eigen::MatrixXd &V, Eigen::MatrixXi &F);
 
+public:
+
     void convex_hull(std::vector< std::vector< int>> &convex_polys);
     void level_set(std::vector< Fermat_Level_Set> &fermat);
 
-    void fermat_spiral( std::list<FermatEdge> &path);
+    void fermat_spiral( std::vector<std::list<FermatEdge>> &path_layer);
     void minimum_spanning_tree(std::vector< Fermat_Level_Set> &fermat,
-                               std::vector< std::vector<MSTGraphNode>> &T,
-                               std::vector<int> &roots);
+                               std::vector< std::vector<MSTGraphNode>> &T);
 
     void fermat_spiral(std::vector< Fermat_Level_Set> &fermat,
                        std::vector< std::vector<MSTGraphNode>> &T,
@@ -89,6 +102,17 @@ public:
                        int e,
                        double t,
                        std::list<FermatEdge> &path);
+
+    void convert_path_clipper(ClipperLib::Paths &clipper ,std::list<FermatEdge> &fermat);
+    void convert_clipper_path(ClipperLib::Paths &clipper ,std::list<FermatEdge> &fermat, int layer);
+    void clipper_path(ClipperLib::Paths &support, int layer);
+
+
+    void mesh_height_map(Eigen::MatrixXd &hmap, Eigen::MatrixXi &smap);
+
+public:
+
+
 private:
 
     void reverse(std::list< FermatEdge> &path);
@@ -98,6 +122,9 @@ private:
     void setup_platform();
     bool turnLeft(Eigen::Vector2d pA, Eigen::Vector2d pB, Eigen::Vector2d pt);
     void connecting_points(std::list<SprtPoint> &sprt);
+    void find_tree_roots(std::vector<bool> &pin_visited,
+                         std::vector< std::vector<MSTGraphNode>> &T,
+                         std::vector<int> &roots);
 
 private:
     std::vector<int> num_vertices_before;
@@ -162,12 +189,81 @@ bool Wall_Support_Generator::point_in_polygons(Eigen::Vector2d p0, ClipperLib::P
     return false;
 }
 
-//void Wall_Support_Generator::fermat_spiral(std::vector< Fermat_Level_Set> &fermat,
-//                   std::vector< std::vector<MSTGraphNode>> &T,
-//                   int u,
-//                   int e,
-//                   int t,
-//                   std::list<FermatEdge> &path);
+void Wall_Support_Generator::find_tree_roots(std::vector<bool> &pin_visited,
+                     std::vector< std::vector<MSTGraphNode>> &T,
+                     std::vector<int> &roots)
+{
+    std::vector<bool> is_roots;
+    is_roots = pin_visited;
+
+    for(int id = 0; id < T.size(); id++)
+    {
+        for(int jd = 0; jd < T[id].size(); jd++)
+        {
+            is_roots[T[id][jd].x] = false;
+        }
+    }
+
+    for(int id = 0; id < T.size(); id++)
+    {
+        if(is_roots[id]) roots.push_back(id);
+    }
+
+    return;
+}
+
+void Wall_Support_Generator::convert_path_clipper(ClipperLib::Paths &clipper ,std::list<FermatEdge> &fermat)
+{
+    clipper.clear();
+    ClipperLib::Path support;
+    std::list<FermatEdge>::iterator it;
+    for(it = fermat.begin(); it != fermat.end(); it++)
+        support.push_back(ClipperLib::IntPoint(settings.mm2int(it->p0.x()), settings.mm2int(it->p0.y())));
+    support.push_back(ClipperLib::IntPoint(settings.mm2int(fermat.back().p1.x()), settings.mm2int(fermat.back().p1.y())));
+    clipper.push_back(support);
+    return;
+}
+
+void Wall_Support_Generator::convert_clipper_path(ClipperLib::Paths &clipper ,std::list<FermatEdge> &fermat, int layer)
+{
+    fermat.clear();
+    for(int id = 0; id < clipper.size(); id++) {
+        for (int jd = 1; jd < clipper[id].size(); jd++) {
+            FermatEdge fe;
+            fe.p0 = Eigen::Vector2d(settings.int2mm(clipper[id][jd - 1].X),
+                                    settings.int2mm(clipper[id][jd - 1].Y));
+            fe.p1 = Eigen::Vector2d(settings.int2mm(clipper[id][jd].X),
+                                    settings.int2mm(clipper[id][jd].Y));
+            fe.yh = settings.int2mm(P[layer]);
+            fermat.push_back(fe);
+        }
+    }
+}
+
+void Wall_Support_Generator::clipper_path(ClipperLib::Paths &support, int layer)
+{
+
+    ClipperLib::Paths mesh;
+    mesh = layer_slices[layer];
+
+    ClipperLib::Clipper clipper;
+    ClipperLib::ClipperOffset co;
+    co.AddPaths(mesh, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+    co.Execute(mesh, settings.mm2int(settings.overhang_offset));
+    ClipperLib::SimplifyPolygons(mesh);
+
+    clipper.AddPaths(support, ClipperLib::ptSubject, false);
+    clipper.AddPaths(mesh, ClipperLib::ptClip, true);
+
+    ClipperLib::PolyTree polytree;
+    clipper.Execute(ClipperLib::ctDifference, polytree, ClipperLib::pftPositive, ClipperLib::pftPositive);
+
+    ClipperLib::Paths solution;
+    ClipperLib::OpenPathsFromPolyTree(polytree, solution);
+
+    support = solution;
+    return;
+}
 
 void Wall_Support_Generator::fermat_spiral(std::vector< Fermat_Level_Set> &fermat,
                                            std::vector< std::vector<MSTGraphNode>> &T,
@@ -191,14 +287,21 @@ void Wall_Support_Generator::fermat_spiral(std::vector< Fermat_Level_Set> &ferma
        for(int id = 0; id < T[u].size(); id++)
            child.push_back(T[u][id]);
 
-       std::sort(child.begin(), child.end(), MSTGraphNodeComparator);
-
-       std::vector< std::list< FermatEdge>> path_cuts;
-
        if(is_root)
            fermat[u].anticlockwise(0, child[0].e1, child[0].t1, settings.fermat_cut_width * 2, e, t);
 
+       for(int id = 0; id < child.size(); id++) {
+           child[id].e1 = (child[id].e1 - e + fermat[u].num_level_id(0)) % fermat[u].num_level_id(0);
+       }
+
+       std::sort(child.begin(), child.end(), MSTGraphNodeComparator);
+
+       for(int id = 0; id < child.size(); id++)
+           child[id].e1  = (child[id].e1 + e) % fermat[u].num_level_id(0);
+
+       std::vector< std::list< FermatEdge>> path_cuts;
        fermat[u].fermat_spiral(e, t, path_cuts, child);
+
        for(int id = 0; id < child.size(); id++)
        {
            connect(path, path_cuts[id]);
@@ -211,7 +314,7 @@ void Wall_Support_Generator::fermat_spiral(std::vector< Fermat_Level_Set> &ferma
    }
 }
 
-void Wall_Support_Generator::fermat_spiral(std::list<FermatEdge> &path)
+void Wall_Support_Generator::fermat_spiral(std::vector<std::list<FermatEdge>> &path_layer)
 {
     if(sp_pin.empty())
         setup_platform();
@@ -219,7 +322,8 @@ void Wall_Support_Generator::fermat_spiral(std::list<FermatEdge> &path)
     std::vector<Fermat_Level_Set> fermat;
     level_set(fermat);
 
-//    Fermat_Level_Set squre0, squre1, squre2;
+    //testing code
+//    Fermat_Level_Set squre0, squre1, squre2, squre3;
 //
 //    ClipperLib::Path outer0;
 //    outer0.push_back(ClipperLib::IntPoint(0, 0));
@@ -242,46 +346,121 @@ void Wall_Support_Generator::fermat_spiral(std::list<FermatEdge> &path)
 //    outer2.push_back(ClipperLib::IntPoint(40000, 0));
 //    squre2 = Fermat_Level_Set(outer2, 0);
 //
+//    ClipperLib::Path outer3;
+//    outer3.push_back(ClipperLib::IntPoint(15000, 15000));
+//    outer3.push_back(ClipperLib::IntPoint(15000, 25000));
+//    outer3.push_back(ClipperLib::IntPoint(25000, 25000));
+//    outer3.push_back(ClipperLib::IntPoint(25000, 15000));
+//    squre3 = Fermat_Level_Set(outer3, 0);
+//
 //    fermat.push_back(squre0);
 //    fermat.push_back(squre1);
 //    fermat.push_back(squre2);
-
-
-//    for(int id = 0; id < fermat.size(); id++)
-//    {
-//        if(fermat[id].num_level() != 0)
-//        {
-//            std::cout << "fermat :" << id << std::endl;
-//            std::list<FermatEdge> present_path;
-//            fermat[id].fermat_spiral(0, 0.5, present_path);
-//            path.insert(path.end(), present_path.begin(), present_path.end());
-//        }
-//    }
+//    fermat.push_back(squre3);
+    //testing code
 
     std::vector< std::vector<MSTGraphNode>> T;
-    std::vector<int> roots;
-    minimum_spanning_tree(fermat, T, roots);
+    minimum_spanning_tree(fermat, T);
 
-//    T.resize(3);
-//
+    //testing code
+//    T.resize(4);
 //    MSTGraphNode node;
-//    squre0.closest(squre1, node.e1, node.t1, node.e2, node.t2);
+//    roots.push_back(1);
 //
-//    node.x = 1;
-//    T[0].push_back(node);
-//    roots.push_back(0);
+//    squre1.closest(squre0, node.e1, node.t1, node.e2, node.t2);
+//    node.x = 0;
+//    T[1].push_back(node);
 //
 //    squre1.closest(squre2, node.e1, node.t1, node.e2, node.t2);
 //    node.x = 2;
 //    T[1].push_back(node);
+//
+//    squre1.closest(squre3, node.e1, node.t1, node.e2, node.t2);
+//    node.x = 3;
+//    T[1].push_back(node);
+    //testing code
 
-    for(int id = 0; id < roots.size(); id++)
+
+    std::vector<ClipperLib::Paths> clipper_layer;
+    std::list<FermatEdge>::iterator it;
+    path_layer.resize(number_layer());
+
+    settings.print_N();
+    settings.print_TsN("WALL SUPPORT");
+
+    for(int layer_id = 1; layer_id < number_layer(); layer_id++)
     {
-        std::list<FermatEdge> present_path;
-        fermat_spiral(fermat, T, roots[id], -1, -1, present_path);
-        path.insert(path.end(), present_path.begin(), present_path.end());
-    }
+        memset(settings.tmp_str, 0, sizeof(settings.tmp_str));
+        sprintf(settings.tmp_str, "\t layer %d, total %.3f %%...", layer_id,  100.0f * (double)(layer_id) / (layer_slices.size() - 2));
+        settings.print_Ts(settings.tmp_str);
 
+        //a vector for all the pin's height below P[layer_id]
+        std::vector<bool> pin_below_layer;
+        pin_below_layer.resize(settings.pillar_column * settings.pillar_row, false);
+
+        //if there is a new pin which height is below P[layer_id], the pattern will be changed.
+        bool fermat_pattern_change = false;
+
+        for(int pin_id = 0; pin_id < settings.pillar_column * settings.pillar_row; pin_id++)
+        {
+            int row = pin_id / settings.pillar_column;
+            int column = pin_id % settings.pillar_column;
+            if(platform(row, column) < settings.int2mm(P[layer_id]) && platform(row, column) > 0)
+            {
+                pin_below_layer[pin_id] = true;
+                if(platform(row, column) >= settings.int2mm(P[layer_id - 1]))
+                    fermat_pattern_change = true;
+            }
+
+        }
+
+        if(fermat_pattern_change)
+        {
+
+            std::vector<int> roots;
+            std::vector< std::vector<MSTGraphNode>> T_layer;
+
+            T_layer.resize(T.size());
+            for(int id = 0; id < T.size(); id++) {
+                if(!pin_below_layer[id]) continue;
+                for (int jd = 0; jd < T[id].size(); jd++) {
+                    if(pin_below_layer[T[id][jd].x])
+                    {
+                        T_layer[id].push_back(T[id][jd]);
+                    }
+                }
+            }
+
+            clipper_layer.clear();
+            find_tree_roots(pin_below_layer, T_layer, roots);
+            for(int id = 0; id < roots.size(); id++)
+            {
+                std::list<FermatEdge> subtree_path;
+                fermat_spiral(fermat, T_layer, roots[id], -1, -1, subtree_path);
+
+                ClipperLib::Paths subtree_clipper;
+                convert_path_clipper(subtree_clipper, subtree_path);
+                clipper_path(subtree_clipper, layer_id);
+                clipper_layer.push_back(subtree_clipper);
+            }
+        }
+        else
+        {
+            //if the fermat pattern didn't change,
+            // the previous layer's fermal spiral has to subtract the new layer's slice polygons
+            for(int id = 0; id < clipper_layer.size(); id++)
+                if(clipper_layer[id].size() > 0)
+                    clipper_path(clipper_layer[id], layer_id);
+        }
+
+        for(int id = 0; id < clipper_layer.size(); id++)
+            if(clipper_layer[id].size() > 0)
+            {
+                std::list<FermatEdge> subtree_path;
+                convert_clipper_path(clipper_layer[id], subtree_path, layer_id);
+                path_layer[layer_id].insert(path_layer[layer_id].end(), subtree_path.begin(), subtree_path.end());
+            }
+    }
     return;
 }
 
@@ -311,18 +490,10 @@ void Wall_Support_Generator::convex_hull(std::vector<std::vector<int>> &convex_p
                 sprt_list.push_back(sprt);
             }
 
-//            for(int id = 0; id < sprt_list.size(); id++)
-//            {
-//                std::cout << sprt_list[id].pt[0] << ", " << sprt_list[id].pt[1]  << std::endl;
-//            }
-
             std::sort(sprt_list.begin(), sprt_list.end(), SprtYiComparatorIncrease);
 
             for(int id = 1; id < sprt_list.size(); id++)
                 sprt_list[id].pt -= sprt_list[0].pt;
-
-//            for(int id = 0; id < sprt_list.size(); id++)
-//                std::cout << sprt_list[id].pt[0] << ", " << sprt_list[id].pt[1]  << std::endl;
 
             std::sort(sprt_list.begin() + 1, sprt_list.end(), SprtCompratorTurnLeft);
 
@@ -359,8 +530,7 @@ void Wall_Support_Generator::convex_hull(std::vector<std::vector<int>> &convex_p
 }
 
 void Wall_Support_Generator::minimum_spanning_tree(std::vector< Fermat_Level_Set> &fermat,
-                                                   std::vector< std::vector<MSTGraphNode>> &T,
-                                                   std::vector<int> &roots)
+                                                   std::vector< std::vector<MSTGraphNode>> &T)
 {
 
     std::vector< std::vector<MSTGraphNode>> G;
@@ -467,26 +637,18 @@ void Wall_Support_Generator::minimum_spanning_tree(std::vector< Fermat_Level_Set
         }
     }while(num_fermats);
 
-    std::vector<bool> is_roots;
-    is_roots.resize(fermat.size(), false);
-    for(int id = 0; id < T.size(); id++)
-    {
-        if(!fermat[id].empty()) is_roots[id] = true;
-    }
-
+    settings.print_N();
+    settings.print_TsN("Minimal Spanning Tree: ");
     for(int id = 0; id < T.size(); id++)
     {
         for(int jd = 0; jd < T[id].size(); jd++)
         {
-            std::cout << id << "->" << T[id][jd].x << " " <<  T[id][jd].key << std::endl;
-            is_roots[T[id][jd].x] = false;
+            memset(settings.tmp_str, 0, sizeof(settings.tmp_str));
+            sprintf(settings.tmp_str, "\t Tree %d -> Tree %d = %f",id,  T[id][jd].x, T[id][jd].key);
+            settings.print_TsN(settings.tmp_str);
         }
     }
-
-    for(int id = 0; id < T.size(); id++)
-    {
-        if(is_roots[id]) roots.push_back(id);
-    }
+    settings.print_N();
     return;
 }
 
@@ -794,6 +956,32 @@ void Wall_Support_Generator::connecting_points(std::list<SprtPoint> &sprt)
     sprt.push_back(sB);
     sprt.insert(sprt.end(), upper.begin(), upper.end());
 
+}
+
+void Wall_Support_Generator::mesh_height_map(Eigen::MatrixXd &hmap, Eigen::MatrixXi &smap)
+{
+    std::queue<HeightMapNode> Queue;
+    for(int row_id = 0; row_id < settings.pillar_row; row_id++)
+    {
+        for(int col_id = 0; col_id < settings.pillar_column; col_id++)
+        {
+            HeightMapNode node;
+            node.X = row_id * settings.x_sample_num_each_pin;
+            node.Y = col_id * settings.y_sample_num_each_pin;
+            node.Xsize = settings.x_sample_num_each_pin;
+            node.Ysize = settings.y_sample_num_each_pin;
+            node.layer = 0;
+            node.new_layer = true;
+            node.polys.clear();
+            Queue.push(node);
+        }
+    }
+
+    while(!Queue.empty())
+    {
+        HeightMapNode u = Queue.front();
+
+    }
 }
 
 

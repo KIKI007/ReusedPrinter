@@ -31,7 +31,6 @@ public:
             C.row(id) = c;
         }
 
-        std::cout << V.rows() << std::endl;
         Eigen::MatrixXd tmpV_(V_.rows() + V.rows(), 3);
         tmpV_.block(0, 0, V_.rows(), V_.cols()) = V_;
         tmpV_.block(V_.rows(), 0, V.rows(), V.cols()) = V;

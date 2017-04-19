@@ -32,7 +32,7 @@ public:
 
             //transform
             V.row(kd) -=  Eigen::RowVector3d((m(0) + M(0)) / 2 , m(1), (m(2) + M(2)) / 2 );
-            V.row(kd) +=  Eigen::RowVector3d(11.0 / 2 * settings_.pad_size, 0, 9.0 / 2  * settings_.pad_size);
+            V.row(kd) +=  Eigen::RowVector3d(11.0 / 2 * settings_.pad_size, 0, 10.0 / 2  * settings_.pad_size);
 
         }
     }

@@ -5,6 +5,7 @@
 #ifndef SUPPORTER_SETTINGS_H
 #define SUPPORTER_SETTINGS_H
 #include <limits>
+#include <string>
 
 class Settings
 {
@@ -46,35 +47,67 @@ public:
         pillar_standard_height = 12.7; //mm 0.5inch
         pillar_row = 9;
         pillar_column = 11;
+
+        //layout
+        x_sample_num_each_pin = 1<<4;
+        y_sample_num_each_pin = 1<<4;
     }
 
 public:
 
     inline long long mm2int_Even(double mm)
     {
-        long long INT = (long long)(mm / UNIT);
-        if(INT % 2 != 0) INT -= 1;
+        long long INT = (long long)(round(mm / UNIT));
+        INT *= 2;
         return INT;
     }
 
     inline long long mm2int_Odd(double mm)
     {
-        long long INT = (long long)(mm / UNIT);
-        if(INT % 2 != 1) INT -= 1;
+        long long INT = (long long)(round(mm / UNIT));
+        INT = INT * 2 + 1;
         return INT;
     }
 
     inline long long mm2int(double mm)
     {
-        return (long long)(mm / UNIT);
+        return (long long)(round(mm / UNIT * 2));
     }
 
     inline double int2mm(long long INT)
     {
-        return (double)INT * UNIT;
+        return (double)INT * UNIT / 2;
+    }
+
+    inline double int2mm(double INT)
+    {
+        return INT * UNIT / 2;
+    }
+
+    inline double int2mm(int INT)
+    {
+        return (double)INT * UNIT / 2;
+    }
+
+public:
+
+    void print_N()
+    {
+        std::cout << std::endl;
     }
 
 
+    void print_TsN(std::string script, int tab = 0)
+    {
+        while(tab --)std::cout << "\t";
+        std::cout << script << std::endl;
+    }
+
+    void print_Ts(std::string script, int tab = 0)
+    {
+        while(tab --)std::cout << "\t";
+        std::cout << script;
+    }
 
 
 public:
@@ -114,7 +147,15 @@ public:
     double expected_sample_num;
     double printing_max_angle;
 
+    //layout
+    int x_sample_num_each_pin;
+    int y_sample_num_each_pin;
 
+public:
+    char tmp_str[1024];
 };
+
+
+
 
 #endif //SUPPORTER_SETTINGS_H

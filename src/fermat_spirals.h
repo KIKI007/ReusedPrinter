@@ -152,6 +152,11 @@ public:
 
     bool empty(){return num_level() == 0;}
 
+    int num_level_id(int id){
+        assert(0 <= id && id <= levelset.size());
+        return levelset[id].size();
+    }
+
     int num_level(){return levelset.size();}
 
     void get_level(std::vector<FermatEdge> &polygon, int level)
@@ -215,7 +220,6 @@ Fermat_Level_Set::Fermat_Level_Set(ClipperLib::Path &outside, double pin_height)
         }
 
         outside_area *= settings.UNIT * settings.UNIT;
-        std::cout << outside_area << std::endl;
     }while(outside_area > settings.support_center_area);
 }
 
