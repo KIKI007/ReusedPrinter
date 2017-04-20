@@ -44,6 +44,8 @@ protected:
     //all in in P is odd
     void set_layer_height();
 
+    double layer_height(int id) { return id * settings.layer_height; }
+
     // right now useless
     bool check_polygon(ClipperLib::Path poly);
 

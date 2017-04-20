@@ -378,7 +378,7 @@ void Slice_Overhang_Detector::sampling(Eigen::MatrixXd &SP)
         for(int jd = 0; jd < sample_vertices[id].size(); jd++)
         {
             SP(kd, 0) = sample_vertices[id][jd][0];
-            SP(kd, 1) = settings.int2mm(P[id]);
+            SP(kd, 1) = layer_height(id);
             SP(kd, 2) = sample_vertices[id][jd][1];
             kd++;
         }

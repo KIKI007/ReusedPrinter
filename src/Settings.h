@@ -49,8 +49,8 @@ public:
         pillar_column = 11;
 
         //layout
-        x_sample_num_each_pin = 1<<4;
-        y_sample_num_each_pin = 1<<4;
+        xy_sample_num_each_pin = 1 << 4;
+        maximum_height_map = pillar_standard_height * 100;
     }
 
 public:
@@ -148,8 +148,8 @@ public:
     double printing_max_angle;
 
     //layout
-    int x_sample_num_each_pin;
-    int y_sample_num_each_pin;
+    int xy_sample_num_each_pin;
+    double maximum_height_map;
 
 public:
     char tmp_str[1024];

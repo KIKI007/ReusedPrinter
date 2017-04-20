@@ -264,6 +264,7 @@
 #include <nanogui/screen.h>
 #include <iostream>
 #include "igl/readOBJ.h"
+#include "igl/readSTL.h"
 
 #include "testing_models_path.h"
 #include "slice.h"
@@ -287,11 +288,13 @@ Eigen::MatrixXi F2;
 int layer;
 igl::viewer::Viewer viewer;
 Wall_Support_Generator slicer;
+Settings settings;
 
 void loadModel()
 {
     // Load a mesh in OBJ format
-    igl::readOFF(TESTING_MODELS_PATH "/arch.off", V, F);
+    Eigen::MatrixXd temp_V, N;
+    bool success = igl::readSTL(TESTING_MODELS_PATH "/timber/timber.stl",V,F,N);
     NormalizingModel normaler;
     normaler.size_normalize(V);
 //        V.resize(4, 3);®
@@ -597,6 +600,73 @@ void fermat_spiral()
 
 }
 
+void heightmap()
+{
+    viewer.data.clear();
+    Eigen::MatrixXd hmap;
+    Eigen::MatrixXi smap;
+    slicer.mesh_height_map(hmap, smap);
+
+    Eigen::MatrixXd V;
+    V.resize(hmap.size(), 3);
+
+    std::cout << smap << std::endl;
+
+    int kd = 0;
+    for(int id = 0; id < hmap.rows(); id++)
+    {
+        for(int jd = 0; jd < hmap.cols(); jd++)
+        {
+            double sq_width = settings.pad_size / settings.xy_sample_num_each_pin;
+            V(kd, 0) = jd * sq_width + sq_width / 2;
+            V(kd, 2) = id * sq_width + sq_width / 2;
+            V(kd, 1) = hmap(id, jd) < settings.maximum_height_map ? hmap(id, jd) : 0;
+            //V(kd, 1) = smap(id, jd) ? settings.pillar_standard_height * 5 : 0;
+            kd++;
+        }
+    }
+    viewer.core.point_size = 1;
+    viewer.data.add_points(V, Eigen::RowVector3d(1, 0 ,0));
+}
+
+void layout_optimization()
+{
+    loadModel();
+    SceneOrganizer organizer;
+    viewer.data.clear();
+    Eigen::MatrixXd hmap;
+    Eigen::MatrixXi smap;
+    slicer.mesh_height_map(hmap, smap);
+    double dx = 0, dz = 0;
+    slicer.layout_optimization_xy(dx, dz, hmap, smap);
+
+
+    for(int id = 0; id < V.rows(); id++)
+    {
+        V(id, 0) = V(id, 0) + dx;
+        V(id, 2) = V(id, 2) + dz;
+    }
+
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
+
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
+
+    slicer = Wall_Support_Generator();
+    slicer.set_mesh(V, F);
+    slicer.contour_construction();
+    slicer.draw_platform(H);
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, H);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
+}
+
 int main(int argc, char *argv[])
 {
     loadModel();
@@ -619,6 +689,10 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("convex hull", convex_hull);
         viewer.ngui->addButton("level set", level_set);
         viewer.ngui->addButton("fermat", fermat_spiral);
+
+        viewer.ngui->addWindow(Eigen::Vector2i(600,10),"Layout");
+        viewer.ngui->addButton("Height Map", heightmap);
+        viewer.ngui->addButton("Layout Optimization", layout_optimization);
         viewer.screen->performLayout();
         return false;
     };

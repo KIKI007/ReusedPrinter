@@ -21,8 +21,7 @@ typedef struct tagHeightMapNode
 {
     int X;
     int Y;
-    int Xsize;
-    int Ysize;
+    int XYsize;
     int layer;
     bool new_layer;
     ClipperLib::Paths polys;
@@ -112,6 +111,7 @@ public:
 
 public:
 
+    void layout_optimization_xy(double &x, double &y, Eigen::MatrixXd &hmap, Eigen::MatrixXi &smap);
 
 private:
 
@@ -125,6 +125,8 @@ private:
     void find_tree_roots(std::vector<bool> &pin_visited,
                          std::vector< std::vector<MSTGraphNode>> &T,
                          std::vector<int> &roots);
+
+
 
 private:
     std::vector<int> num_vertices_before;
@@ -234,7 +236,7 @@ void Wall_Support_Generator::convert_clipper_path(ClipperLib::Paths &clipper ,st
                                     settings.int2mm(clipper[id][jd - 1].Y));
             fe.p1 = Eigen::Vector2d(settings.int2mm(clipper[id][jd].X),
                                     settings.int2mm(clipper[id][jd].Y));
-            fe.yh = settings.int2mm(P[layer]);
+            fe.yh = layer_height(layer);
             fermat.push_back(fe);
         }
     }
@@ -405,10 +407,10 @@ void Wall_Support_Generator::fermat_spiral(std::vector<std::list<FermatEdge>> &p
         {
             int row = pin_id / settings.pillar_column;
             int column = pin_id % settings.pillar_column;
-            if(platform(row, column) < settings.int2mm(P[layer_id]) && platform(row, column) > 0)
+            if(platform(row, column) < layer_height(layer_id) && platform(row, column) > 0)
             {
                 pin_below_layer[pin_id] = true;
-                if(platform(row, column) >= settings.int2mm(P[layer_id - 1]))
+                if(platform(row, column) >= layer_height(layer_id - 1))
                     fermat_pattern_change = true;
             }
 
@@ -460,6 +462,8 @@ void Wall_Support_Generator::fermat_spiral(std::vector<std::list<FermatEdge>> &p
                 convert_clipper_path(clipper_layer[id], subtree_path, layer_id);
                 path_layer[layer_id].insert(path_layer[layer_id].end(), subtree_path.begin(), subtree_path.end());
             }
+
+        settings.print_TsN("done");
     }
     return;
 }
@@ -688,7 +692,8 @@ void Wall_Support_Generator::projecting_sp_into_pin()
     //valid means the sample points are supported by metal pin
     //non-valid means the sample points are supported by mesh itself
     valid_sp_size = 0;
-    sampling(sp_layer);
+    if(sp_layer.empty())
+        sampling(sp_layer);
 
     //if a sample point intersect with these polygons, this sample point will not be a valid point
     ClipperLib::Paths downward_polys;
@@ -711,7 +716,8 @@ void Wall_Support_Generator::projecting_sp_into_pin()
         //downward_polys will accumulate durning iteration
         //downward_polys = downward_polys + layer_silces[layer_id]
         ClipperLib::Paths subj, clip;
-        subj = downward_polys;
+        subj = downward_polys;、
+        
         clip = layer_slices[layer_id];
 
         ClipperLib::Clipper clipper;
@@ -809,7 +815,7 @@ void Wall_Support_Generator::setup_platform() {
             //!! since the length of each pin can only be the mutiple of settings.pillar_standard_height (present 0.5inch)
             //   draw down the pin to make it satisfy to the fabrication requirement
             if(id < layer_slices.size() && id > 0) {
-                int num_standard_height = settings.int2mm(P[id - 1]) / settings.pillar_standard_height;
+                int num_standard_height = layer_height(id) / settings.pillar_standard_height;
                 platform(row, col) = (double)num_standard_height * settings.pillar_standard_height;
             }
             else
@@ -892,7 +898,7 @@ void Wall_Support_Generator::draw_support(Eigen::MatrixXd &V, Eigen::MatrixXi &F
                     V(size + id, 2) = sp_pin[row * settings.pillar_column + col][id][1];
 
                     V(size + id + Vsize, 0) = sp_pin[row * settings.pillar_column + col][id][0];
-                    V(size + id + Vsize, 1) = settings.int2mm(P[sp_height_pin[row * settings.pillar_column + col][id]]);
+                    V(size + id + Vsize, 1) = layer_height(sp_height_pin[row * settings.pillar_column + col][id]);
                     V(size + id + Vsize, 2) = sp_pin[row * settings.pillar_column + col][id][1];
                 }
 
@@ -960,29 +966,271 @@ void Wall_Support_Generator::connecting_points(std::list<SprtPoint> &sprt)
 
 void Wall_Support_Generator::mesh_height_map(Eigen::MatrixXd &hmap, Eigen::MatrixXi &smap)
 {
-    std::queue<HeightMapNode> Queue;
+    std::list<HeightMapNode> Queue;
+    hmap = Eigen::MatrixXd::Zero(settings.pillar_row  * settings.xy_sample_num_each_pin,
+                                 settings.pillar_column * settings.xy_sample_num_each_pin);
+    smap = Eigen::MatrixXi::Zero(settings.pillar_row  * settings.xy_sample_num_each_pin,
+                                 settings.pillar_column * settings.xy_sample_num_each_pin);
+
     for(int row_id = 0; row_id < settings.pillar_row; row_id++)
     {
         for(int col_id = 0; col_id < settings.pillar_column; col_id++)
         {
             HeightMapNode node;
-            node.X = row_id * settings.x_sample_num_each_pin;
-            node.Y = col_id * settings.y_sample_num_each_pin;
-            node.Xsize = settings.x_sample_num_each_pin;
-            node.Ysize = settings.y_sample_num_each_pin;
+            node.X = row_id * settings.xy_sample_num_each_pin;
+            node.Y = col_id * settings.xy_sample_num_each_pin;
+            node.XYsize = settings.xy_sample_num_each_pin;
             node.layer = 0;
             node.new_layer = true;
             node.polys.clear();
-            Queue.push(node);
+            Queue.push_back(node);
         }
     }
 
-    while(!Queue.empty())
-    {
+    while(!Queue.empty()) {
         HeightMapNode u = Queue.front();
+        Queue.pop_front();
 
+        if (u.layer >= number_layer()) {
+            hmap.block(u.X, u.Y, u.XYsize, u.XYsize) =
+                    Eigen::MatrixXd::Ones(u.XYsize, u.XYsize) * settings.maximum_height_map;
+            continue;
+        }
+
+        ClipperLib::Clipper clipper;
+        if (u.new_layer) {
+            clipper.AddPaths(layer_slices[u.layer], ClipperLib::ptClip, true);
+        } else {
+            clipper.AddPaths(u.polys, ClipperLib::ptClip, true);
+        }
+
+        ClipperLib::Path square;
+        int sq_width = settings.mm2int(settings.pad_size / settings.xy_sample_num_each_pin);
+        square.push_back(ClipperLib::IntPoint(u.Y * sq_width, u.X * sq_width));
+        square.push_back(ClipperLib::IntPoint((u.Y + u.XYsize) * sq_width, u.X * sq_width));
+        square.push_back(ClipperLib::IntPoint((u.Y + u.XYsize) * sq_width, (u.X + u.XYsize) * sq_width));
+        square.push_back(ClipperLib::IntPoint(u.Y * sq_width, (u.X + u.XYsize) * sq_width));
+
+        clipper.AddPath(square, ClipperLib::ptSubject, true);
+
+        //computing the intersection
+        ClipperLib::Paths intersection;
+        clipper.Execute(ClipperLib::ctIntersection, intersection, ClipperLib::pftPositive, ClipperLib::pftPositive);
+        ClipperLib::SimplifyPolygons(intersection);
+
+        //check the collision
+        double area_insec = 0;
+        for (int id = 0; id < intersection.size(); id++)
+            area_insec += ClipperLib::Area(intersection[id]);
+        area_insec = std::abs(area_insec);
+
+        if (intersection.empty() || std::abs(area_insec) < 1e-7)
+        {
+            u.layer++;
+            u.new_layer = true;
+            Queue.push_back(u);
+        }
+        else
+        {
+            double area_squre = std::abs(ClipperLib::Area(square));
+            if (std::abs(area_insec - area_squre) < settings.ZERO_EPS || (u.XYsize == 1)) {
+                int num_standard_pin = layer_height(u.layer) / settings.pillar_standard_height;
+                double pin_height = num_standard_pin * settings.pillar_standard_height;
+                hmap.block(u.X, u.Y, u.XYsize, u.XYsize) = Eigen::MatrixXd::Ones(u.XYsize, u.XYsize) * pin_height;
+            } else {
+                for (int id = 0; id < 2; id++) {
+                    for (int jd = 0; jd < 2; jd++) {
+                        HeightMapNode v = u;
+                        v.X += id * u.XYsize / 2;
+                        v.Y += jd * u.XYsize / 2;
+                        v.XYsize /= 2;
+                        v.polys = intersection;
+                        v.new_layer = false;
+                        Queue.push_back(v);
+                    }
+                }
+            }
+        }
     }
+
+
+
+    if(sp_layer.empty())
+        sampling(sp_layer);
+
+    //if a sample point intersect with these polygons, this sample point will not be a valid point
+    ClipperLib::Paths downward_polys;
+    for(int layer_id = 1; layer_id < layer_slices.size(); layer_id ++)
+    {
+
+        for(int sp_id = 0; sp_id < sp_layer[layer_id].size(); sp_id++)
+        {
+            Eigen::Vector2d sp = sp_layer[layer_id][sp_id];
+            if(point_in_polygons(sp, downward_polys) == false)
+            {
+                // projecting the sample points into its corresponding pin
+                int pin_x = std::round(sp.x() / settings.pad_size * settings.xy_sample_num_each_pin);
+                int pin_y = std::round(sp.y() / settings.pad_size * settings.xy_sample_num_each_pin);
+                smap(pin_x, pin_y) = 1;
+            }
+        }
+
+        //downward_polys will accumulate durning iteration
+        //downward_polys = downward_polys + layer_silces[layer_id]
+        ClipperLib::Paths subj, clip;
+        subj = downward_polys;
+        clip = layer_slices[layer_id];
+
+        ClipperLib::Clipper clipper;
+        clipper.AddPaths(subj, ClipperLib::ptSubject, true);
+        clipper.AddPaths(clip, ClipperLib::ptClip, true);
+
+        clipper.Execute(ClipperLib::ctUnion, downward_polys, ClipperLib::pftPositive, ClipperLib::pftPositive);
+        ClipperLib::SimplifyPolygons(downward_polys);
+    }
+
+
+    return;
 }
 
+
+void Wall_Support_Generator::layout_optimization_xy(double &x, double &y, Eigen::MatrixXd &hmap, Eigen::MatrixXi &smap)
+{
+    //Red Anchor
+    Eigen::MatrixXi red_anchor;
+    red_anchor = Eigen::MatrixXi::Zero(smap.rows(), smap.cols());
+
+    for(int id = 0; id < smap.rows(); id++)
+    {
+        for(int jd = 0; jd < smap.cols(); jd++)
+        {
+            int L = jd > 0 ? red_anchor(id, jd - 1) : 0;
+            int T = id > 0 ? red_anchor(id - 1, jd) : 0;
+            int LT = id > 0 && jd > 0 ? red_anchor(id - 1, jd - 1) : 0;
+            red_anchor(id, jd) = L + T - LT + smap(id, jd);
+        }
+    }
+
+    //minimum
+    int n = settings.pillar_row * settings.xy_sample_num_each_pin;
+    int m = settings.pillar_column * settings.xy_sample_num_each_pin;
+    int kn = std::log(n) + 1;
+    int km = std::log(m) + 1;
+
+    double ****minimum;
+    minimum = new double ***[kn];
+    for(int jr = 0; jr < kn; jr++)
+        minimum[jr] = new double **[n];
+
+    for(int jr = 0; jr < kn; jr++)
+    {
+        for(int ir = 0; ir < n; ir++)
+        {
+            minimum[jr][ir] = new double *[km];
+        }
+    }
+
+    for(int jr = 0; jr < kn; jr++)
+    {
+        for(int ir = 0; ir < n; ir++)
+        {
+            for(int jc = 0; jc < km; jc++)
+                minimum[jr][ir][jc] = new double [m];
+        }
+    }
+
+    for(int ir = 0; ir < n; ir++)
+    {
+        for (int ic = 0; ic < m; ic++)
+        {
+            minimum[0][ir][0][ic] = hmap(ir, ic);
+        }
+    }
+
+    for(int jr = 0; jr < kn; jr ++)
+    {
+        for(int jc = 0; jc < km; jc++)
+        {
+            if(jc + jr == 0) continue;
+            for(int ir = 0; ir + (1 << jr) - 1 < n; ir++)
+            {
+                for(int ic = 0; ic + (1 << jc) - 1 < m; ic++)
+                {
+                    if(jr)
+                    {
+                        minimum[jr][ir][jc][ic] = std::min(minimum[jr - 1][ir]                  [jc][ic],
+                                                           minimum[jr - 1][ir + (1 << (jr - 1))][jc][ic]);
+                    }
+                    else
+                    {
+                        minimum[jr][ir][jc][ic] = std::min(minimum[jr][ir][jc - 1][ic],
+                                                           minimum[jr][ir][jc - 1][ic + (1 << (jc - 1))]);
+                    }
+                }
+            }
+        }
+    }
+
+
+    //optimization
+    double opt_value = 0;
+    double opt_r = 0;
+    double opt_c = 0;
+    int pin_num;
+    for(int dr = 0; dr < settings.xy_sample_num_each_pin; dr++)
+    {
+        for(int dc = 0; dc < settings.xy_sample_num_each_pin; dc++)
+        {
+            double opt_tmp = 0;
+            int pin_tmp = 0;
+            for(int ir = 0; ir < settings.pillar_row; ir++)
+            {
+                for(int ic = 0; ic < settings.pillar_column; ic ++)
+                {
+                    int r1 = ir * settings.xy_sample_num_each_pin + dr ;
+                    int r2 = (ir + 1) * settings.xy_sample_num_each_pin + dr - 1;
+                    int c1 = ic * settings.xy_sample_num_each_pin + dc ;
+                    int c2 = (ic + 1) * settings.xy_sample_num_each_pin + dc - 1;
+
+                    if(c2 >= m || r2 >= n) continue;
+                    //get red anchor
+                    int L =  r1 > 0 ?           red_anchor(r1 - 1, c2) : 0;
+                    int T =  c1 > 0 ?           red_anchor(r2,     c1 - 1) : 0;
+                    int LT = r1 > 0 && c1 > 0 ? red_anchor(r1 - 1, c1 - 1) : 0;
+                    int red_num =   red_anchor(r2, c2) - L - T + LT;
+
+                    if(red_num > 0) pin_tmp++;
+
+                    //get minimum
+
+
+                    int kr = std::log(r2 - r1 + 1);
+                    int kc = std::log(c2 - c1 + 1);
+                    double minimum_1 = std::min(minimum[kr][r1]                [kc][c1],
+                                                minimum[kr][r1]                [kc][c2 + 1 - (1 << kc)]);
+                    double minimum_2 = std::min(minimum[kr][r2 + 1 - (1 << kr)][kc][c1],
+                                                minimum[kr][r2 + 1 - (1 << kr)][kc][c2 + 1 - (1 << kc)]);
+                    double minimum_height = std::min(minimum_1, minimum_2);
+
+                    opt_tmp += minimum_height * red_num;
+                }
+            }
+
+            if(opt_tmp > opt_value || (opt_tmp == opt_value && pin_tmp < pin_num))
+            {
+                opt_value = opt_tmp;
+                opt_r = dr * settings.pad_size / settings.xy_sample_num_each_pin;
+                opt_c = dc * settings.pad_size / settings.xy_sample_num_each_pin;
+                pin_num = pin_tmp;
+            }
+        }
+    }
+
+    //x is column, y is row
+    x = -opt_c;
+    y = -opt_r;
+
+    return;
+}
 
 #endif //SUPPORTER_WALL_SUPPORT_GENERATOR_H
