@@ -258,6 +258,7 @@
 //    viewer.data.clear();
 //    viewer.data.set_mesh(V, tF);
 //}
+
 #include <igl/viewer/Viewer.h>
 #include <igl/triangle/triangulate.h>
 #include <nanogui/formhelper.h>
@@ -297,19 +298,6 @@ void loadModel()
     bool success = igl::readSTL(TESTING_MODELS_PATH "/timber/timber.stl",V,F,N);
     NormalizingModel normaler;
     normaler.size_normalize(V);
-//        V.resize(4, 3);®
-//    F.resize(4, 3);
-//    V << 0.0, 0.0, 0.0,
-//         1.0, 0.0, 0.0,
-//         0.0, 1.0, 0.0,
-//         0.0, 0.0, 1.0;
-//    F << 0, 2, 1,
-//         0, 1, 3,
-//         0, 3, 2,
-//         1, 2, 3;
-//    NormalizingModel normaler;
-//    normaler.size_normalize(V);
-
 }
 
 void slicing()
