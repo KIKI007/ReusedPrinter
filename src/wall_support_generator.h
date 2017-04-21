@@ -1201,8 +1201,6 @@ void Wall_Support_Generator::layout_optimization_xy(double &x, double &y, Eigen:
                     if(red_num > 0) pin_tmp++;
 
                     //get minimum
-
-
                     int kr = std::log(r2 - r1 + 1);
                     int kc = std::log(c2 - c1 + 1);
                     double minimum_1 = std::min(minimum[kr][r1]                [kc][c1],

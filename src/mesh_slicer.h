@@ -24,6 +24,13 @@ public:
         F.setZero();
     }
 
+    MeshSlicer(Settings &s)
+    {
+        settings = s;
+        V.setZero();
+        F.setZero();
+    }
+
     ~MeshSlicer()
     {
 
@@ -73,6 +80,12 @@ public:
     //aims to connect separated segements into a closed polygon
     void contour_construction();
 
+    void stack_slices_construction();
+
+    void overhang_detection();
+
+    void get_bottom_half(std::vector< ClipperLib::Paths> &bottom_half);
+
     // triangulate the closed polygons
     void get_intersecting_surface(std::vector< ClipperLib::Paths> &slices, int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2);
 
@@ -83,8 +96,61 @@ public:
 
 public:
 
-    void get_overhang_slices(std::vector< ClipperLib::Paths> &bottom_half,
-                               std::vector< ClipperLib::Paths> &upper_half);
+    void get_slices(std::vector<ClipperLib::Paths> &slices)
+    {
+        assert(!V.isZero());
+        if(layer_slices.empty())
+            contour_construction();
+        slices = layer_slices;
+    }
+
+
+
+    void get_stack_slices(std::vector<ClipperLib::Paths> &slices)
+    {
+        assert(!V.isZero());
+        if(stack_slices.empty())
+            stack_slices_construction();
+        slices = stack_slices;
+    }
+
+    Settings return_settings(){return settings;}
+
+    void move_XY(double dx, double dz, std::vector< ClipperLib::Paths> &slices)
+    {
+        for(int id = 0; id < slices.size(); id++)
+        {
+            for(int jd = 0; jd < slices[id].size(); jd++)
+            {
+                for(int kd = 0; kd < slices[id][jd].size(); kd++)
+                {
+                    slices[id][jd][kd].X += settings.mm2int(dx);
+                    slices[id][jd][kd].Y += settings.mm2int(dz);
+                }
+            }
+        }
+    }
+
+    void move_XY(double dx, double dz)
+    {
+        for(int id = 0; id < V.rows(); id++)
+        {
+            V(id, 0) = V(id, 0) + dx;
+            V(id, 2) = V(id, 2) + dz;
+        }
+        move_XY(dx, dz, layer_slices);
+        move_XY(dx, dz, stack_slices);
+        move_XY(dx, dz, overhang_slices);
+    }
+
+    void clear(){
+        V.setZero();
+        F.setZero();
+        P.clear();
+        layer_slices.clear();
+        stack_slices.clear();
+        overhang_slices.clear();
+    }
 
 protected:
 
@@ -94,7 +160,11 @@ protected:
 
     std::vector<int> P;
 
+    std::vector< ClipperLib::Paths> stack_slices;
+
     std::vector< ClipperLib::Paths> layer_slices;
+
+    std::vector< ClipperLib::Paths> overhang_slices;
 
     Settings settings;
 };
@@ -381,19 +451,77 @@ void MeshSlicer::get_intersecting_surface(std::vector< ClipperLib::Paths> &slice
 }
 
 
-void MeshSlicer::get_overhang_slices(std::vector<ClipperLib::Paths> &bottom_half,
-                                     std::vector<ClipperLib::Paths> &upper_half)
+void MeshSlicer::stack_slices_construction()
+{
+    if(layer_slices.empty())
+        contour_construction();
+
+    stack_slices.clear();
+    stack_slices.resize(number_layer());
+
+    stack_slices[0] = layer_slices[0];
+    for(int layer = 1; layer < layer_slices.size(); layer++)
+    {
+        ClipperLib::Clipper clipper;
+        clipper.AddPaths(layer_slices[layer], ClipperLib::ptSubject, true);
+        clipper.AddPaths(stack_slices[layer - 1], ClipperLib::ptClip, true);
+        clipper.Execute(ClipperLib::ctDifference, stack_slices[layer], ClipperLib::pftPositive, ClipperLib::pftPositive);
+    }
+
+    return;
+}
+
+void MeshSlicer::overhang_detection()
 {
     assert(!V.isZero());
 
     if(layer_slices.empty())
         contour_construction();
 
+    overhang_slices.resize(number_layer());
+
+    settings.print_N();
+    settings.print_TsN("OVERHANG");
+    for(int layer = 1; layer < layer_slices.size(); layer++)
+    {
+        memset(settings.tmp_str, 0, sizeof(settings.tmp_str));
+        sprintf(settings.tmp_str, "\t layer %d, total %.3f %%...", layer,
+                100.0f * (double) (layer) / (layer_slices.size() - 2));
+        settings.print_Ts(settings.tmp_str);
+
+        ClipperLib::Clipper clipper;
+        ClipperLib::ClipperOffset co;
+        ClipperLib::Paths upper = layer_slices[layer], lower = layer_slices[layer - 1];
+
+        co.AddPaths(lower, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+        co.Execute(lower, settings.mm2int(settings.overhang_offset));
+        ClipperLib::SimplifyPolygons(lower);
+
+        clipper.StrictlySimple(true);
+        clipper.AddPaths(upper, ClipperLib::ptSubject, true);
+        clipper.AddPaths(lower, ClipperLib::ptClip, true);
+        clipper.Execute(ClipperLib::ctDifference, overhang_slices[layer], ClipperLib::pftPositive, ClipperLib::pftPositive);
+
+        settings.print_TsN("done");
+    }
+
+    overhang_slices[0].clear();
+}
+
+
+
+void MeshSlicer::get_bottom_half(std::vector<ClipperLib::Paths> &bottom_half)
+{
+    assert(!V.isZero());
+
+    if(overhang_slices.empty())
+        overhang_detection();
+
+    if(stack_slices.empty())
+        stack_slices_construction();
+
     bottom_half.clear();
     bottom_half.resize(layer_slices.size());
-
-    upper_half.clear();
-    upper_half.resize(layer_slices.size());
 
     settings.print_N();
     settings.print_TsN("OVERHANG");
@@ -402,50 +530,20 @@ void MeshSlicer::get_overhang_slices(std::vector<ClipperLib::Paths> &bottom_half
     for(int layer = 1; layer < layer_slices.size(); layer++)
     {
         memset(settings.tmp_str, 0, sizeof(settings.tmp_str));
-        sprintf(settings.tmp_str, "\t layer %d, total %.3f %%...",layer,  100.0f * (double)(layer) / (layer_slices.size() - 2));
+        sprintf(settings.tmp_str, "\t layer %d, total %.3f %%...", layer,
+                100.0f * (double) (layer) / (layer_slices.size() - 2));
         settings.print_Ts(settings.tmp_str);
 
-        ClipperLib::Clipper clipper;
-        ClipperLib::ClipperOffset co;
-        ClipperLib::Paths upper = layer_slices[layer], lower = layer_slices[layer - 1], overhang;
-
-        // upper_half + bottom_half slice
-        co.AddPaths(lower, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
-        co.Execute(lower, settings.mm2int(settings.overhang_offset));
-        ClipperLib::SimplifyPolygons(lower);
-
-        clipper.StrictlySimple(true);
-        clipper.AddPaths(upper, ClipperLib::ptSubject, true);
-        clipper.AddPaths(lower, ClipperLib::ptClip, true);
-        clipper.Execute(ClipperLib::ctDifference, overhang, ClipperLib::pftPositive, ClipperLib::pftPositive);
-
-        ClipperLib::SimplifyPolygons(overhang);
-
-        //upper_half
-        clipper.Clear();
-        clipper.AddPaths(overhang, ClipperLib::ptSubject, true);
-        clipper.AddPaths(downward, ClipperLib::ptClip, true);
-        clipper.Execute(ClipperLib::ctIntersection, upper_half[layer], ClipperLib::pftPositive, ClipperLib::pftPositive);
-        ClipperLib::SimplifyPolygons(upper_half[layer]);
-
         //bottom half
-        clipper.Clear();
-        clipper.AddPaths(overhang, ClipperLib::ptSubject, true);
-        clipper.AddPaths(downward, ClipperLib::ptClip, true);
+        ClipperLib::Clipper clipper;
+        clipper.AddPaths(overhang_slices[layer], ClipperLib::ptSubject, true);
+        clipper.AddPaths(stack_slices[layer - 1], ClipperLib::ptClip, true);
         clipper.Execute(ClipperLib::ctDifference, bottom_half[layer], ClipperLib::pftPositive, ClipperLib::pftPositive);
-        ClipperLib::SimplifyPolygons(bottom_half[layer]);
 
-        //downward += layer_slice[layer]
-        clipper.Clear();
-        clipper.AddPaths(downward, ClipperLib::ptSubject, true);
-        clipper.AddPaths(upper, ClipperLib::ptClip, true);
-        clipper.Execute(ClipperLib::ctUnion, downward, ClipperLib::pftPositive, ClipperLib::pftPositive);
-        ClipperLib::SimplifyPolygons(downward);
         settings.print_TsN("done");
     }
 
     bottom_half[0].clear();
-    upper_half[0].clear();
 
     return;
 }
