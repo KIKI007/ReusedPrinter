@@ -7,7 +7,7 @@
 #include "igl/readSTL.h"
 
 #include "testing_models_path.h"
-#include "slice.h"
+#include "mesh_slicer.h"
 #include "clipper.hpp"
 #include "normalizing_model.h"
 #include "scene_organizer.h"
@@ -29,27 +29,22 @@ int layer;
 igl::viewer::Viewer viewer;
 Wall_Support_Generator slicer;
 Settings settings;
-
+std::string pathname;
 void loadModel()
 {
     // Load a mesh in OBJ format
     Eigen::MatrixXd temp_V, N;
-    bool success = igl::readSTL(TESTING_MODELS_PATH "/timber/timber.stl",V,F,N);
-    NormalizingModel normaler;
-    normaler.size_normalize(V);
-//        V.resize(4, 3);®
-//    F.resize(4, 3);
-//    V << 0.0, 0.0, 0.0,
-//         1.0, 0.0, 0.0,
-//         0.0, 1.0, 0.0,
-//         0.0, 0.0, 1.0;
-//    F << 0, 2, 1,
-//         0, 1, 3,
-//         0, 3, 2,
-//         1, 2, 3;
-//    NormalizingModel normaler;
-//    normaler.size_normalize(V);
+    bool success = igl::readSTL(TESTING_MODELS_PATH + pathname + "/" + pathname + ".stl",V,F,N);
+    if(success)
+    {
+        NormalizingModel normaler;
+        normaler.size_normalize(V);
+        viewer.data.clear();
+        viewer.data.set_mesh(V, F);
 
+        slicer = Wall_Support_Generator();
+        slicer.set_mesh(V, F);
+    }
 }
 
 void slicing()
@@ -106,21 +101,41 @@ void series_slicing()
     return;
 }
 
-void overhang_slicing()
+void overhang_bottom_slicing()
 {
     SceneOrganizer organizer;
-    std::vector<ClipperLib::Paths> slices;
-    slicer.removing_overlap(slices);
+    std::vector<ClipperLib::Paths> bslice,uslice;
+    slicer.get_overhang_slices(bslice, uslice);
     for(int id = 0; id < slicer.number_layer(); id++)
     {
-        slicer.get_intersecting_surface(slices, id, V, F);
+        slicer.get_intersecting_surface(bslice, id, V, F);
         if(V.rows() >= 3)
             organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
     }
     Eigen::MatrixXd C;
     organizer.get_mesh(V, F, C);
     viewer.data.clear();
-    viewer.data.set_mesh(V, F);
+    if(V.rows() >= 3)
+        viewer.data.set_mesh(V, F);
+    return;
+}
+
+void overhang_upper_slicing()
+{
+    SceneOrganizer organizer;
+    std::vector<ClipperLib::Paths> bslice,uslice;
+    slicer.get_overhang_slices(bslice, uslice);
+    for(int id = 0; id < slicer.number_layer(); id++)
+    {
+        slicer.get_intersecting_surface(uslice, id, V, F);
+        if(V.rows() >= 3)
+            organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
+    }
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.clear();
+    if(V.rows() >= 3)
+        viewer.data.set_mesh(V, F);
     return;
 }
 
@@ -409,17 +424,22 @@ void layout_optimization()
 
 int main(int argc, char *argv[])
 {
+    pathname = "Fert";
     loadModel();
     slicing();
     viewer.callback_init = [&](igl::viewer::Viewer& viewer)
     {
+        viewer.ngui->addVariable("string", pathname);
+        viewer.ngui->addButton("Load Model", loadModel);
+
         viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Sampling Control");
         viewer.ngui->addGroup("Slicing Settings");
         viewer.ngui->addVariable("layer", layer);
         viewer.ngui->addButton("slice", show_slice);
         viewer.ngui->addButton("recovery", recover);
         viewer.ngui->addButton("series slicing", series_slicing);
-        viewer.ngui->addButton("overhang slicing", overhang_slicing);
+        viewer.ngui->addButton("overhang bottom slicing", overhang_bottom_slicing);
+        viewer.ngui->addButton("overhang upper slicing", overhang_upper_slicing);
         viewer.ngui->addButton("sampling", sampling);
 
         viewer.ngui->addWindow(Eigen::Vector2i(400,10),"Support Generation");
@@ -439,7 +459,5 @@ int main(int argc, char *argv[])
 
     viewer.callback_key_down = &key_down;
 
-    //draw();
-    viewer.data.set_mesh(V,F);
     viewer.launch();
 }

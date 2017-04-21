@@ -23,7 +23,7 @@ public:
         Eigen::Vector3d M = V.colwise().maxCoeff();
 
         //scale
-        //V  *= (settings_.maximum_model_heigh / (M(1) - m(1)));
+        V  *= (settings_.maximum_model_heigh / (M(1) - m(1)));
 
         m = V.colwise().minCoeff();
         M = V.colwise().maxCoeff();

@@ -5,7 +5,7 @@
 #ifndef SUPPORTER_SLICE_OVERHANG_DETECTOR_H
 #define SUPPORTER_SLICE_OVERHANG_DETECTOR_H
 
-#include "slice.h"
+#include "mesh_slicer.h"
 #include <list>
 
 typedef struct tagEDGE
@@ -22,10 +22,10 @@ bool EdgeXiComparator(EDGE& e1, EDGE& e2)
 }
 
 
-class Slice_Overhang_Detector: public Slice
+class Slice_Overhang_Detector: public MeshSlicer
 {
 public:
-    Slice_Overhang_Detector():Slice() { }
+    Slice_Overhang_Detector():MeshSlicer() { }
 
 protected:
     int num_rows(int ymax, int ymin) {  return (double)(ymax - ymin) / settings.mm2int(settings.sample_distance) + 2; }

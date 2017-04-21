@@ -13,19 +13,18 @@
 #include "settings.h"
 #include "hash_edge.h"
 
-
-
 class EdgeHash;
-class Slice
+
+class MeshSlicer
 {
 public:
-    Slice()
+    MeshSlicer()
     {
         V.setZero();
         F.setZero();
     }
 
-    ~Slice()
+    ~MeshSlicer()
     {
 
     }
@@ -82,6 +81,11 @@ public:
         get_intersecting_surface(layer_slices, layer, V2, F2);
     }
 
+public:
+
+    void get_overhang_slices(std::vector< ClipperLib::Paths> &bottom_half,
+                               std::vector< ClipperLib::Paths> &upper_half);
+
 protected:
 
     Eigen::MatrixXi V;
@@ -95,7 +99,7 @@ protected:
     Settings settings;
 };
 
-void Slice::set_mesh(Eigen::MatrixXd &in_V, Eigen::MatrixXi &in_F)
+void MeshSlicer::set_mesh(Eigen::MatrixXd &in_V, Eigen::MatrixXi &in_F)
 {
     F = in_F;
 
@@ -107,7 +111,7 @@ void Slice::set_mesh(Eigen::MatrixXd &in_V, Eigen::MatrixXi &in_F)
     return;
 }
 
-void Slice::set_layer_height()
+void MeshSlicer::set_layer_height()
 {
     assert(!V.isZero());
 
@@ -124,7 +128,7 @@ void Slice::set_layer_height()
     return;
 }
 
-void Slice::build_triangle_list(std::vector<std::vector<int>> &L)
+void MeshSlicer::build_triangle_list(std::vector<std::vector<int>> &L)
 {
     //set P
     set_layer_height();
@@ -154,7 +158,7 @@ void Slice::build_triangle_list(std::vector<std::vector<int>> &L)
     return;
 }
 
-void Slice::compute_intersection(int fd, int Y, Eigen::MatrixXi &mat)
+void MeshSlicer::compute_intersection(int fd, int Y, Eigen::MatrixXi &mat)
 {
 
     Eigen::RowVector3d p[3], n, dy, dq,q[2];
@@ -198,7 +202,7 @@ void Slice::compute_intersection(int fd, int Y, Eigen::MatrixXi &mat)
     return;
 }
 
-void Slice::incremental_slicing(std::vector< std::vector<Eigen::MatrixXi>> &S)
+void MeshSlicer::incremental_slicing(std::vector< std::vector<Eigen::MatrixXi>> &S)
 {
     assert(!V.isZero() && layer_slices.empty());
 
@@ -244,7 +248,7 @@ void Slice::incremental_slicing(std::vector< std::vector<Eigen::MatrixXi>> &S)
     }
 }
 
-void Slice::contour_construction()
+void MeshSlicer::contour_construction()
 {
 
     assert(!V.isZero() && layer_slices.empty());
@@ -310,17 +314,10 @@ void Slice::contour_construction()
 
 }
 
-void Slice::get_intersecting_surface(std::vector< ClipperLib::Paths> &slices, int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2) {
+void MeshSlicer::get_intersecting_surface(std::vector< ClipperLib::Paths> &slices, int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2) {
 
-    assert(!V.isZero());
-    if(slices.empty())
-        contour_construction();
     assert(0 <= layer && layer < slices.size());
 
-    ClipperLib::Paths solution;
-    ClipperLib::Clipper clipper;
-    clipper.AddPaths(slices[layer], ClipperLib::ptClip, true);
-    clipper.Execute(ClipperLib::ctUnion, solution, ClipperLib::pftPositive, ClipperLib::pftPositive);
 
     std::vector<Eigen::RowVector2i> holes;
     std::vector<Eigen::RowVector2i> vertices;
@@ -328,11 +325,13 @@ void Slice::get_intersecting_surface(std::vector< ClipperLib::Paths> &slices, in
 
     int size = 0;
 
-    for (size_t id = 0; id < solution.size(); id++) {
+    std::cout << layer << std::endl;
+
+    for (size_t id = 0; id < slices[layer].size(); id++) {
         Eigen::RowVector2d center(0, 0), hole(0, 0);
-        for (size_t jd = 0; jd < solution[id].size(); jd++) {
-            Eigen::RowVector2i pt(solution[id][jd].X, solution[id][jd].Y);
-            Eigen::RowVector2i edge(size + jd, size + (jd + 1) % solution[id].size());
+        for (size_t jd = 0; jd < slices[layer][id].size(); jd++) {
+            Eigen::RowVector2i pt(slices[layer][id][jd].X, slices[layer][id][jd].Y);
+            Eigen::RowVector2i edge(size + jd, size + (jd + 1) % slices[layer][id].size());
             vertices.push_back(pt);
             edges.push_back(edge);
             hole[0] = pt[0];
@@ -340,12 +339,12 @@ void Slice::get_intersecting_surface(std::vector< ClipperLib::Paths> &slices, in
             center += hole;
         }
 
-        if (!ClipperLib::Orientation(solution[id])) {
-            center /= solution[id].size();
+        if (!ClipperLib::Orientation(slices[layer][id])) {
+            center /= slices[layer][id].size();
             hole = (hole - center) * 0.999f + center;
             holes.push_back(Eigen::RowVector2i(hole[0], hole[1]));
         }
-        size += solution[id].size();
+        size += slices[layer][id].size();
     }
 
     Eigen::MatrixXd V1(vertices.size(), 2);
@@ -369,7 +368,7 @@ void Slice::get_intersecting_surface(std::vector< ClipperLib::Paths> &slices, in
         for (size_t id = 0; id < in_V2.rows(); id++)
         {
             V2(id, 0) = settings.int2mm(in_V2(id, 0));
-            V2(id, 1) = settings.int2mm(P[layer]);
+            V2(id, 1) = layer_height(layer);
             V2(id, 2) = settings.int2mm(in_V2(id, 1));
         }
     }
@@ -382,7 +381,76 @@ void Slice::get_intersecting_surface(std::vector< ClipperLib::Paths> &slices, in
 }
 
 
-bool Slice::check_polygon(ClipperLib::Path poly)
+void MeshSlicer::get_overhang_slices(std::vector<ClipperLib::Paths> &bottom_half,
+                                     std::vector<ClipperLib::Paths> &upper_half)
+{
+    assert(!V.isZero());
+
+    if(layer_slices.empty())
+        contour_construction();
+
+    bottom_half.clear();
+    bottom_half.resize(layer_slices.size());
+
+    upper_half.clear();
+    upper_half.resize(layer_slices.size());
+
+    settings.print_N();
+    settings.print_TsN("OVERHANG");
+
+    ClipperLib::Paths downward = layer_slices[0];
+    for(int layer = 1; layer < layer_slices.size(); layer++)
+    {
+        memset(settings.tmp_str, 0, sizeof(settings.tmp_str));
+        sprintf(settings.tmp_str, "\t layer %d, total %.3f %%...",layer,  100.0f * (double)(layer) / (layer_slices.size() - 2));
+        settings.print_Ts(settings.tmp_str);
+
+        ClipperLib::Clipper clipper;
+        ClipperLib::ClipperOffset co;
+        ClipperLib::Paths upper = layer_slices[layer], lower = layer_slices[layer - 1], overhang;
+
+        // upper_half + bottom_half slice
+        co.AddPaths(lower, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+        co.Execute(lower, settings.mm2int(settings.overhang_offset));
+        ClipperLib::SimplifyPolygons(lower);
+
+        clipper.StrictlySimple(true);
+        clipper.AddPaths(upper, ClipperLib::ptSubject, true);
+        clipper.AddPaths(lower, ClipperLib::ptClip, true);
+        clipper.Execute(ClipperLib::ctDifference, overhang, ClipperLib::pftPositive, ClipperLib::pftPositive);
+
+        ClipperLib::SimplifyPolygons(overhang);
+
+        //upper_half
+        clipper.Clear();
+        clipper.AddPaths(overhang, ClipperLib::ptSubject, true);
+        clipper.AddPaths(downward, ClipperLib::ptClip, true);
+        clipper.Execute(ClipperLib::ctIntersection, upper_half[layer], ClipperLib::pftPositive, ClipperLib::pftPositive);
+        ClipperLib::SimplifyPolygons(upper_half[layer]);
+
+        //bottom half
+        clipper.Clear();
+        clipper.AddPaths(overhang, ClipperLib::ptSubject, true);
+        clipper.AddPaths(downward, ClipperLib::ptClip, true);
+        clipper.Execute(ClipperLib::ctDifference, bottom_half[layer], ClipperLib::pftPositive, ClipperLib::pftPositive);
+        ClipperLib::SimplifyPolygons(bottom_half[layer]);
+
+        //downward += layer_slice[layer]
+        clipper.Clear();
+        clipper.AddPaths(downward, ClipperLib::ptSubject, true);
+        clipper.AddPaths(upper, ClipperLib::ptClip, true);
+        clipper.Execute(ClipperLib::ctUnion, downward, ClipperLib::pftPositive, ClipperLib::pftPositive);
+        ClipperLib::SimplifyPolygons(downward);
+        settings.print_TsN("done");
+    }
+
+    bottom_half[0].clear();
+    upper_half[0].clear();
+
+    return;
+}
+
+bool MeshSlicer::check_polygon(ClipperLib::Path poly)
 {
     int size = poly.size();
     for(size_t id = 0; id < poly.size(); id++)
