@@ -135,24 +135,37 @@ public:
     {
         for(int id = 0; id < V.rows(); id++)
         {
-            V(id, 0) = V(id, 0) + dx;
-            V(id, 2) = V(id, 2) + dz;
+            V(id, 0) = V(id, 0) + settings.mm2int(dx);
+            V(id, 2) = V(id, 2) + settings.mm2int(dz);
+
+            dV(id, 0) = dV(id, 0) + dx;
+            dV(id, 2) = dV(id, 2) + dz;
         }
         move_XY(dx, dz, layer_slices);
         move_XY(dx, dz, stack_slices);
         move_XY(dx, dz, overhang_slices);
     }
 
+    void getV(Eigen::MatrixXd &out_V)
+    {
+        out_V = dV;
+    }
+
     void clear(){
+
+        dV.setZero();
         V.setZero();
         F.setZero();
         P.clear();
+
         layer_slices.clear();
         stack_slices.clear();
         overhang_slices.clear();
     }
 
 protected:
+
+    Eigen::MatrixXd dV;
 
     Eigen::MatrixXi V;
 
@@ -177,6 +190,8 @@ void MeshSlicer::set_mesh(Eigen::MatrixXd &in_V, Eigen::MatrixXi &in_F)
     for(size_t id = 0; id < V.rows(); id++)
         for(size_t jd = 0; jd < V.cols(); jd++)
             V(id, jd) = settings.mm2int_Even(in_V(id, jd));
+
+    dV = in_V;
 
     return;
 }
