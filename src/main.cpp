@@ -9,6 +9,7 @@
 #include "testing_models_path.h"
 #include "mesh_slicer.h"
 #include "mesh_layout.h"
+#include "mesh_support.h"
 #include "clipper.hpp"
 #include "normalizing_model.h"
 #include "scene_organizer.h"
@@ -19,7 +20,6 @@ using std::endl;
 // Input polygon
 Eigen::MatrixXd V;
 Eigen::MatrixXi E, F;
-Eigen::MatrixXd H;
 
 // Triangulated interior
 Eigen::MatrixXd V2;
@@ -30,6 +30,8 @@ igl::viewer::Viewer viewer;
 MeshSlicer slicer;
 Settings settings;
 std::string pathname;
+Eigen::MatrixXd platform;
+
 void loadModel()
 {
     // Load a mesh in OBJ format
@@ -44,6 +46,7 @@ void loadModel()
 
         slicer.clear();
         slicer.set_mesh(V, F);
+        platform.setZero();
     }
 }
 
@@ -234,115 +237,125 @@ void overhang_upper_slicing()
 //
 //}
 //
-//void convex_hull()
-//{
-//    loadModel();
-//    viewer.data.clear();
-//    SceneOrganizer organizer;
-//    //organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
-//
-//    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
-//    Eigen::MatrixXd SP;
-//    std::vector<std::vector<int>> convex;
-//    slicer.draw_platform(H);
-//    slicer.draw_sp(SP);
-//    slicer.convex_hull(convex);
-//
-//    GeneratingPlatform platform_builder;
-//    platform_builder.draw_platform(V, F, H);
-//
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
-//
-//    Eigen::MatrixXd C;
-//    organizer.get_mesh(V, F, C);
-//    viewer.data.set_face_based(true);
-//    viewer.data.set_mesh(V, F);
-//
-//    viewer.data.set_colors(C);
-//    viewer.core.point_size = 3;
-//    viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
-//    viewer.core.line_width = 2;
-//
-//    for(int id = 0; id < convex.size(); id++)
-//    {
-//        for(int jd = 0; jd < convex[id].size(); jd++)
-//        {
-//            viewer.data.add_edges(
-//                    SP.row(convex[id][jd] + slicer.get_num_vertices_before(id)),
-//                    SP.row(convex[id][(jd + 1) % convex[id].size()] + slicer.get_num_vertices_before(id)),
-//                    Eigen::RowVector3d(0, 1, 0));
-//        }
-//    }
-//}
-//
-//void level_set()
-//{
-//    loadModel();
-//    viewer.data.clear();
-//    SceneOrganizer organizer;
-//    std::vector<Fermat_Level_Set> fermat;
-//    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
-//    slicer.level_set(fermat);
-//    slicer.draw_platform(H);
-//
-//    GeneratingPlatform platform_builder;
-//    platform_builder.draw_platform(V, F, H);
-//
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
-//
-//    Eigen::MatrixXd C;
-//    organizer.get_mesh(V, F, C);
-//    viewer.data.set_face_based(true);
-//    viewer.data.set_mesh(V, F);
-//    viewer.data.set_colors(C);
-//    for(int id = 0; id < fermat.size(); id++)
-//        for(int jd = 0; jd < fermat[id].num_level(); jd++)
-//        {
-//            std::vector<FermatEdge> polygon;
-//            fermat[id].get_level(polygon, jd);
-//            for(int kd = 0; kd < polygon.size(); kd++)
-//            viewer.data.add_edges(
-//                    polygon[kd].P0(),
-//                    polygon[kd].P1(),
-//                    Eigen::RowVector3d(0, 1, 0));
-//        }
-//}
-//
-//void fermat_spiral()
-//{
-//    loadModel();
-//    viewer.data.clear();
-//    SceneOrganizer organizer;
-//    //organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-//    std::vector<std::list<FermatEdge>> path_layer;
-//    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
-//    slicer.fermat_spiral(path_layer);
-//    slicer.draw_platform(H);
-//
-//    GeneratingPlatform platform_builder;
-//    platform_builder.draw_platform(V, F, H);
-//
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(204.0f/255, 204.0/255 ,255.0f/255));
-//
-//    Eigen::MatrixXd C;
-//    organizer.get_mesh(V, F, C);
-//    viewer.data.set_face_based(true);
-//    viewer.data.set_mesh(V, F);
-//    viewer.data.set_colors(C);
-//
-//    for(int id = 0; id < slicer.number_layer(); id+= 2)
-//    {
-//        std::list<FermatEdge> path = path_layer[id];
-//        for(std::list<FermatEdge>::iterator it = path.begin(); it != path.end(); ++it)
-//        {
-//            viewer.data.add_edges(
-//                    it->P0(),
-//                    it->P1(),
-//                    Eigen::RowVector3d(1, 0, 0));
-//        }
-//    }
-//
-//}
+void convex_hull()
+{
+    loadModel();
+    viewer.data.clear();
+    SceneOrganizer organizer;
+
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
+    Eigen::MatrixXd SP;
+    std::vector<std::vector<ConvexHullPoint>> convex;
+
+    MeshSupport support;
+    support.sp_pin_construction(slicer, platform);
+    std::cout << "done" << std::endl;
+    support.convex_hull_construction(convex);
+
+    slicer.getV(V);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, platform);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+
+    viewer.data.set_colors(C);
+    viewer.core.point_size = 3;
+    viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
+    viewer.core.line_width = 2;
+
+    for(int id = 0; id < convex.size(); id++)
+    {
+        for(int jd = 0; jd < convex[id].size(); jd++)
+        {
+            viewer.data.add_edges(
+                    convex[id][jd].PT(),
+                    convex[id][(jd + 1) % convex[id].size()].PT(),
+                    Eigen::RowVector3d(0, 1, 0));
+        }
+    }
+
+    return;
+}
+
+void level_set()
+{
+    loadModel();
+    viewer.data.clear();
+    SceneOrganizer organizer;
+    std::vector<Fermat_Level_Set> fermat;
+
+    MeshSupport support;
+    support.sp_pin_construction(slicer, platform);
+    support.level_set(fermat);
+    slicer.getV(V);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, platform);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
+
+    for(int id = 0; id < fermat.size(); id++)
+        for(int jd = 0; jd < fermat[id].num_level(); jd++)
+        {
+            std::vector<FermatEdge> polygon;
+            fermat[id].get_level(polygon, jd);
+            for(int kd = 0; kd < polygon.size(); kd++)
+            viewer.data.add_edges(
+                    polygon[kd].P0(),
+                    polygon[kd].P1(),
+                    Eigen::RowVector3d(0, 1, 0));
+        }
+}
+
+void fermat_spiral()
+{
+    loadModel();
+    viewer.data.clear();
+    SceneOrganizer organizer;
+    std::vector<std::list<FermatEdge>> path_layer;
+    MeshSupport support;
+    support.fermat_spiral(path_layer, slicer, platform);
+
+    std::cout << "finished" << std::endl;
+
+    slicer.getV(V);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, platform);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(204.0f/255, 204.0/255 ,255.0f/255));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
+
+    for(int id = 0; id < slicer.number_layer(); id+= 10)
+    {
+        std::list<FermatEdge> path = path_layer[id];
+        for(std::list<FermatEdge>::iterator it = path.begin(); it != path.end(); ++it)
+        {
+            viewer.data.add_edges(
+                    it->P0(),
+                    it->P1(),
+                    Eigen::RowVector3d(1, 0, 0));
+        }
+    }
+
+}
 //
 void heightmap()
 {
@@ -408,7 +421,6 @@ void xy_move()
     viewer.data.clear();
     Mesh_Layout layout;
     double dx = 0, dz = 0;
-    Eigen::MatrixXd platform;
     layout.xy_layout(slicer, dx, dz, platform);
 
     for(int id = 0; id < V.rows(); id++)
@@ -451,16 +463,18 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("overhang bottom", overhang_bottom_slicing);
         viewer.ngui->addButton("overhang upper", overhang_upper_slicing);
 
-        viewer.ngui->addWindow(Eigen::Vector2i(400,10),"Layout Optimization");
+        viewer.ngui->addWindow(Eigen::Vector2i(300,10),"Layout Optimization");
         viewer.ngui->addButton("Height Map", heightmap);
         viewer.ngui->addButton("Red Map", redmap);
         viewer.ngui->addButton("XY Layout", xy_move);
+
+        viewer.ngui->addWindow(Eigen::Vector2i(400,10),"Support");
 //        viewer.ngui->addButton("platform & mesh", platform_n_mesh);
 //        viewer.ngui->addButton("platform", platform);
 //        viewer.ngui->addButton("support", generating_support);
-//        viewer.ngui->addButton("convex hull", convex_hull);
-//        viewer.ngui->addButton("level set", level_set);
-//        viewer.ngui->addButton("fermat", fermat_spiral);
+        viewer.ngui->addButton("convex hull", convex_hull);
+        viewer.ngui->addButton("level set", level_set);
+        viewer.ngui->addButton("fermat", fermat_spiral);
 //
 //        viewer.ngui->addWindow(Eigen::Vector2i(600,10),"Layout");
 //        viewer.ngui->addButton("Height Map", heightmap);

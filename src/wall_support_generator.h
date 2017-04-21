@@ -656,7 +656,7 @@ void Wall_Support_Generator::minimum_spanning_tree(std::vector< Fermat_Level_Set
     return;
 }
 
-void Wall_Support_Generator::level_set( std::vector<Fermat_Level_Set> &fermat)
+void Wall_Support_Generator::level_set(std::vector<Fermat_Level_Set> &fermat)
 {
     if(sp_pin.empty())
         setup_platform();
