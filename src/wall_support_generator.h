@@ -717,7 +717,8 @@ void Wall_Support_Generator::projecting_sp_into_pin()
         //downward_polys = downward_polys + layer_silces[layer_id]
         ClipperLib::Paths subj, clip;
         subj = downward_polys;
-        
+
+
         clip = layer_slices[layer_id];
 
         ClipperLib::Clipper clipper;
@@ -1052,8 +1053,6 @@ void Wall_Support_Generator::mesh_height_map(Eigen::MatrixXd &hmap, Eigen::Matri
             }
         }
     }
-
-
 
     if(sp_layer.empty())
         sampling(sp_layer);

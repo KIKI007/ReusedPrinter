@@ -4,7 +4,7 @@ project(supporter)
 add_executable(${PROJECT_NAME}_bin main.cpp
         clipper.hpp
         clipper.cpp
-        slice.h hash_edge.h
+        mesh_slicer.h hash_edge.h
         normalizing_model.h
         scene_organizer.h slice_overhang_detector.h wall_support_generator.h fermat_spirals.h)
         #testing_models_path.h
