@@ -6,6 +6,8 @@
 #define SUPPORTER_SETTINGS_H
 #include <limits>
 #include <string>
+#include <ctime>
+#include <cstdio>
 
 class Settings
 {
@@ -93,22 +95,36 @@ public:
 
     void print_N()
     {
-        std::cout << std::endl;
+//        std::cout << std::endl;
     }
 
 
     void print_TsN(std::string script, int tab = 0)
     {
-        while(tab --)std::cout << "\t";
-        std::cout << script << std::endl;
+//       while(tab --)std::cout << "\t";
+//        std::cout << script << std::endl;
     }
 
     void print_Ts(std::string script, int tab = 0)
     {
-        while(tab --)std::cout << "\t";
-        std::cout << script;
+//        while(tab --)std::cout << "\t";
+//        std::cout << script;
     }
 
+
+public:
+
+    void tic(std::string script)
+    {
+        std::cout<< script << "...";
+        start = std::clock();
+    }
+
+    void toc()
+    {
+        double duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+        std::cout<< duration << "s" <<'\n';
+    }
 
 public:
     //global
@@ -153,6 +169,8 @@ public:
 
 public:
     char tmp_str[1024];
+
+    std::clock_t start;
 };
 
 
