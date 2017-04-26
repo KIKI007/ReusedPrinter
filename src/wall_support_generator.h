@@ -9,6 +9,7 @@
 #include "fermat_spirals.h"
 #include <algorithm>
 #include <queue>
+#include <iostream>
 
 typedef struct tagSprtPoint
 {
@@ -433,6 +434,7 @@ void Wall_Support_Generator::fermat_spiral(std::vector<std::list<FermatEdge>> &p
                 }
             }
 
+            T_layer.clear();
             clipper_layer.clear();
             find_tree_roots(pin_below_layer, T_layer, roots);
             for(int id = 0; id < roots.size(); id++)
@@ -1212,7 +1214,7 @@ void Wall_Support_Generator::layout_optimization_xy(double &x, double &y, Eigen:
                     opt_tmp += minimum_height * red_num;
                 }
             }
-
+≈
             if(opt_tmp > opt_value || (opt_tmp == opt_value && pin_tmp < pin_num))
             {
                 opt_value = opt_tmp;

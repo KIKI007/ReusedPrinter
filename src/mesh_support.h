@@ -72,6 +72,8 @@ public:
 
     void sp_pin_construction(MeshSlicer &slicer, Eigen::MatrixXd &H);
 
+    void pin_highest_layer_construction(std::vector<ClipperLib::Paths> &bottom_half);
+
     void convex_hull_construction(std::vector< std::vector<ConvexHullPoint>> &convex);
 
 public:
@@ -96,9 +98,14 @@ public:
 
     void convert_clipper_path(ClipperLib::Paths &clipper ,std::list<FermatEdge> &fermat, int layer);
 
-    void clipper_path(ClipperLib::Paths &support, int layer);
+    void clipper_path(ClipperLib::Paths &support, int layer, std::vector<ClipperLib::Paths> &slices);
 
     void connect(std::list<FermatEdge> &path1, std::list<FermatEdge> &path2);
+
+public:
+
+    //for paper
+    void virtual_support_construction(MeshSlicer &slicer, Eigen::MatrixXd &H, Eigen::MatrixXd &V, Eigen::MatrixXi &F);
 
 private:
 
@@ -109,6 +116,8 @@ private:
     Eigen::MatrixXd platform;
 
     std::vector<ClipperLib::Paths> layer_slices;
+
+    std::vector<int> pin_highest_layer;
 };
 
 void MeshSupport::level_set(std::vector<Fermat_Level_Set> &fermat)
@@ -142,13 +151,15 @@ void MeshSupport::sp_pin_construction(MeshSlicer &slicer,  Eigen::MatrixXd &H)
     //platform
     if(H.isZero())
     {
-        Mesh_Layout layout;
+        MeshLayout layout;
         double dx, dz;
-        layout.xy_layout(slicer, dx, dz, H);
+        layout.set_slicer(slicer);
+        layout.xy_layout(dx, dz, H);
         slicer.move_XY(dx, dz);
     }
 
-    platform = H;
+    H = platform = Eigen::MatrixXd::Zero(9, 11);
+    //platform = H;
     slicer.get_slices(layer_slices);
 
     //sp_pin
@@ -188,10 +199,62 @@ void MeshSupport::sp_pin_construction(MeshSlicer &slicer,  Eigen::MatrixXd &H)
             clipper.Execute(ClipperLib::ctIntersection, solution, ClipperLib::pftPositive, ClipperLib::pftPositive);
             ClipperLib::SimplifyPolygons(solution);
             if(!solution.empty())
-                sp_pin[ir * settings.pillar_column + ic] = solution;
+            {
+                ClipperLib::ClipperOffset co;
+                co.AddPaths(solution, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+                //co.Execute(solution, -settings.mm2int(settings.extrusion_width / 2));
+
+                double area = 0;
+                for(int id = 0; id < solution.size();id++)
+                {
+                    area += ClipperLib::Area(solution[id]);
+                }
+                if(std::abs(area) > settings.support_center_area)
+                    sp_pin[ir * settings.pillar_column + ic] = solution;
+                else
+                    platform(ir, ic) = H(ir, ic) = 0;
+            }
+
         }
     }
 
+    pin_highest_layer_construction(bottom_half);
+
+    return;
+}
+
+void MeshSupport::pin_highest_layer_construction(std::vector<ClipperLib::Paths> &bottom_half)
+{
+    pin_highest_layer.resize(settings.pillar_row * settings.pillar_column, 0);
+    for(int ir = 0; ir < settings.pillar_row; ir++) {
+        for (int ic = 0; ic < settings.pillar_column; ic++) {
+            if(!sp_pin[ir * settings.pillar_column + ic].empty())
+            {
+                for(int layer = 0; layer < bottom_half.size(); layer++)
+                {
+                    ClipperLib::Path square;
+                    int L =  settings.mm2int(settings.pad_size * ic);
+                    int R =  settings.mm2int(settings.pad_size * (ic + 1));
+                    int T =  settings.mm2int(settings.pad_size * ir);
+                    int B =  settings.mm2int(settings.pad_size * (ir + 1));
+                    square.push_back(ClipperLib::IntPoint(L, T));
+                    square.push_back(ClipperLib::IntPoint(R, T));
+                    square.push_back(ClipperLib::IntPoint(R, B));
+                    square.push_back(ClipperLib::IntPoint(L, B));
+
+                    ClipperLib::Clipper clipper;
+                    ClipperLib::Paths solution;
+                    clipper.AddPath(square, ClipperLib::ptSubject, true);
+                    clipper.AddPaths(bottom_half[layer], ClipperLib::ptClip, true);
+                    clipper.Execute(ClipperLib::ctIntersection, solution, ClipperLib::pftPositive, ClipperLib::pftPositive);
+                    ClipperLib::SimplifyPolygons(solution);
+                    if(!solution.empty())
+                        pin_highest_layer[ir * settings.pillar_column + ic] = layer - 1;
+                }
+            }
+        }
+    }
+    return;
 }
 
 void MeshSupport::convex_hull_construction(std::vector<std::vector<ConvexHullPoint>> &convex)
@@ -319,11 +382,11 @@ void MeshSupport::convert_clipper_path(ClipperLib::Paths &clipper ,std::list<Fer
     }
 }
 
-void MeshSupport::clipper_path(ClipperLib::Paths &support, int layer)
+void MeshSupport::clipper_path(ClipperLib::Paths &support, int layer, std::vector<ClipperLib::Paths> &slices)
 {
 
     ClipperLib::Paths mesh;
-    mesh = layer_slices[layer];
+    mesh = slices[layer];
 
     ClipperLib::Clipper clipper;
     ClipperLib::ClipperOffset co;
@@ -354,7 +417,14 @@ void MeshSupport::fermat_spiral(std::vector< Fermat_Level_Set> &fermat,
     if(T[u].empty())
     {
         std::list< FermatEdge> present_path;
-        fermat[u].fermat_spiral(e, t, present_path);
+        if(e < 0|| t < 0)
+        {
+            fermat[u].fermat_spiral(0, 0, present_path);
+        }
+        else
+        {
+            fermat[u].fermat_spiral(e, t, present_path);
+        }
         connect(path, present_path);
         return;
     }
@@ -405,16 +475,16 @@ void MeshSupport::fermat_spiral(std::vector<std::list<FermatEdge>> &path_layer, 
 //
 //    ClipperLib::Path outer0;
 //    outer0.push_back(ClipperLib::IntPoint(0, 0));
-//    outer0.push_back(ClipperLib::IntPoint(0, 10000));
-//    outer0.push_back(ClipperLib::IntPoint(10000, 10000));
-//    outer0.push_back(ClipperLib::IntPoint(10000, 0));
+//    outer0.push_back(ClipperLib::IntPoint(0, 3000));
+//    outer0.push_back(ClipperLib::IntPoint(3000, 3000));
+//    outer0.push_back(ClipperLib::IntPoint(3000, 0));
 //    squre0 = Fermat_Level_Set(outer0, 0);
 //
 //    ClipperLib::Path outer1;
-//    outer1.push_back(ClipperLib::IntPoint(15000, 0));
-//    outer1.push_back(ClipperLib::IntPoint(15000, 10000));
-//    outer1.push_back(ClipperLib::IntPoint(25000, 10000));
-//    outer1.push_back(ClipperLib::IntPoint(25000, 0));
+//    outer1.push_back(ClipperLib::IntPoint(3000, 0));
+//    outer1.push_back(ClipperLib::IntPoint(3000,  10000));
+//    outer1.push_back(ClipperLib::IntPoint(13000, 10000));
+//    outer1.push_back(ClipperLib::IntPoint(13000, 0));
 //    squre1 = Fermat_Level_Set(outer1, 0);
 //
 //    ClipperLib::Path outer2;
@@ -437,8 +507,24 @@ void MeshSupport::fermat_spiral(std::vector<std::list<FermatEdge>> &path_layer, 
 //    fermat.push_back(squre3);
     //testing code
 
-    std::vector< std::vector<MSTGraphNode>> T;
-    minimum_spanning_tree(fermat, T);
+//    std::vector< std::vector<MSTGraphNode>> T;
+//    std::vector<int> roots;
+    //minimum_spanning_tree(fermat, T);
+
+//    MSTGraphNode node;
+//    roots.push_back(0);
+//    path_layer.resize(1);
+//    T.resize(2);
+//    squre0.closest(squre1, node.e1, node.t1, node.e2, node.t2);
+//    node.x = 1;
+//    T[0].push_back(node);
+//    for(int id = 0; id < roots.size(); id++)
+//    {
+//        fermat_spiral(fermat, T, roots[id], -1, -1,  path_layer[0]);
+//    }
+
+
+    //    squre1.closest(squre0, node.e1, node.t1, node.e2, node.t2);
 
     //testing code
 //    T.resize(4);
@@ -458,6 +544,8 @@ void MeshSupport::fermat_spiral(std::vector<std::list<FermatEdge>> &path_layer, 
 //    T[1].push_back(node);
     //testing code
 
+    std::vector<ClipperLib::Paths> stack_slices;
+    slicer.get_stack_slices(stack_slices);
 
     std::vector<ClipperLib::Paths> clipper_layer;
     std::list<FermatEdge>::iterator it;
@@ -465,7 +553,8 @@ void MeshSupport::fermat_spiral(std::vector<std::list<FermatEdge>> &path_layer, 
 
     settings.print_N();
     settings.print_TsN("WALL SUPPORT");
-
+    std::vector< std::vector<MSTGraphNode>> T;
+    minimum_spanning_tree(fermat, T);
     for(int layer_id = 1; layer_id < number_layer(); layer_id++)
     {
         memset(settings.tmp_str, 0, sizeof(settings.tmp_str));
@@ -483,11 +572,19 @@ void MeshSupport::fermat_spiral(std::vector<std::list<FermatEdge>> &path_layer, 
         {
             int row = pin_id / settings.pillar_column;
             int column = pin_id % settings.pillar_column;
-            if(platform(row, column) < layer_height(layer_id) && platform(row, column) > 0)
+            if(sp_pin[pin_id].empty()) continue;
+            if(platform(row, column) < layer_height(layer_id)
+               && layer_id < pin_highest_layer[row * settings.pillar_column + column])
             {
                 pin_below_layer[pin_id] = true;
                 if(platform(row, column) >= layer_height(layer_id - 1))
                     fermat_pattern_change = true;
+            }
+
+            if(layer_id == pin_highest_layer[row * settings.pillar_column + column])
+            {
+                pin_below_layer[pin_id] = false;
+                fermat_pattern_change = true;
             }
 
         }
@@ -504,12 +601,13 @@ void MeshSupport::fermat_spiral(std::vector<std::list<FermatEdge>> &path_layer, 
                 for (int jd = 0; jd < T[id].size(); jd++) {
                     if(pin_below_layer[T[id][jd].x])
                     {
-                        T_layer[id].push_back(T[id][jd]);
+                        //T_layer[id].push_back(T[id][jd]);
                     }
                 }
             }
 
             clipper_layer.clear();
+            //T_layer.clear();
             find_tree_roots(pin_below_layer, T_layer, roots);
             for(int id = 0; id < roots.size(); id++)
             {
@@ -518,7 +616,7 @@ void MeshSupport::fermat_spiral(std::vector<std::list<FermatEdge>> &path_layer, 
 
                 ClipperLib::Paths subtree_clipper;
                 convert_path_clipper(subtree_clipper, subtree_path);
-                clipper_path(subtree_clipper, layer_id);
+                clipper_path(subtree_clipper, layer_id, stack_slices);
                 clipper_layer.push_back(subtree_clipper);
             }
         }
@@ -528,7 +626,7 @@ void MeshSupport::fermat_spiral(std::vector<std::list<FermatEdge>> &path_layer, 
             // the previous layer's fermal spiral has to subtract the new layer's slice polygons
             for(int id = 0; id < clipper_layer.size(); id++)
                 if(clipper_layer[id].size() > 0)
-                    clipper_path(clipper_layer[id], layer_id);
+                    clipper_path(clipper_layer[id], layer_id, stack_slices);
         }
 
         for(int id = 0; id < clipper_layer.size(); id++)
@@ -678,6 +776,24 @@ void MeshSupport::connect(std::list<FermatEdge> &path1, std::list<FermatEdge> &p
     path1.insert(path1.end(), path2.begin(), path2.end());
 
     return;
+}
+
+
+void MeshSupport::virtual_support_construction(MeshSlicer &slicer, Eigen::MatrixXd &H, Eigen::MatrixXd &V, Eigen::MatrixXi &F)
+{
+    //platform
+    MeshLayout layout;
+    double dx, dz;
+    layout.set_slicer(slicer);
+    layout.xy_layout(dx, dz, H);
+    slicer.move_XY(dx, dz);
+
+    platform = H;
+    slicer.get_slices(layer_slices);
+
+    Eigen::MatrixXi red_map;
+    Eigen::MatrixXd height_map;
+
 }
 
 #endif //EXAMPLE_MESH_SUPPORT_H

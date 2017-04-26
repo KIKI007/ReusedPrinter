@@ -17,6 +17,7 @@ option(LIBIGL_WITH_OPENGL_GLFW      "Use GLFW"           OFF)
 option(LIBIGL_WITH_PNG              "Use PNG"            OFF)
 option(LIBIGL_WITH_TETGEN           "Use Tetgen"         OFF)
 option(LIBIGL_WITH_TRIANGLE         "Use Triangle"       OFF)
+option(LIBIGL_WITH_BOOST            "Use Boost"          OFF)
 option(LIBIGL_WITH_VIEWER           "Use OpenGL viewer"  OFF)
 option(LIBIGL_WITH_XML              "Use XML"            OFF)
 option(LIBIGL_WITH_PYTHON           "Use Python"         OFF)
@@ -173,6 +174,13 @@ if(LIBIGL_WITH_CGAL) # to be cleaned
       ${CGAL_3RD_PARTY_INCLUDE_DIRS}
       ${CGAL_INCLUDE_DIRS})
   endif()
+endif()
+
+### Compile Boost part
+if(LIBIGL_WITH_BOOST)
+  find_package(Boost 1.59 COMPONENTS program_options REQUIRED)
+  list(APPEND LIBIGL_INCLUDE_DIRS ${Boost_INCLUDE_DIR})
+  message("Boost ${Boost_INCLUDE_DIR}")
 endif()
 
 #Compile CoMISo

@@ -22,28 +22,44 @@ typedef struct tagHeightMapNode
     ClipperLib::Paths polys;
 }HeightMapNode;
 
-class Mesh_Layout
+class MeshLayout
 {
 public:
-    Mesh_Layout()
+    MeshLayout()
     {
-
+        clear();
     }
 
-    Mesh_Layout(Settings s)
+    MeshLayout(Settings s)
     {
         settings = s;
     }
 
 public:
 
+    void clear()
+    {
+        red_map_.setZero();
+        height_map_.setZero();
+        slicer_.clear();
+    }
+
+    void set_slicer(MeshSlicer &slicer)
+    {
+        clear();
+        slicer_ = slicer;
+        settings = slicer.return_settings();
+    }
+
+public:
+
     void layer_projecting(Eigen::MatrixXi &map, std::vector<ClipperLib::Paths> &slices);
 
-    void get_height_map(Eigen::MatrixXd &height_map, MeshSlicer &slicer);
+    void get_height_map(Eigen::MatrixXd &height_map);
 
-    void get_red_map(Eigen::MatrixXi &red_map, MeshSlicer &slicer);
+    void get_red_map(Eigen::MatrixXi &red_map);
 
-    void xy_layout(MeshSlicer &slicer, double &dx, double &dz, Eigen::MatrixXd &platform);
+    void xy_layout(double &dx, double &dz, Eigen::MatrixXd &platform);
 
 private:
 
@@ -55,11 +71,17 @@ private:
 
 public:
 
+    MeshSlicer slicer_;
+
+    Eigen::MatrixXd height_map_;
+
+    Eigen::MatrixXi red_map_;
+
     Settings settings;
 };
 
 
-void Mesh_Layout::layer_projecting(Eigen::MatrixXi &map, std::vector<ClipperLib::Paths> &slices)
+void MeshLayout::layer_projecting(Eigen::MatrixXi &map, std::vector<ClipperLib::Paths> &slices)
 {
     std::queue<HeightMapNode> Queue;
     map = Eigen::MatrixXi::Zero(settings.pillar_row  * settings.xy_sample_num_each_pin,
@@ -150,18 +172,24 @@ void Mesh_Layout::layer_projecting(Eigen::MatrixXi &map, std::vector<ClipperLib:
     }
 }
 
-void Mesh_Layout::get_height_map(Eigen::MatrixXd &height_map, MeshSlicer &slicer)
+void MeshLayout::get_height_map(Eigen::MatrixXd &height_map)
 {
-    settings.tic("read");
-    std::vector<ClipperLib::Paths> stack_slices, slices;
-    slicer.get_slices(slices);
+    if(!height_map_.isZero())
+    {
+        height_map = height_map_;
+        return;
+    }
 
-    settings.toc();
+    //settings.tic("read");
+    std::vector<ClipperLib::Paths> stack_slices, slices;
+    slicer_.get_slices(slices);
+
+    //settings.toc();
     Eigen::MatrixXi map;
     // height map
-    settings.tic("project");
+    //settings.tic("project");
     layer_projecting(map, slices);
-    settings.toc();
+    //settings.toc();
     height_map.resize(map.rows(), map.cols());
 
     for(int ir = 0; ir < map.rows(); ir++)
@@ -179,19 +207,26 @@ void Mesh_Layout::get_height_map(Eigen::MatrixXd &height_map, MeshSlicer &slicer
             }
         }
     }
+    height_map_ = height_map;
 
     return;
 }
 
-void Mesh_Layout::get_red_map(Eigen::MatrixXi &red_map, MeshSlicer &slicer)
+void MeshLayout::get_red_map(Eigen::MatrixXi &red_map)
 {
 
-    settings.tic("get overhang slices");
-    std::vector<ClipperLib::Paths> bottom_half;
-    slicer.get_bottom_half(bottom_half);
-    settings.toc();
+    if(!red_map_.isZero())
+    {
+        red_map = red_map_;
+        return;
+    }
 
-    settings.tic("assemble");
+    //settings.tic("get overhang slices");
+    std::vector<ClipperLib::Paths> bottom_half;
+    slicer_.get_bottom_half(bottom_half);
+    //settings.toc();
+
+    //settings.tic("assemble");
     ClipperLib::Paths downward = bottom_half[0];
     ClipperLib::Clipper clipper;
 
@@ -203,9 +238,8 @@ void Mesh_Layout::get_red_map(Eigen::MatrixXi &red_map, MeshSlicer &slicer)
         }
     }
     clipper.Execute(ClipperLib::ctUnion, downward, ClipperLib::pftPositive, ClipperLib::pftPositive);
-    settings.toc();
+    //settings.toc();
 
-    settings.tic("project");
     Eigen::MatrixXi map;
     std::vector<ClipperLib::Paths> slices;
     slices.push_back(downward);
@@ -226,14 +260,17 @@ void Mesh_Layout::get_red_map(Eigen::MatrixXi &red_map, MeshSlicer &slicer)
             }
         }
     }
-    settings.toc();
+    //settings.toc();
 
+    red_map_= red_map;
 
     return;
 }
 
-void Mesh_Layout::xy_layout(MeshSlicer &slicer, double &dx, double &dz, Eigen::MatrixXd &platform)
+void MeshLayout::xy_layout(double &dx, double &dz, Eigen::MatrixXd &platform)
 {
+    assert(!slicer_.empty());
+
     dx = 0;
     dz = 0;
 
@@ -241,14 +278,14 @@ void Mesh_Layout::xy_layout(MeshSlicer &slicer, double &dx, double &dz, Eigen::M
     Eigen::MatrixXi red_map;
 
     //settings.tic("height map");
-    get_height_map(height_map, slicer);
+    get_height_map(height_map);
     //settings.toc();
 
     //settings.tic("red map");
-    get_red_map(red_map, slicer);
+    get_red_map(red_map);
     //settings.toc();
 
-    settings.tic("layout optimization");
+    //settings.tic("layout optimization");
     //Red Anchor
     Eigen::MatrixXi red_anchor;
     red_anchor = Eigen::MatrixXi::Zero(red_map.rows(), red_map.cols());
@@ -355,8 +392,6 @@ void Mesh_Layout::xy_layout(MeshSlicer &slicer, double &dx, double &dz, Eigen::M
                     int LT = r1 > 0 && c1 > 0 ? red_anchor(r1 - 1, c1 - 1) : 0;
                     int red_num =   red_anchor(r2, c2) - L - T + LT;
 
-                    if(red_num > 0) num_pin_tmp++;
-
                     //get minimum
                     int kr = std::log2(r2 - r1 + 1);
                     int kc = std::log2(c2 - c1 + 1);
@@ -372,12 +407,15 @@ void Mesh_Layout::xy_layout(MeshSlicer &slicer, double &dx, double &dz, Eigen::M
                     {
                         platform_tmp(ir, ic) = minimum_height;
                         opt_tmp += minimum_height * red_num;
+                        if(red_num > 0 && minimum_height > 0) num_pin_tmp++;
                     }
 
                 }
             }
 
-            if(opt_tmp > opt_value || (opt_tmp == opt_value && num_pin_tmp < num_pin))
+            std::cout << dr << ",\t" << dc << ",\t" << opt_tmp << ",\t" << num_pin_tmp << std::endl;
+
+            if(opt_tmp > opt_value || (std::abs(opt_tmp - opt_value) < settings.ZERO_EPS && num_pin_tmp < num_pin))
             {
                 opt_value = opt_tmp;
                 opt_r = dr * settings.pad_size / settings.xy_sample_num_each_pin;
@@ -392,7 +430,7 @@ void Mesh_Layout::xy_layout(MeshSlicer &slicer, double &dx, double &dz, Eigen::M
     dx = -opt_c;
     dz = -opt_r;
 
-    settings.toc();
+    //settings.toc();
     return;
 }
 
