@@ -187,7 +187,7 @@ void output()
 
     //layout
     MeshLayout layout;
-    double dx, dz;
+    double dx = 0, dz = 0;
     layout.set_slicer(slicer);
     layout.xy_layout(dx, dz, platform);
     slicer.move_XY(dx,dz);
@@ -352,11 +352,10 @@ void fermat_spiral()
     viewer.data.set_mesh(V, F);
     viewer.data.set_colors(C);
 //
-    for(int id = 0; id < path_layer.size(); id+= 10)
-    {
+    int id = 1;
+    for(int id = 0; id < path_layer.size(); id+= 10) {
         std::list<FermatEdge> path = path_layer[id];
-        for(std::list<FermatEdge>::iterator it = path.begin(); it != path.end(); ++it)
-        {
+        for (std::list<FermatEdge>::iterator it = path.begin(); it != path.end(); ++it) {
             viewer.data.add_edges(
                     it->P0(),
                     it->P1(),
@@ -432,6 +431,7 @@ void xy_move()
     viewer.data.clear();
     MeshLayout layout;
     double dx = 0, dz = 0;
+    layout.set_slicer(slicer);
     layout.xy_layout(dx, dz, platform);
     slicer.move_XY(dx, dz);
     slicer.getV(V);
@@ -473,13 +473,20 @@ void gcode()
     viewer.data.set_mesh(V, F);
     viewer.data.set_colors(C);
     Gcode gcode(TESTING_MODELS_PATH  "/"  + pathname + "/" + pathname + ".gcode");
+    gcode.get_minXY();
+    slicer.getV(V);
+    std::cout << "Gcode: MinX " << gcode.min_X  << ",\tMinY " << gcode.min_Y << std::endl;
+    std::cout << "Support: MinX "    << V.colwise().minCoeff()[0]  + settings.platform_zero_x
+              << ",\tMinY "          << -V.colwise().maxCoeff()[2] + settings.platform_zero_y;
+    gcode.move_XY( V.colwise().minCoeff()[0] + settings.platform_zero_x - gcode.min_X,
+                  -V.colwise().maxCoeff()[2] + settings.platform_zero_y - gcode.min_Y);
     gcode.add_support(path_layer);
     gcode.print(TESTING_MODELS_PATH  "/"  + pathname + "/" + pathname + "_new.gcode");
 }
 
 int main(int argc, char *argv[])
 {
-    pathname = "cube";
+    pathname = "arch";
     loadModel();
     viewer.callback_init = [&](igl::viewer::Viewer& viewer)
     {

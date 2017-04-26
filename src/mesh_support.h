@@ -136,6 +136,19 @@ void MeshSupport::level_set(std::vector<Fermat_Level_Set> &fermat)
             {
                 outside.push_back(convex[pin_id][id].pi);
             }
+            ClipperLib::Paths simpl;
+            ClipperLib::SimplifyPolygon(outside, simpl);
+
+            double outside_area = 0;
+            for(int jd = 0; jd < simpl.size(); jd++)
+            {
+                double sol_area =  std::abs(ClipperLib::Area(simpl[jd]));
+                if(outside_area <= sol_area)
+                {
+                    outside_area = sol_area;
+                    outside = simpl[jd];
+                }
+            }
 
             fermat[pin_id] = Fermat_Level_Set(outside, platform(pin_id / settings.pillar_column, pin_id % settings.pillar_column));
 
@@ -158,8 +171,8 @@ void MeshSupport::sp_pin_construction(MeshSlicer &slicer,  Eigen::MatrixXd &H)
         slicer.move_XY(dx, dz);
     }
 
-    H = platform = Eigen::MatrixXd::Zero(9, 11);
-    //platform = H;
+    //H = platform = Eigen::MatrixXd::Zero(9, 11);
+    platform = H;
     slicer.get_slices(layer_slices);
 
     //sp_pin
@@ -200,16 +213,12 @@ void MeshSupport::sp_pin_construction(MeshSlicer &slicer,  Eigen::MatrixXd &H)
             ClipperLib::SimplifyPolygons(solution);
             if(!solution.empty())
             {
-                ClipperLib::ClipperOffset co;
-                co.AddPaths(solution, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
-                //co.Execute(solution, -settings.mm2int(settings.extrusion_width / 2));
-
                 double area = 0;
                 for(int id = 0; id < solution.size();id++)
                 {
                     area += ClipperLib::Area(solution[id]);
                 }
-                if(std::abs(area) > settings.support_center_area)
+                if(std::abs(area) > settings.ZERO_EPS)
                     sp_pin[ir * settings.pillar_column + ic] = solution;
                 else
                     platform(ir, ic) = H(ir, ic) = 0;

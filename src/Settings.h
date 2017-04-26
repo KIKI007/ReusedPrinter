@@ -35,7 +35,7 @@ public:
         overhang_offset = 0.2; //mm
         extrusion_width = 0.6; //mm
         support_center_area = 0.25; //mm
-        fermat_cut_width = 0.2; //mm
+        fermat_cut_width = 0.5; //mm
 
         face_overhang_angle = 50 * PI / 180;
         expected_sample_num = 2000;
@@ -55,8 +55,9 @@ public:
         maximum_height_map = pillar_standard_height * 100;
 
         //gcode
-        nF_printing = 540;
+        nF_printing_rest = 1800;
         nF_moving = 1800;
+        nF_printing_first = 540;
         nF_reversing = 4800;
         platform_zero_x = -60;
         platform_zero_y = 50;
@@ -178,7 +179,8 @@ public:
     double maximum_height_map;
 
     //gcode
-    double nF_printing;
+    double nF_printing_first;
+    double nF_printing_rest;
     double nF_moving;
     double nF_reversing;
 

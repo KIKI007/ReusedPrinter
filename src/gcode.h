@@ -52,8 +52,11 @@ public:
 
     void clear()
     {
+        type = Empty;
         nG = nM = 0;
         nE = nS = nF = nX = nY = nZ = 0;
+        comment = "";
+        zero_eps = 1e-6;
     }
 public:
 
@@ -270,8 +273,6 @@ public:
     {
         char *char_str = new char[str.length()];
         std::strcpy(char_str, str.c_str());
-        char tmp_sgn;
-        double tmp_num;
         sscanf(char_str, "%c%lf",&sgn, &num);
         return;
     }
@@ -316,6 +317,16 @@ public:
     {
         if(nG != 1)return false;
         if((type & G_Type) && (type & E_Type))
+            return true;
+        else
+            return false;
+    }
+
+
+    bool is_G1EF()
+    {
+        if(nG != 1)return false;
+        if((type & G_Type) && (type & E_Type) && (type & F_Type))
             return true;
         else
             return false;
@@ -522,6 +533,40 @@ public:
         return std::round(code.nZ / settings.layer_height);
     }
 
+    void get_minXY()
+    {
+        min_X = settings.MAX_DOUBLE;
+        min_Y = settings.MAX_DOUBLE;
+        double X = 0, Y = 0;
+        for(int layer = 1; layer < lines_layer.size() - 1; layer++) {
+            for(int id = 0; id < lines_layer[layer].size(); id++)
+            if (lines_layer[layer][id].is_G1XY() && lines_layer[layer][id].is_G1E())
+            {
+                min_X = std::min(min_X, X);
+                min_X = std::min(min_X, lines_layer[layer][id].nX);
+                min_Y = std::min(min_Y, Y);
+                min_Y = std::min(min_Y, lines_layer[layer][id].nY);
+            }
+        }
+        min_Y -= settings.extrusion_width / 2;
+        min_X -= settings.extrusion_width / 2;
+    }
+
+    void move_XY(double dX, double dY)
+    {
+        for(int layer = 1; layer < lines_layer.size() - 1; layer++) {
+                for(int id = 0; id < lines_layer[layer].size(); id++)
+                {
+                    if(lines_layer[layer][id].is_G1XY())
+                    {
+                        lines_layer[layer][id].nX += dX;
+                        lines_layer[layer][id].nY += dY;
+                    }
+                }
+        }
+        return;
+    }
+
 
     void remove_G1Z_code_inside_layer()
     {
@@ -542,10 +587,9 @@ public:
     void add_support(std::vector<std::list<FermatEdge>> &path_layer)
     {
         get_dE_D_dL();
-        double X = 0, Y = 0;
+        double X = 0, Y = 0, F = 0;
         for(int layer = 1; layer < path_layer.size(); layer++)
         {
-
             std::vector<GcodeLine> support;
             GcodeLine code;
             for(int id = 0; id < lines_layer[layer].size(); id++)
@@ -554,7 +598,9 @@ public:
                 if(code.is_G1XY()) {
                     X = code.nX;
                     Y = code.nY;
+                    if(code.is_G1EF()) F = code.nF;
                 }
+
             }
 
             code.set_G92E0();
@@ -579,7 +625,10 @@ public:
 
                 double dL = std::sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1));
                 E += dL * dEdL[layer];
-                if(new_speed) code.set_G1_XYEF(X2, Y2, E, settings.nF_printing);
+                if(new_speed)
+                {
+                    code.set_G1_XYEF(X2, Y2, E, F);
+                }
                 else code.set_G1_XYE(X2, Y2, E);
                 support.push_back(code);
                 X = X2;
@@ -588,7 +637,6 @@ public:
             }
             lines_layer[layer].insert(lines_layer[layer].end(), support.begin(), support.end());
         }
-
     }
 
     void get_dE_D_dL()
@@ -645,6 +693,10 @@ public:
     Settings settings;
 
     std::vector<double> dEdL;
+
+    double min_X;
+
+    double min_Y;
 };
 
 #endif //EXAMPLE_GCODE_H
