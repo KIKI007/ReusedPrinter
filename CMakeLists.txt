@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project(example)
+project(supporter)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -27,7 +27,7 @@ endif()
 # libigl options: choose between header only and compiled static library
 # Header-only is preferred for small projects. For larger projects the static build
 # considerably reduces the compilation times
-option(LIBIGL_USE_STATIC_LIBRARY "Use LibIGL as static library" ON)
+option(LIBIGL_USE_STATIC_LIBRARY "Use LibIGL as static library" OFF)
 
 # add a customizable menu bar
 option(LIBIGL_WITH_NANOGUI     "Use Nanogui menu"   ON)
@@ -42,6 +42,7 @@ option(LIBIGL_WITH_PNG         "Use PNG"            OFF)
 option(LIBIGL_WITH_TETGEN      "Use Tetgen"         OFF)
 option(LIBIGL_WITH_TRIANGLE    "Use Triangle"       ON)
 option(LIBIGL_WITH_XML         "Use XML"            OFF)
+option(LIBIGL_WITH_BOOST        "Use Boost"         ON)
 option(LIBIGL_WITH_LIM         "Use LIM"            OFF)
 option(LIBIGL_WITH_COMISO      "Use CoMiso"         OFF)
 option(LIBIGL_WITH_MATLAB      "Use Matlab"         OFF) # This option is not supported yet
@@ -69,5 +70,10 @@ message("libigl definitions: ${LIBIGL_DEFINITIONS}")
 include_directories(${LIBIGL_INCLUDE_DIRS})
 add_definitions(${LIBIGL_DEFINITIONS})
 
+# Store location of tutorial/shared directory
+set(TESTING_MODELS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/models CACHE PATH "location of testing_models")
+#add_definitions("-DTESTING_MODELS_PATH=\"${TESTING_MODELS_PATH}\"")
+
 # Add your project files
-add_subdirectory(src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+add_subdirectory("src")

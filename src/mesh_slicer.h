@@ -45,6 +45,8 @@ public:
     //direct computing the layer_height without using some vector's size
     inline int number_layer() { return (max_Y() - min_Y()) / settings.mm2int_Even(settings.layer_height) + 1; }
 
+    bool empty() {return V.isZero();}
+
 protected:
     //set the matrix P
     //all in in P is odd
@@ -480,7 +482,7 @@ void MeshSlicer::stack_slices_construction()
         ClipperLib::Clipper clipper;
         clipper.AddPaths(layer_slices[layer], ClipperLib::ptSubject, true);
         clipper.AddPaths(stack_slices[layer - 1], ClipperLib::ptClip, true);
-        clipper.Execute(ClipperLib::ctDifference, stack_slices[layer], ClipperLib::pftPositive, ClipperLib::pftPositive);
+        clipper.Execute(ClipperLib::ctUnion, stack_slices[layer], ClipperLib::pftPositive, ClipperLib::pftPositive);
     }
 
     return;
