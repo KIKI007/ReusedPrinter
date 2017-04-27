@@ -474,10 +474,10 @@ void MeshSupport::fermat_spiral(std::vector< Fermat_Level_Set> &fermat,
 
 void MeshSupport::fermat_spiral(std::vector<std::list<FermatEdge>> &path_layer, MeshSlicer &slicer, Eigen::MatrixXd &H)
 {
-    sp_pin_construction(slicer, H);
+    sp_pin_construction(slicer, H);settings.print_TsN("SP PIN FINISH");
 
     std::vector<Fermat_Level_Set> fermat;
-    level_set(fermat);
+    level_set(fermat); settings.print_TsN("LEVEL SET FINISH");
 
     //testing code
 //    Fermat_Level_Set squre0, squre1, squre2, squre3;
@@ -563,7 +563,7 @@ void MeshSupport::fermat_spiral(std::vector<std::list<FermatEdge>> &path_layer, 
     settings.print_N();
     settings.print_TsN("WALL SUPPORT");
     std::vector< std::vector<MSTGraphNode>> T;
-    minimum_spanning_tree(fermat, T);
+    minimum_spanning_tree(fermat, T);settings.print_TsN("MST FINISH");
     for(int layer_id = 1; layer_id < number_layer(); layer_id++)
     {
         memset(settings.tmp_str, 0, sizeof(settings.tmp_str));
