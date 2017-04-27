@@ -6,6 +6,8 @@
 #define SUPPORTER_SETTINGS_H
 #include <limits>
 #include <string>
+#include <ctime>
+#include <cstdio>
 
 class Settings
 {
@@ -31,7 +33,7 @@ public:
 
         //support generation
         overhang_offset = 0.2; //mm
-        support_width = 0.5; //mm
+        extrusion_width = 0.6; //mm
         support_center_area = 0.25; //mm
         fermat_cut_width = 0.5; //mm
 
@@ -42,7 +44,7 @@ public:
         //platform
         pad_size = 12.7; //mm 0.5inch
         pad_thickness = 1.4224; //mm 0.056inch
-        pillar_length = 304.8; //mm 12inch
+        pillar_length = 4 * 25.4; //mm 12inch
         pillar_radius = 3.175; //mm 0.125 inch
         pillar_standard_height = 12.7; //mm 0.5inch
         pillar_row = 9;
@@ -51,6 +53,14 @@ public:
         //layout
         xy_sample_num_each_pin = 1 << 4;
         maximum_height_map = pillar_standard_height * 100;
+
+        //gcode
+        nF_printing_rest = 1800;
+        nF_moving = 1800;
+        nF_printing_first = 540;
+        nF_reversing = 4800;
+        platform_zero_x = -60;
+        platform_zero_y = 50;
     }
 
 public:
@@ -93,22 +103,36 @@ public:
 
     void print_N()
     {
-        std::cout << std::endl;
+//        std::cout << std::endl;
     }
 
 
     void print_TsN(std::string script, int tab = 0)
     {
-        while(tab --)std::cout << "\t";
-        std::cout << script << std::endl;
+//       while(tab --)std::cout << "\t";
+//        std::cout << script << std::endl;
     }
 
     void print_Ts(std::string script, int tab = 0)
     {
-        while(tab --)std::cout << "\t";
-        std::cout << script;
+//        while(tab --)std::cout << "\t";
+//        std::cout << script;
     }
 
+
+public:
+
+    void tic(std::string script)
+    {
+        std::cout<< script << "...";
+        start = std::clock();
+    }
+
+    void toc()
+    {
+        double duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+        std::cout<< duration << "s" <<'\n';
+    }
 
 public:
     //global
@@ -130,6 +154,8 @@ public:
     double pillar_standard_height;
     int pillar_row;
     int pillar_column;
+    double platform_zero_x;
+    double platform_zero_y;
 
     //sampling
     double sample_distance;
@@ -139,7 +165,7 @@ public:
 
     //support generation
     double overhang_offset;
-    double support_width;
+    double extrusion_width;
     double support_center_area;
     double fermat_cut_width;
 
@@ -147,12 +173,21 @@ public:
     double expected_sample_num;
     double printing_max_angle;
 
+
     //layout
     int xy_sample_num_each_pin;
     double maximum_height_map;
 
+    //gcode
+    double nF_printing_first;
+    double nF_printing_rest;
+    double nF_moving;
+    double nF_reversing;
+
 public:
     char tmp_str[1024];
+
+    std::clock_t start;
 };
 
 

@@ -204,7 +204,7 @@ Fermat_Level_Set::Fermat_Level_Set(ClipperLib::Path &outside, double pin_height)
         ClipperLib::ClipperOffset co;
         co.AddPath(outside, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
         ClipperLib::Paths solution;
-        co.Execute(solution, -settings.mm2int(settings.support_width));
+        co.Execute(solution, -settings.mm2int(settings.extrusion_width * 2));
         ClipperLib::SimplifyPolygons(solution);
 
         outside.clear();
@@ -565,6 +565,14 @@ void Fermat_Level_Set::fermat_spiral(int e0, double t0, std::list<FermatEdge> &p
 
     anticlockwise(0, e0, t0, 2 * settings.fermat_cut_width, e1, t1);
 
+    if(num_level() <= 1)
+    {
+        std::list< FermatEdge> centers[2];
+        partition(0, e0, t0, e1, t1, centers[0], centers[1]);
+        path = centers[0];
+        return;
+    }
+
     while(level < num_level() - 1)
     {
         reroute(level, e0, t0, e1, t1, uppers[level], lowers[level]);
@@ -576,6 +584,7 @@ void Fermat_Level_Set::fermat_spiral(int e0, double t0, std::list<FermatEdge> &p
         e1 = e3;t1 = t3;
         level++;
     }
+
 
     std::list< FermatEdge> centers[2];
     partition(level, e0, t0, e1, t1, centers[0], centers[1]);
