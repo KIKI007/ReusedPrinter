@@ -83,6 +83,7 @@ public:
 
 void MeshLayout::layer_projecting(Eigen::MatrixXi &map, std::vector<ClipperLib::Paths> &slices)
 {
+    settings.tic("\nRasterize Time: ");
     std::queue<HeightMapNode> Queue;
     map = Eigen::MatrixXi::Zero(settings.pillar_row  * settings.xy_sample_num_each_pin,
                                 settings.pillar_column * settings.xy_sample_num_each_pin);
@@ -170,6 +171,7 @@ void MeshLayout::layer_projecting(Eigen::MatrixXi &map, std::vector<ClipperLib::
             }
         }
     }
+    settings.toc();
 }
 
 void MeshLayout::get_height_map(Eigen::MatrixXd &height_map)

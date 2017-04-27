@@ -97,7 +97,7 @@ void recover()
 void series_slicing()
 {
     SceneOrganizer organizer;
-    for(int id = 0; id < slicer.number_layer(); id+= 5)
+    for(int id = 0; id < slicer.number_layer(); id+= 2)
     {
         slicer.get_intersecting_surface(id, V, F);
         if(V.rows() >= 3)
