@@ -10,7 +10,7 @@ add_executable(${PROJECT_NAME}_bin main.cpp
         fermat_spirals.h
         mesh_layout.h
         mesh_support.h
-        gcode.h)
+        gcode.h scan_line_fill.h)
         #testing_models_path.h
         #detecting_overhangs.h
         #rendering_tree_support.h
@@ -23,4 +23,5 @@ target_link_libraries(
         ${LIBIGL_VIEWER_EXTRA_LIBRARIES}
         ${LIBIGL_OPENGL_EXTRA_LIBRARIES}
         ${LIBIGL_OPENGL_GLFW_EXTRA_LIBRARIES}
-        ${LIBIGL_TRIANGLE_EXTRA_LIBRARIES})
+        ${LIBIGL_TRIANGLE_EXTRA_LIBRARIES}
+        ${LIBIGL_PNG_EXTRA_LIBRARIES})
