@@ -165,10 +165,11 @@ void MeshSupport::sp_pin_construction(MeshSlicer &slicer,  Eigen::MatrixXd &H)
     if(H.isZero())
     {
         MeshLayout layout;
-        double dx, dz;
+        LayoutOptOutput opt;
         layout.set_slicer(slicer);
-        layout.xy_layout(dx, dz, H);
-        slicer.move_XY(dx, dz);
+        opt = layout.xy_layout();
+        slicer.move_XY(opt.dx, opt.dy);
+        H = opt.platform;
     }
 
     //H = platform = Eigen::MatrixXd::Zero(9, 11);
@@ -792,10 +793,10 @@ void MeshSupport::virtual_support_construction(MeshSlicer &slicer, Eigen::Matrix
 {
     //platform
     MeshLayout layout;
-    double dx, dz;
+    LayoutOptOutput opt;
     layout.set_slicer(slicer);
-    layout.xy_layout(dx, dz, H);
-    slicer.move_XY(dx, dz);
+    opt = layout.xy_layout();
+    slicer.move_XY(opt.dx, opt.dy);
 
     platform = H;
     slicer.get_slices(layer_slices);
