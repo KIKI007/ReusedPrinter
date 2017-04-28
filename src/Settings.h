@@ -51,7 +51,7 @@ public:
         pillar_column = 11;
 
         //layout
-        xy_sample_num_each_pin = 1 << 4;
+        xy_sample_num_each_pin = 1 << 5;
         maximum_height_map = pillar_standard_height * 100;
 
         //gcode

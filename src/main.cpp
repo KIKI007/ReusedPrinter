@@ -15,9 +15,11 @@
 #include "clipper.hpp"
 #include "normalizing_model.h"
 #include "scene_organizer.h"
-
 #include "gcode.h"
+#include "scan_line_fill.h"
 
+#include <igl/png/writePNG.h>
+#include <igl/png/readPNG.h>
 using namespace ClipperLib;
 using std::cout;
 using std::endl;
@@ -60,6 +62,35 @@ void slicing()
 {
     slicer.set_mesh(V, F);
     slicer.contour_construction();
+}
+
+void image()
+{
+    if(layer > slicer.number_layer() - 1)
+        layer = slicer.number_layer() - 1;
+    std::vector<ClipperLib::Paths> slices;
+    slicer.get_slices(slices);
+    Eigen::MatrixXd imag;
+    ScanLineFill filler;
+    filler.polygon_fill(slices[layer], imag);
+    int nr = imag.rows();
+    int nc = imag.cols();
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> R(nc, nr);
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> G(nc ,nr);
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> B(nc ,nr);
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> A(nc ,nr);
+    for(int ir = 0; ir < nr; ir++)
+    {
+        for(int ic = 0; ic < nc; ic++)
+        {
+            A(ic, ir) = 255;
+            if(imag(ir, ic))
+                R(ic, ir) = G(ic, ir) = B(ic, ir) = 0;
+            else
+                R(ic, ir) = G(ic, ir) = B(ic, ir) = 255;
+        }
+    }
+    igl::png::writePNG(R,G,B,A,"/Users/wangziqi/Desktop/USC Spring/Code/Supporter/out.png");
 }
 
 void show_slice()
@@ -504,6 +535,7 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("series slicing", series_slicing);
         viewer.ngui->addButton("overhang bottom", overhang_bottom_slicing);
         viewer.ngui->addButton("overhang upper", overhang_upper_slicing);
+        viewer.ngui->addButton("image", image);
 
         viewer.ngui->addWindow(Eigen::Vector2i(300,10),"Layout Optimization");
         viewer.ngui->addButton("Height Map", heightmap);
