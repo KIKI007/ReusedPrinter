@@ -56,6 +56,7 @@ struct MenuInput
 {
     int layer;
     int layer_step;
+    double angle;
 }menu_input;
 
 void loadModel()
@@ -78,6 +79,7 @@ void loadModel()
 
         menu_input.layer = 0;
         menu_input.layer_step = 5;
+        menu_input.angle = 0;
     }
 }
 
@@ -241,11 +243,11 @@ void output()
 
     //layout
     MeshLayout layout;
-    double dx = 0, dz = 0;
+    LayoutOptOutput opt;
     layout.set_slicer(slicer);
-    layout.xy_layout(dx, dz, platform);
-    slicer.move_XY(dx,dz);
-    slicer.get_vertices_mat(V);
+    opt = layout.xy_layout();
+    slicer.move_XY(opt.dx, opt.dy);
+    platform = opt.platform;
 
     //output mesh for rendering
     igl::writeSTL(TESTING_MODELS_PATH "/" + pathname + "/" + pathname + "_render.stl",V, F);
@@ -382,42 +384,42 @@ void level_set()
         }
 }
 
-//void fermat_spiral()
-//{
-//    settings.tic("Time");
-//    loadModel();
-//    viewer.data.clear();
-//    SceneOrganizer organizer;
-//    std::vector<std::list<FermatEdge>> path_layer;
-//    MeshSupport support;
-//    support.fermat_spiral(path_layer, slicer, platform);
-//    settings.toc();
+void fermat_spiral()
+{
+    settings.tic("Time");
+    loadModel();
+    viewer.data.clear();
+    SceneOrganizer organizer;
+    std::vector<std::list<FermatEdge>> path_layer;
+    MeshSupport support;
+    support.fermat_spiral(path_layer, slicer, platform);
+    settings.toc();
+
+    slicer.get_vertices_mat(V);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, platform);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(204.0f/255, 204.0/255 ,255.0f/255));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
 //
-//    slicer.get_vertices_mat(V);
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-//
-//    GeneratingPlatform platform_builder;
-//    platform_builder.draw_platform(V, F, platform);
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(204.0f/255, 204.0/255 ,255.0f/255));
-//
-//    Eigen::MatrixXd C;
-//    organizer.get_mesh(V, F, C);
-//    viewer.data.set_face_based(true);
-//    viewer.data.set_mesh(V, F);
-//    viewer.data.set_colors(C);
-////
-//    int id = 1;
-//    for(int id = 0; id < path_layer.size(); id+= 10) {
-//        std::list<FermatEdge> path = path_layer[id];
-//        for (std::list<FermatEdge>::iterator it = path.begin(); it != path.end(); ++it) {
-//            viewer.data.add_edges(
-//                    it->P0(),
-//                    it->P1(),
-//                    Eigen::RowVector3d(1, 0, 0));
-//        }
-//    }
-//    std::cout << "finished" << std::endl;
-//}
+    int id = 1;
+    for(int id = 0; id < path_layer.size(); id+= 10) {
+        std::list<FermatEdge> path = path_layer[id];
+        for (std::list<FermatEdge>::iterator it = path.begin(); it != path.end(); ++it) {
+            viewer.data.add_edges(
+                    it->P0(),
+                    it->P1(),
+                    Eigen::RowVector3d(1, 0, 0));
+        }
+    }
+    std::cout << "finished" << std::endl;
+}
 //
 void heightmap()
 {
@@ -484,12 +486,13 @@ void xy_move()
     SceneOrganizer organizer;
     viewer.data.clear();
     MeshLayout layout;
-    double dx = 0, dz = 0;
+    LayoutOptOutput opt;
     layout.set_slicer(slicer);
-    settings.tic("TIME\t");
-    layout.xy_layout(dx, dz, platform);
-    settings.toc();
-    slicer.move_XY(dx, dz);
+    opt = layout.xy_layout();
+
+    platform = opt.platform;
+    slicer.move_XY(opt.dx, opt.dy);
+
     slicer.get_vertices_mat(V);
     organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
 
@@ -504,41 +507,91 @@ void xy_move()
     viewer.data.set_colors(C);
 }
 
-//void gcode()
-//{
-//    std::cout << TESTING_MODELS_PATH  "/" + pathname + "/" + pathname + ".gcode" << std::endl;
-//
-//    loadModel();
-//    viewer.data.clear();
-//    SceneOrganizer organizer;
-//    std::vector<std::list<FermatEdge>> path_layer;
-//    MeshSupport support;
-//    support.fermat_spiral(path_layer, slicer, platform);
-//    settings.toc();
-//
-//    slicer.get_vertices_mat(V);
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-//
-//    GeneratingPlatform platform_builder;
-//    platform_builder.draw_platform(V, F, platform);
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(204.0f/255, 204.0/255 ,255.0f/255));
-//
-//    Eigen::MatrixXd C;
-//    organizer.get_mesh(V, F, C);
-//    viewer.data.set_face_based(true);
-//    viewer.data.set_mesh(V, F);
-//    viewer.data.set_colors(C);
-//    Gcode gcode(TESTING_MODELS_PATH  "/"  + pathname + "/" + pathname + ".gcode");
-//    gcode.get_minXY();
-//    slicer.get_vertices_mat(V);
-//    std::cout << "Gcode: MinX " << gcode.min_X  << ",\tMinY " << gcode.min_Y << std::endl;
-//    std::cout << "Support: MinX "    << V.colwise().minCoeff()[0]  + settings.platform_zero_x
-//              << ",\tMinY "          << -V.colwise().maxCoeff()[2] + settings.platform_zero_y;
-//    gcode.move_XY( V.colwise().minCoeff()[0] + settings.platform_zero_x - gcode.min_X,
-//                  -V.colwise().maxCoeff()[2] + settings.platform_zero_y - gcode.min_Y);
-//    gcode.add_support(path_layer);
-//    gcode.print(TESTING_MODELS_PATH  "/"  + pathname + "/" + pathname + "_new.gcode");
-//}
+void rotate_move()
+{
+    //loadModel();
+    SceneOrganizer organizer;
+    viewer.data.clear();
+    MeshLayout layout;
+    LayoutOptOutput opt;
+    layout.set_slicer(slicer);
+    opt = layout.rotate_layout();
+
+    platform = opt.platform;
+    slicer.rotate(opt.center, opt.angle);
+    slicer.move_XY(opt.dx, opt.dy);
+
+    slicer.get_vertices_mat(V);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, platform);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
+}
+
+void rotate()
+{
+    SceneOrganizer organizer;
+    viewer.data.clear();
+
+    Eigen::Vector2d center(0, 0);
+    slicer.rotate(center, menu_input.angle / 180 * settings.PI);
+
+    slicer.get_vertices_mat(V);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, platform);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
+}
+
+void gcode()
+{
+    std::cout << TESTING_MODELS_PATH  "/" + pathname + "/" + pathname + ".gcode" << std::endl;
+
+    loadModel();
+    viewer.data.clear();
+    SceneOrganizer organizer;
+    std::vector<std::list<FermatEdge>> path_layer;
+    MeshSupport support;
+    support.fermat_spiral(path_layer, slicer, platform);
+    settings.toc();
+
+    slicer.get_vertices_mat(V);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, platform);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(204.0f/255, 204.0/255 ,255.0f/255));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
+    Gcode gcode(TESTING_MODELS_PATH  "/"  + pathname + "/" + pathname + ".gcode");
+    gcode.get_minXY();
+    slicer.get_vertices_mat(V);
+    std::cout << "Gcode: MinX " << gcode.min_X  << ",\tMinY " << gcode.min_Y << std::endl;
+    std::cout << "Support: MinX "    << V.colwise().minCoeff()[0]  + settings.platform_zero_x
+              << ",\tMinY "          << -V.colwise().maxCoeff()[2] + settings.platform_zero_y;
+    gcode.move_XY( V.colwise().minCoeff()[0] + settings.platform_zero_x - gcode.min_X,
+                  -V.colwise().maxCoeff()[2] + settings.platform_zero_y - gcode.min_Y);
+    gcode.add_support(path_layer);
+    gcode.print(TESTING_MODELS_PATH  "/"  + pathname + "/" + pathname + "_new.gcode");
+}
 
 int main(int argc, char *argv[])
 {
@@ -564,17 +617,22 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("Overhang Bottom", overhang_bottom_slicing);
         viewer.ngui->addButton("Overhang Upper", overhang_upper_slicing);
 
-        viewer.ngui->addWindow(Eigen::Vector2i(420,10),"Layout Optimization");
+        viewer.ngui->addWindow(Eigen::Vector2i(340,10),"Layout Optimization");
+        viewer.ngui->addGroup("Map");
         viewer.ngui->addButton("Height Map", heightmap);
         viewer.ngui->addButton("Red Map", redmap);
+        viewer.ngui->addGroup("Optimize");
+        viewer.ngui->addVariable("Angle", menu_input.angle);
         viewer.ngui->addButton("XY Layout", xy_move);
+        viewer.ngui->addButton("Rotate", rotate);
+        viewer.ngui->addButton("Rotate Layout", rotate_move);
 
-        viewer.ngui->addWindow(Eigen::Vector2i(520,10),"Support");
+        viewer.ngui->addWindow(Eigen::Vector2i(460,10),"Support");
 //        viewer.ngui->addButton("platform & mesh", platform_n_mesh);
 //        viewer.ngui->addButton("support", generating_support);
         viewer.ngui->addButton("convex hull", convex_hull);
         viewer.ngui->addButton("level set", level_set);
-//        viewer.ngui->addButton("fermat", fermat_spiral);
+        viewer.ngui->addButton("fermat", fermat_spiral);
 
 //        viewer.ngui->addWindow(Eigen::Vector2i(600,10),"Layout");
 //        viewer.ngui->addButton("Height Map", heightmap);

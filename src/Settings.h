@@ -25,9 +25,6 @@ public:
         //slice
         layer_height = 0.2;
 
-        //sampling
-        sample_distance = 2;
-
         //rendering
         maximum_model_heigh = 40; //mm
 
@@ -51,8 +48,12 @@ public:
         pillar_column = 11;
 
         //layout
-        xy_sample_num_each_pin = 1 << 6;
+        xy_sample_num_each_pin = 50;
+        //xy_sample_num_each_pin = 16;
+        sample_width = mm2int(pad_size / xy_sample_num_each_pin);
         maximum_height_map = pillar_standard_height * 100;
+        angle_sample_num = 360;
+        angle_step = PI / angle_sample_num * 2;
 
         //gcode
         nF_printing_rest = 1800;
@@ -98,6 +99,16 @@ public:
     {
         return (double)INT * UNIT / 2;
     }
+
+public:
+
+    int pin_x(int ir){return ir * sample_width;}
+
+    int pin_y(int ic){return ic * sample_width;}
+
+    int pin_center_x(int ir) {return ir * sample_width + sample_width / 2;}
+
+    int pin_center_y(int ic) {return ic * sample_width + sample_width / 2;}
 
 public:
 
@@ -157,9 +168,6 @@ public:
     double platform_zero_x;
     double platform_zero_y;
 
-    //sampling
-    double sample_distance;
-
     //rendering
     double maximum_model_heigh; //to shrink the model inside the rendering space
 
@@ -176,6 +184,9 @@ public:
 
     //layout
     int xy_sample_num_each_pin;
+    int sample_width;
+    int angle_sample_num;
+    double angle_step;
     double maximum_height_map;
 
     //gcode

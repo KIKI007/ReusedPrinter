@@ -50,6 +50,8 @@ public:
 
     Settings return_settings(){return settings;}
 
+    void rotate(Eigen::Vector2d center, double angle);
+
     // a function for moving paths
     void move_XY(double dx, double dz, std::vector< ClipperLib::Paths> &slices);
 
@@ -654,6 +656,25 @@ void MeshSlicer::clear()
     layer_slices.clear();
     stack_slices.clear();
     overhang_slices.clear();
+    return;
+}
+
+void MeshSlicer::rotate(Eigen::Vector2d center, double angle)
+{
+    Eigen::Matrix2d rot_mat;
+    rot_mat <<  cos(angle), -sin(angle),
+            sin(angle),  cos(angle);
+
+    for(int id = 0; id < dV.rows(); id++)
+    {
+        Eigen::Vector2d pt(dV(id, 0), dV(id, 2));
+        pt -= center;
+        pt = rot_mat * pt;
+        pt += center;
+        dV(id, 0) = pt(0);
+        dV(id, 2) = pt(1);
+    }
+
     return;
 }
 
