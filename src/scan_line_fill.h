@@ -28,15 +28,16 @@ class ScanLineFill
 
 public:
 
-    ScanLineFill()
+    ScanLineFill(bool expand_fill = true)
     {
         N = settings.xy_sample_num_each_pin;
         sample_width = settings.mm2int(settings.pad_size / N);
+        expand = expand_fill;
     }
 
 public:
 
-    void polygon_fill(ClipperLib::Paths &poly, Eigen::MatrixXd &imag);
+    void polygon_fill(ClipperLib::Paths &poly, Eigen::MatrixXi &imag);
 
 protected:
 
@@ -44,17 +45,17 @@ protected:
 
     void init_scanline_new_edgetable(std::vector< std::list<EDGE>>& slNet, ClipperLib::Paths &poly);
 
-    void process_scanline_fill(std::vector< std::list<EDGE> >& slNet,  Eigen::MatrixXd &image);
+    void process_scanline_fill(std::vector< std::list<EDGE> >& slNet,  Eigen::MatrixXi &image);
 
     void insert_net_into_aet(std::list<EDGE> &net, std::list<EDGE> &aet, int y);
 
     void remove_non_active_edge_from_aet(std::list<EDGE> &aet, int y);
 
-    void fill_ate_scanline(std::list<EDGE> aet, int y, Eigen::MatrixXd &image);
+    void fill_ate_scanline(std::list<EDGE> aet, int y, Eigen::MatrixXi &image);
 
     void update_and_resort_aet(std::list<EDGE>& aet, int dy);
 
-    void process_horizontal_line(ClipperLib::Paths poly, Eigen::MatrixXd &imag);
+    void process_horizontal_line(ClipperLib::Paths poly, Eigen::MatrixXi &imag);
 
 protected:
 
@@ -86,8 +87,8 @@ protected:
     }
 
 private:
-
     Settings settings;
+    bool expand;
 
 private:
     int sta_layer;
@@ -96,11 +97,10 @@ private:
     int sample_width;
 };
 
-void ScanLineFill::polygon_fill(ClipperLib::Paths &poly, Eigen::MatrixXd &imag)
+void ScanLineFill::polygon_fill(ClipperLib::Paths &poly, Eigen::MatrixXi &imag)
 {
-    assert(!poly.empty());
-
-    imag = Eigen::MatrixXd::Zero(settings.pillar_row * N, settings.pillar_column * N);
+    imag = Eigen::MatrixXi::Zero(settings.pillar_row * N, settings.pillar_column * N);
+    if(poly.empty()) return;
     bounding_box(poly);
     std::vector< std::list<EDGE>> slNet;
     process_horizontal_line(poly, imag);
@@ -163,7 +163,7 @@ void ScanLineFill::init_scanline_new_edgetable(std::vector< std::list<EDGE> >& s
     return;
 }
 
-void ScanLineFill::process_horizontal_line(ClipperLib::Paths poly, Eigen::MatrixXd &imag)
+void ScanLineFill::process_horizontal_line(ClipperLib::Paths poly, Eigen::MatrixXi &imag)
 {
     for(int id = 0; id < poly.size(); id++)
     {
@@ -174,11 +174,17 @@ void ScanLineFill::process_horizontal_line(ClipperLib::Paths poly, Eigen::Matrix
             pe = poly[id][(jd + 1) % size_poly_id];
             if (ps.Y == pe.Y && on_layer(pe.Y))
             {
-                int X0, X1, row = before_layer(pe.Y);
+                int X0, X1, row = before_layer(pe.Y), c0, c1;
                 if(ps.X < pe.X){X0 = ps.X, X1 = pe.X;}
                 else           {X1 = ps.X, X0 = pe.X;}
-                for(int col = after_layer(X0); col <= before_layer(X1); col++)
+
+                if(expand) c0 = before_layer(X0), c1 = after_layer(X1);
+                else c0 = after_layer(X0), c1 = before_layer(X1);
+
+                for(int col = c0; col <= c1; col++)
+                {
                     imag(row, col) = 1;
+                }
             }
         }
     }
@@ -186,12 +192,11 @@ void ScanLineFill::process_horizontal_line(ClipperLib::Paths poly, Eigen::Matrix
 }
 
 
-void ScanLineFill::process_scanline_fill(std::vector< std::list<EDGE> >& slNet,  Eigen::MatrixXd &image)
+void ScanLineFill::process_scanline_fill(std::vector< std::list<EDGE> >& slNet,  Eigen::MatrixXi &image)
 {
     std::list<EDGE> aet;
     for(int layer = sta_layer; layer < end_layer; layer += 1)
     {
-        std::cout << layer << std::endl;
         int y = layer_height(layer);
         insert_net_into_aet(slNet[layer - sta_layer], aet, y);
         remove_non_active_edge_from_aet(aet, y);
@@ -234,10 +239,11 @@ void ScanLineFill::remove_non_active_edge_from_aet(std::list<EDGE> &aet, int y)
     return;
 }
 
-void ScanLineFill::fill_ate_scanline(std::list<EDGE> aet, int y, Eigen::MatrixXd &imag)
+void ScanLineFill::fill_ate_scanline(std::list<EDGE> aet, int y, Eigen::MatrixXi &imag)
 {
     std::list<EDGE>::iterator ait, it0, it1;
     int X0 = 0, X1 = 0;
+    int c0, c1;
     int row = layer(y);
     for(ait = aet.begin(); ait != aet.end();)
     {
@@ -245,7 +251,11 @@ void ScanLineFill::fill_ate_scanline(std::list<EDGE> aet, int y, Eigen::MatrixXd
         it1 = ait++;
         if(it0->xi < it1->xi) {X0 = it0->xi, X1 = it1->xi;}
         else {X1 = it0->xi, X0 = it1->xi;}
-        for(int col = after_layer(X0); col <= before_layer(X1); col++)
+
+        if(expand) c0 = before_layer(X0), c1 = after_layer(X1);
+        else c0 = after_layer(X0), c1 = before_layer(X1);
+
+        for(int col = c0; col <= c1; col++)
         {
             imag(row, col) = 1;
         }
@@ -290,7 +300,7 @@ void ScanLineFill::update_and_resort_aet(std::list<EDGE>& aet, int dy)
 //
 //public:
 //    void removing_overlap(std::vector<ClipperLib::Paths> &slices);
-//    void sampling(Eigen::MatrixXd &SP);
+//    void sampling(Eigen::MatrixXi &SP);
 //    void sampling(std::vector<std::vector<Eigen::Vector2d>> &sample_vertices);
 //protected:
 //};

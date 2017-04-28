@@ -182,33 +182,28 @@ void MeshLayout::get_height_map(Eigen::MatrixXd &height_map)
         return;
     }
 
-    //settings.tic("read");
-    std::vector<ClipperLib::Paths> stack_slices, slices;
-    slicer_.get_slices(slices);
+    int nc = settings.pillar_column  * settings.xy_sample_num_each_pin,
+            nr = settings.pillar_row  * settings.xy_sample_num_each_pin;
+    height_map =  Eigen::MatrixXd::Ones(nr, nc) * settings.maximum_height_map;
 
-    //settings.toc();
-    Eigen::MatrixXi map;
-    // height map
-    //settings.tic("project");
-    layer_projecting(map, slices);
-    //settings.toc();
-    height_map.resize(map.rows(), map.cols());
+    VecMatrixXi bitmaps;
+    slicer_.get_bitmaps(bitmaps);
 
-    for(int ir = 0; ir < map.rows(); ir++)
+    for(int layer = 0; layer < slicer_.number_layer(); layer++)
     {
-        for(int ic = 0; ic < map.cols(); ic++)
+        double layer_height = slicer_.layer_pin_height(layer);
+        for(int ir = 0; ir < nr; ir++)
         {
-            if(map(ir, ic) >= 0)
+            for(int ic = 0; ic < nc; ic++)
             {
-                int num_standard_pin = map(ir, ic) * settings.layer_height / settings.pillar_standard_height;
-                height_map(ir, ic) =  num_standard_pin * settings.pillar_standard_height;
-            }
-            else
-            {
-                height_map(ir, ic)  = settings.maximum_height_map;
+                if(bitmaps[layer](ir, ic) && height_map(ir, ic) > layer_height)
+                {
+                    height_map(ir, ic) = layer_height;
+                }
             }
         }
     }
+
     height_map_ = height_map;
 
     return;
@@ -223,48 +218,26 @@ void MeshLayout::get_red_map(Eigen::MatrixXi &red_map)
         return;
     }
 
-    //settings.tic("get overhang slices");
+    int nc = settings.pillar_column  * settings.xy_sample_num_each_pin,
+            nr = settings.pillar_row  * settings.xy_sample_num_each_pin;
+    red_map =  Eigen::MatrixXi::Zero(nr, nc);
+
     std::vector<ClipperLib::Paths> bottom_half;
     slicer_.get_bottom_half(bottom_half);
-    //settings.toc();
 
-    //settings.tic("assemble");
-    ClipperLib::Paths downward = bottom_half[0];
-    ClipperLib::Clipper clipper;
-
-    for(int layer = 1; layer < bottom_half.size(); layer++)
+    for(int layer = 1; layer < slicer_.number_layer(); layer++)
     {
-        if(!bottom_half[layer].empty())
+        Eigen::MatrixXi bitmap;
+        ScanLineFill fill;
+        fill.polygon_fill(bottom_half[layer], bitmap);
+        for(int ir = 0; ir < nr; ir++)
         {
-            clipper.AddPaths(bottom_half[layer], ClipperLib::ptSubject, true);
-        }
-    }
-    clipper.Execute(ClipperLib::ctUnion, downward, ClipperLib::pftPositive, ClipperLib::pftPositive);
-    //settings.toc();
-
-    Eigen::MatrixXi map;
-    std::vector<ClipperLib::Paths> slices;
-    slices.push_back(downward);
-    layer_projecting(map, slices);
-    red_map.resize(map.rows(), map.cols());
-
-    for(int ir = 0; ir < map.rows(); ir++)
-    {
-        for(int ic = 0; ic < map.cols(); ic++)
-        {
-            if(map(ir, ic) >= 0)
+            for(int ic = 0; ic < nc; ic++)
             {
-                red_map(ir, ic) = 1;
-            }
-            else
-            {
-                red_map(ir, ic) = 0;
+                if(bitmap(ir, ic)) red_map(ir, ic) = 1;
             }
         }
     }
-    //settings.toc();
-
-    red_map_= red_map;
 
     return;
 }

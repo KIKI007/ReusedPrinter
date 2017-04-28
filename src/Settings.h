@@ -32,7 +32,7 @@ public:
         maximum_model_heigh = 40; //mm
 
         //support generation
-        overhang_offset = 0.2; //mm
+        overhang_offset = 0.3; //mm
         extrusion_width = 0.6; //mm
         support_center_area = 0.25; //mm
         fermat_cut_width = 0.5; //mm
@@ -51,7 +51,7 @@ public:
         pillar_column = 11;
 
         //layout
-        xy_sample_num_each_pin = 1 << 5;
+        xy_sample_num_each_pin = 1 << 6;
         maximum_height_map = pillar_standard_height * 100;
 
         //gcode
