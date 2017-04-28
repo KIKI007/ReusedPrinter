@@ -4,37 +4,37 @@
 
 #ifndef SUPPORTER_SLICE_H
 #define SUPPORTER_SLICE_H
+
+//Eigen Library
 #include <Eigen/Dense>
-#include <igl/triangle/triangulate.h>
+#include <Eigen/StdVector>
+
+//std library
 #include <vector>
 #include <list>
 #include <cmath>
+
+//self head file
 #include "clipper.hpp"
 #include "settings.h"
 #include "hash_edge.h"
+#include "scan_line_fill.h"
+
+//igl Library
+#include <igl/triangle/triangulate.h>
+
+typedef std::vector< Eigen::MatrixXi, Eigen::aligned_allocator<Eigen::MatrixXi>> VecMatrixXi;
 
 class EdgeHash;
 
 class MeshSlicer
 {
 public:
-    MeshSlicer()
-    {
-        V.setZero();
-        F.setZero();
-    }
+    MeshSlicer() { clear(); }
 
-    MeshSlicer(Settings &s)
-    {
-        settings = s;
-        V.setZero();
-        F.setZero();
-    }
+    MeshSlicer(Settings &s) { settings = s;clear(); }
 
-    ~MeshSlicer()
-    {
-
-    }
+    ~MeshSlicer() {}
 
 public:
     // it will convert a double-based mesh into a int-based mesh
@@ -45,23 +45,47 @@ public:
     //direct computing the layer_height without using some vector's size
     inline int number_layer() { return (max_Y() - min_Y()) / settings.mm2int_Even(settings.layer_height) + 1; }
 
+    //return true if the slicer has not been set mesh
     bool empty() {return V.isZero();}
 
-protected:
-    //set the matrix P
-    //all in in P is odd
-    void set_layer_height();
+    Settings return_settings(){return settings;}
 
-    double layer_height(int id) { return id * settings.layer_height; }
+    // a function for moving paths
+    void move_XY(double dx, double dz, std::vector< ClipperLib::Paths> &slices);
 
-    // right now useless
-    bool check_polygon(ClipperLib::Path poly);
+    // to add an vector (dx, 0, dz) to all data in this class
+    // after layout optimization,
+    // instead of re-slicing whole mesh, better option is to move all data in this class
+    // Save a lot of time
+    void move_XY(double dx, double dz);
+
+    // to get mesh's vertices in double value
+    void get_vertices_mat(Eigen::MatrixXd &out_V) { out_V = dV; }
+
+    //clean all data in this mesh
+    void clear();
+
+public:
+
+    // = min_y + layer * layer_thickness
+    double layer_height(int id) { return settings.int2mm(min_Y()) + id * settings.layer_height; }
+
+    //different from layer height,
+    // a pin height is the maximum position that a metal pin can reach below the its layer height
+    double layer_pin_height(int id);
 
     inline double max_Y() { assert(!V.isZero());return V.colwise().maxCoeff()[1]; }
 
     inline double min_Y() { assert(!V.isZero());return V.colwise().minCoeff()[1]; }
 
+    // right now useless
+    bool check_polygon(ClipperLib::Path poly);
 protected:
+//slicing function
+
+    //setup the matrix P
+    //!!all values in in P are odd number
+    void layer_height_construction();
 
     //compute each layer's potential intersection triangle
     //return L[id] which includes mesh's face index
@@ -79,107 +103,62 @@ protected:
 
 public:
 
-    //aims to connect separated segements into a closed polygon
+    //aims to connect separated segments into a closed polygon
+    //main function for slicing
+    //!!please use this function after set mesh
     void contour_construction();
 
+    // To save the polygon boolean operation time
+    // using hight resolution image to represent each polygon in some cases
+    // significantly save time but not wise to use it in those circumstances which require very detail input
+    void bitmaps_construction();
+
+    // stack_slices[i] = sum[layer_slices[0, ..., i]]
     void stack_slices_construction();
 
+    // overhang[i] = difference[ layer_slices[i], layer_slices[i - 1]]
     void overhang_detection();
 
+public:
+
+    // bottom_half is those support area which touch down the building platform
     void get_bottom_half(std::vector< ClipperLib::Paths> &bottom_half);
 
     // triangulate the closed polygons
     void get_intersecting_surface(std::vector< ClipperLib::Paths> &slices, int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2);
 
-    void get_intersecting_surface(int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2)
-    {
-        get_intersecting_surface(layer_slices, layer, V2, F2);
-    }
+    // triangulate the "layer"th layer of the layer_slices
+    void get_intersecting_surface(int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2);
 
-public:
+    //return layer_slices;
+    void get_slices(std::vector<ClipperLib::Paths> &slices);
 
-    void get_slices(std::vector<ClipperLib::Paths> &slices)
-    {
-        assert(!V.isZero());
-        if(layer_slices.empty())
-            contour_construction();
-        slices = layer_slices;
-    }
+    //return stack_slices
+    void get_stack_slices(std::vector<ClipperLib::Paths> &slices);
 
-
-
-    void get_stack_slices(std::vector<ClipperLib::Paths> &slices)
-    {
-        assert(!V.isZero());
-        if(stack_slices.empty())
-            stack_slices_construction();
-        slices = stack_slices;
-    }
-
-    Settings return_settings(){return settings;}
-
-    void move_XY(double dx, double dz, std::vector< ClipperLib::Paths> &slices)
-    {
-        for(int id = 0; id < slices.size(); id++)
-        {
-            for(int jd = 0; jd < slices[id].size(); jd++)
-            {
-                for(int kd = 0; kd < slices[id][jd].size(); kd++)
-                {
-                    slices[id][jd][kd].X += settings.mm2int(dx);
-                    slices[id][jd][kd].Y += settings.mm2int(dz);
-                }
-            }
-        }
-    }
-
-    void move_XY(double dx, double dz)
-    {
-        for(int id = 0; id < V.rows(); id++)
-        {
-            V(id, 0) = V(id, 0) + settings.mm2int(dx);
-            V(id, 2) = V(id, 2) + settings.mm2int(dz);
-
-            dV(id, 0) = dV(id, 0) + dx;
-            dV(id, 2) = dV(id, 2) + dz;
-        }
-        move_XY(dx, dz, layer_slices);
-        move_XY(dx, dz, stack_slices);
-        move_XY(dx, dz, overhang_slices);
-    }
-
-    void getV(Eigen::MatrixXd &out_V)
-    {
-        out_V = dV;
-    }
-
-    void clear(){
-
-        dV.setZero();
-        V.setZero();
-        F.setZero();
-        P.clear();
-
-        layer_slices.clear();
-        stack_slices.clear();
-        overhang_slices.clear();
-    }
+    //return bitmap
+    //!! always re-compute bitmaps when calling this function
+    void get_bitmaps(VecMatrixXi &bitmaps);
 
 protected:
 
-    Eigen::MatrixXd dV;
+    Eigen::MatrixXd dV; //vertices in double value
 
-    Eigen::MatrixXi V;
+    Eigen::MatrixXi V;  //vertices in integer value
 
-    Eigen::MatrixXi F;
+    Eigen::MatrixXi F;  //faces' indexs in integer value
 
-    std::vector<int> P;
+protected:
+
+    std::vector<int> P; //layer height
 
     std::vector< ClipperLib::Paths> stack_slices;
 
     std::vector< ClipperLib::Paths> layer_slices;
 
     std::vector< ClipperLib::Paths> overhang_slices;
+
+    VecMatrixXi layer_bitmaps;
 
     Settings settings;
 };
@@ -198,7 +177,7 @@ void MeshSlicer::set_mesh(Eigen::MatrixXd &in_V, Eigen::MatrixXi &in_F)
     return;
 }
 
-void MeshSlicer::set_layer_height()
+void MeshSlicer::layer_height_construction()
 {
     assert(!V.isZero());
 
@@ -218,7 +197,7 @@ void MeshSlicer::set_layer_height()
 void MeshSlicer::build_triangle_list(std::vector<std::vector<int>> &L)
 {
     //set P
-    set_layer_height();
+    layer_height_construction();
 
     int sizeL = number_layer();
     int dy = settings.mm2int_Even(settings.layer_height);
@@ -401,6 +380,24 @@ void MeshSlicer::contour_construction()
 
 }
 
+void MeshSlicer::bitmaps_construction()
+{
+    if(layer_slices.empty())
+        contour_construction();
+
+    layer_bitmaps.resize(number_layer());
+
+    ScanLineFill filler(false);
+    for(int layer = 0; layer < number_layer(); layer++)
+    {
+        Eigen::MatrixXi bitmap;
+        filler.polygon_fill(layer_slices[layer], bitmap);
+        layer_bitmaps[layer] = bitmap;
+    }
+
+    return;
+}
+
 void MeshSlicer::get_intersecting_surface(std::vector< ClipperLib::Paths> &slices, int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2) {
 
     assert(0 <= layer && layer < slices.size());
@@ -577,5 +574,88 @@ bool MeshSlicer::check_polygon(ClipperLib::Path poly)
     if(size >= 3) return true;
     else return false;
 }
+
+double MeshSlicer::layer_pin_height(int id)
+{
+    int num_standard_pin = layer_height(id) / settings.pillar_standard_height;
+    return num_standard_pin * settings.pillar_standard_height;
+}
+
+void MeshSlicer::get_intersecting_surface(int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2)
+{
+    get_intersecting_surface(layer_slices, layer, V2, F2);
+    return;
+}
+
+void MeshSlicer::get_slices(std::vector<ClipperLib::Paths> &slices)
+{
+    assert(!V.isZero());
+    if(layer_slices.empty()) contour_construction();
+    slices = layer_slices;
+    return;
+}
+
+void MeshSlicer::get_stack_slices(std::vector<ClipperLib::Paths> &slices)
+{
+    assert(!V.isZero());
+    if(stack_slices.empty())
+        stack_slices_construction();
+    slices = stack_slices;
+    return;
+}
+
+void MeshSlicer::get_bitmaps(VecMatrixXi &bitmaps)
+{
+    assert(!V.isZero());
+    bitmaps_construction();
+    bitmaps = layer_bitmaps;
+    return;
+}
+
+void MeshSlicer::move_XY(double dx, double dz, std::vector<ClipperLib::Paths> &slices)
+{
+    for(int id = 0; id < slices.size(); id++)
+    {
+        for(int jd = 0; jd < slices[id].size(); jd++)
+        {
+            for(int kd = 0; kd < slices[id][jd].size(); kd++)
+            {
+                slices[id][jd][kd].X += settings.mm2int(dx);
+                slices[id][jd][kd].Y += settings.mm2int(dz);
+            }
+        }
+    }
+    return;
+}
+
+void MeshSlicer::move_XY(double dx, double dz)
+{
+    for(int id = 0; id < V.rows(); id++)
+    {
+        V(id, 0) = V(id, 0) + settings.mm2int(dx);
+        V(id, 2) = V(id, 2) + settings.mm2int(dz);
+
+        dV(id, 0) = dV(id, 0) + dx;
+        dV(id, 2) = dV(id, 2) + dz;
+    }
+    move_XY(dx, dz, layer_slices);
+    move_XY(dx, dz, stack_slices);
+    move_XY(dx, dz, overhang_slices);
+    return;
+}
+
+void MeshSlicer::clear()
+{
+    dV.setZero();
+    V.setZero();
+    F.setZero();
+    P.clear();
+
+    layer_slices.clear();
+    stack_slices.clear();
+    overhang_slices.clear();
+    return;
+}
+
 
 #endif //SUPPORTER_SLICE_H
