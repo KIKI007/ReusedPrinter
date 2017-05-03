@@ -2,56 +2,10 @@
 //Menu
 #include <nanogui/formhelper.h>
 #include <nanogui/screen.h>
-
-//Rendering
-#include <igl/viewer/Viewer.h>
-#include <igl/triangle/triangulate.h>
-
-//I/O
-#include "igl/read_triangle_mesh.h"
-#include "igl/readSTL.h"
-#include "igl/writeSTL.h"
-#include "igl/write_triangle_mesh.h"
-#include <igl/png/writePNG.h>
-#include <igl/png/readPNG.h>
-#include <igl/jet.h>
-
-//Std
-#include <iostream>
-
-//Self Class
-#include "mesh_slicer.h"
-#include "mesh_layout.h"
-#include "mesh_support.h"
-#include "clipper.hpp"
-#include "normalizing_model.h"
-#include "scene_organizer.h"
-#include "gcode.h"
-#include "scan_line_fill.h"
-
-//Model path
-#include "testing_models_path.h"
-
-using namespace ClipperLib;
-using std::cout;
-using std::endl;
-
-// Input polygon
-Eigen::MatrixXd V;
-Eigen::MatrixXi E, F;
-
-// Triangulated interior
-Eigen::MatrixXd V2;
-Eigen::MatrixXi F2;
+#include "menu_function.h"
 
 //GUI
 igl::viewer::Viewer viewer;
-
-//Class
-Settings settings;
-MeshSlicer slicer;
-std::string pathname;
-Eigen::MatrixXd platform;
 
 struct MenuInput
 {
@@ -60,734 +14,134 @@ struct MenuInput
     double angle;
     double layout_dx;
     double layout_dy;
+    string model_name;
+    int layout_opt_type;
 }menu_input;
 
-enum SupportType
+struct Scene_Data
 {
-    Non,
-    Pin,
-    Pin_XY,
-    Pin_XY_Rotate
-};
+    MatrixXd V; //original model vertices
+    MatrixXi F; //original model faces
+    MeshSlicerOverhang slicer;
+}scene_data;
 
-void loadModel()
+struct Scene_Color
 {
-    // Load a mesh in OBJ format
-    Eigen::MatrixXd temp_V, N;
-    //std::cout << TESTING_MODELS_PATH "/" + pathname + "/" + pathname + ".stl";
-    bool success = igl::readSTL(TESTING_MODELS_PATH "/" + pathname + "/" + pathname + ".stl",V,F,N);
-    if(success)
+public:
+    Scene_Color()
     {
-        NormalizingModel normaler;
-        normaler.size_normalize(V);
-        viewer.data.clear();
-        viewer.data.set_mesh(V, F);
-
-        slicer.clear();
-        slicer.set_mesh(V, F);
-        slicer.contour_construction();
-        platform.setZero();
-    }
-}
-
-void slicing()
-{
-    slicer.set_mesh(V, F);
-    slicer.contour_construction();
-}
-
-void image()
-{
-    for(int id = 0; id < slicer.number_layer(); id+= menu_input.layer_step)
-    {
-        std::vector<ClipperLib::Paths> slices;
-        slicer.get_slices(slices);
-        Eigen::MatrixXi imag;
-        ScanLineFill filler;
-        filler.polygon_fill(slices[id], imag);
-        int nr = imag.rows();
-        int nc = imag.cols();
-        Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> R(nc, nr);
-        Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> G(nc ,nr);
-        Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> B(nc ,nr);
-        Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> A(nc ,nr);
-        for(int ir = 0; ir < nr; ir++)
-        {
-            for(int ic = 0; ic < nc; ic++)
-            {
-                A(ic, ir) = 255;
-                if(imag(ir, ic))
-                    R(ic, ir) = G(ic, ir) = B(ic, ir) = 0;
-                else
-                    R(ic, ir) = G(ic, ir) = B(ic, ir) = 255;
-            }
-        }
-
-        std::string output_path = TESTING_MODELS_PATH "/" + pathname + "/image/";
-        char num[100];
-        sprintf(num, "%d", id);
-        output_path = output_path + num + ".png";
-
-        igl::png::writePNG(R,G,B,A,output_path);
-    }
-}
-
-void draw_image(Eigen::MatrixXd map)
-{
-    int nr = map.rows();
-    int nc = map.cols();
-    typedef Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> ColorMatrix;
-    ColorMatrix R,G,B,A;
-    A = ColorMatrix::Zero(nc, nr);
-    R = ColorMatrix::Zero(nc, nr);
-    G = ColorMatrix::Zero(nc, nr);
-    B = ColorMatrix::Zero(nc, nr);
-    for(int id = 0; id < nr; id++)
-    {
-        for(int jd = 0; jd < nc; jd++)
-        {
-            double h = map(id, jd) / settings.maximum_height_map;
-            double r, g, b;
-            igl::jet(h, r, g, b);
-            R(jd, id) = r * 255;
-            B(jd, id) = g * 255;
-            G(jd, id) = b * 255;
-            A(jd, id) = 255;
-        }
+        yellow = RowVector3d (1, 1, 0);
     }
 
-    std::string output_path = TESTING_MODELS_PATH "/" + pathname + "/image/";
-    char num[100];
-    output_path = output_path + "height.png";
+    RowVector3d yellow;
+}scene_color;
 
-    igl::png::writePNG(R,G,B,A,output_path);
-}
 
-void show_slice()
+void init()
 {
-    if(menu_input.layer > slicer.number_layer() - 1)
-        menu_input.layer = slicer.number_layer() - 1;
-    slicer.get_intersecting_surface(menu_input.layer, V, F);
-//    std::cout << V << F << std::endl;
-    if(V.rows() >= 3)
-    {
-        viewer.data.clear();
-        viewer.data.set_mesh(V, F);
-    }
-    return;
-}
-
-bool key_down(igl::viewer::Viewer& viewer, unsigned char key, int modifier)
-{
-    std::cout<<"Key: "<<key<<" "<<(unsigned int)key<<std::endl;
-    if (key == 10)
-    {
-        show_slice();
-    }
-    return false;
-}
-
-void recover()
-{
-    loadModel();
-    viewer.data.clear();
-    viewer.data.set_mesh(V, F);
-    return;
-}
-
-void series_slicing()
-{
-    SceneOrganizer organizer;
-    for(int id = 0; id < slicer.number_layer(); id+= menu_input.layer_step)
-    {
-        slicer.get_intersecting_surface(id, V, F);
-        if(V.rows() >= 3)
-            organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
-    }
-    Eigen::MatrixXd C;
-    organizer.get_mesh(V, F, C);
-    viewer.data.clear();
-    viewer.data.set_mesh(V, F);
-    return;
-}
-
-void overhang_bottom_slicing()
-{
-    SceneOrganizer organizer;
-    std::vector<ClipperLib::Paths> bslice,uslice;
-    slicer.get_bottom_half(bslice);
-    for(int id = 0; id < slicer.number_layer(); id++)
-    {
-        slicer.get_intersecting_surface(bslice, id, V, F);
-        if(V.rows() >= 3)
-            organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
-    }
-    Eigen::MatrixXd C;
-    organizer.get_mesh(V, F, C);
-    viewer.data.clear();
-    if(V.rows() >= 3)
-        viewer.data.set_mesh(V, F);
-    return;
-}
-
-void overhang_upper_slicing()
-{
-//    SceneOrganizer organizer;
-//    std::vector<ClipperLib::Paths> bslice,uslice;
-//    slicer.get_overhang_slices(bslice, uslice);
-//    for(int id = 0; id < slicer.number_layer(); id++)
-//    {
-//        slicer.get_intersecting_surface(uslice, id, V, F);
-//        if(V.rows() >= 3)
-//            organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
-//    }
-//    Eigen::MatrixXd C;
-//    organizer.get_mesh(V, F, C);
-//    viewer.data.clear();
-//    if(V.rows() >= 3)
-//        viewer.data.set_mesh(V, F);
-//    return;
-}
-
-//void platform_n_mesh()
-//{
-//    loadModel();
-//    viewer.data.clear();
-//    SceneOrganizer organizer;
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-//
-//    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
-//    Eigen::MatrixXi E;
-//    Eigen::MatrixXd SP;
-//    slicer.draw_platform(H);
-//    slicer.draw_sp(SP);
-//    slicer.draw_sp_lines(E);
-//
-//    GeneratingPlatform platform_builder;
-//    platform_builder.draw_platform(V, F, H);
-//
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
-//
-//    Eigen::MatrixXd C;
-//    organizer.get_mesh(V, F, C);
-//    viewer.data.set_face_based(true);
-//    viewer.data.set_mesh(V, F);
-//
-//    viewer.data.set_colors(C);
-//    viewer.core.point_size = 3;
-//    viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
-//
-//    for (int id = 0;id < E.rows(); id++)
-//        viewer.data.add_edges(SP.row(E(id, 0)), SP.row(E(id, 1)), Eigen::RowVector3d(1, 0, 0));
-//}
-//
-
-void output_screen()
-{
-    igl::writeSTL(TESTING_MODELS_PATH "/" + pathname + "/" + pathname + "_tmp.stl",V, F);
-    return;
-}
-
-void output_model(Eigen::MatrixXd oV, Eigen::MatrixXi oF, std::string aprex)
-{
-    for(int id = 0; id < oV.rows(); id++)
-    {
-        double y = oV(id, 1);
-        double z = oV(id, 2);
-        oV(id, 0) *= 0.03;
-        oV(id, 1) = -z * 0.03;
-        oV(id, 2) = y * 0.03;
-    }
-    igl::writeSTL(TESTING_MODELS_PATH "/" + pathname + "/" + pathname + "_" + aprex + ".stl",oV, oF);
-    return;
-}
-
-void output_printing()
-{
-    loadModel();
-    SceneOrganizer organizer;
-
-    //layout
-    MeshLayout layout;
-    LayoutOptOutput opt;
-    layout.set_slicer(slicer);
-    opt = layout.xy_layout();
-    slicer.move_XY(opt.dx, opt.dy);
-    platform = opt.platform;
-
-    //output mesh for rendering
-    igl::writeSTL(TESTING_MODELS_PATH "/" + pathname + "/" + pathname + "_render.stl",V, F);
-
-    //output mesh
-    for(int id = 0; id < V.rows(); id++)
-    {
-        double y = V(id, 1);
-        double z = V(id, 2);
-        V(id, 0) += settings.platform_zero_x;
-        V(id, 1) = -z + settings.platform_zero_y;
-        V(id, 2) = y;
-    }
-    igl::writeSTL(TESTING_MODELS_PATH "/" + pathname + "/" + pathname + "_print.stl",V, F);
-
-    //ouput platform
-    GeneratingPlatform platform_builder;
-    platform_builder.draw_platform(V, F, platform);
-    igl::writeSTL(TESTING_MODELS_PATH "/" + pathname + "/" + pathname + "_platform.stl",V, F);
-
-}
-
-//void generating_support()
-//{
-//    loadModel();
-//    viewer.data.clear();
-//    SceneOrganizer organizer;
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
-//
-//    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
-//    Eigen::MatrixXd SP;
-//    Eigen::MatrixXi E;
-//    slicer.draw_platform(H);
-//    slicer.draw_sp(SP);
-//    slicer.draw_sp_lines(E);
-//    slicer.draw_support(V, F);
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 0, 1));
-//
-//    GeneratingPlatform platform_builder;
-//    platform_builder.draw_platform(V, F, H);
-//
-//    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
-//
-//    Eigen::MatrixXd C;
-//    organizer.get_mesh(V, F, C);
-//    viewer.data.set_face_based(true);
-//    viewer.data.set_mesh(V, F);
-//
-//    viewer.data.set_colors(C);
-//    viewer.core.point_size = 3;
-//    viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
-//
-//}
-//
-void convex_hull()
-{
-    loadModel();
-    viewer.data.clear();
-    SceneOrganizer organizer;
-
-    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(9, 11);
-    Eigen::MatrixXd SP;
-    std::vector<std::vector<ConvexHullPoint>> convex;
-
-    MeshSupport support;
-    support.sp_pin_construction(slicer, platform);
-    std::cout << "done" << std::endl;
-    support.convex_hull_construction(convex);
-
-    slicer.get_vertices_mat(V);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
-
-    GeneratingPlatform platform_builder;
-    platform_builder.draw_platform(V, F, platform);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
-
-    Eigen::MatrixXd C;
-    organizer.get_mesh(V, F, C);
-    viewer.data.set_face_based(true);
-    viewer.data.set_mesh(V, F);
-
-    viewer.data.set_colors(C);
-    viewer.core.point_size = 3;
-    viewer.data.add_points(SP, Eigen::RowVector3d(1, 0 ,0));
-    viewer.core.line_width = 2;
-
-    for(int id = 0; id < convex.size(); id++)
-    {
-        for(int jd = 0; jd < convex[id].size(); jd++)
-        {
-            viewer.data.add_edges(
-                    convex[id][jd].PT(),
-                    convex[id][(jd + 1) % convex[id].size()].PT(),
-                    Eigen::RowVector3d(0, 1, 0));
-        }
-    }
-
-    return;
-}
-
-void level_set()
-{
-    loadModel();
-    viewer.data.clear();
-    SceneOrganizer organizer;
-    std::vector<Fermat_Level_Set> fermat;
-
-    MeshSupport support;
-    support.sp_pin_construction(slicer, platform);
-    support.level_set(fermat);
-    slicer.get_vertices_mat(V);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-
-    GeneratingPlatform platform_builder;
-    platform_builder.draw_platform(V, F, platform);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
-
-    Eigen::MatrixXd C;
-    organizer.get_mesh(V, F, C);
-    viewer.data.set_face_based(true);
-    viewer.data.set_mesh(V, F);
-    viewer.data.set_colors(C);
-
-    for(int id = 0; id < fermat.size(); id++)
-        for(int jd = 0; jd < fermat[id].num_level(); jd++)
-        {
-            std::vector<FermatEdge> polygon;
-            fermat[id].get_level(polygon, jd);
-            for(int kd = 0; kd < polygon.size(); kd++)
-            viewer.data.add_edges(
-                    polygon[kd].P0(),
-                    polygon[kd].P1(),
-                    Eigen::RowVector3d(0, 1, 0));
-        }
-}
-
-void fermat_spiral()
-{
-    settings.tic("Time");
-    loadModel();
-    viewer.data.clear();
-    SceneOrganizer organizer;
-    std::vector<std::list<FermatEdge>> path_layer;
-    MeshSupport support;
-    support.fermat_spiral(path_layer, slicer, platform);
-    settings.toc();
-
-    slicer.get_vertices_mat(V);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-
-    GeneratingPlatform platform_builder;
-    platform_builder.draw_platform(V, F, platform);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(204.0f/255, 204.0/255 ,255.0f/255));
-
-    Eigen::MatrixXd C;
-    organizer.get_mesh(V, F, C);
-    viewer.data.set_face_based(true);
-    viewer.data.set_mesh(V, F);
-    viewer.data.set_colors(C);
-//
-    int id = 1;
-    for(int id = 0; id < path_layer.size(); id+= 10) {
-        std::list<FermatEdge> path = path_layer[id];
-        for (std::list<FermatEdge>::iterator it = path.begin(); it != path.end(); ++it) {
-            viewer.data.add_edges(
-                    it->P0(),
-                    it->P1(),
-                    Eigen::RowVector3d(1, 0, 0));
-        }
-    }
-    std::cout << "finished" << std::endl;
-}
-//
-void heightmap()
-{
-//    Eigen::MatrixXd hmap;
-//    Eigen::MatrixXi smap;
-//    MeshLayout layout;
-//    double dx, dy;
-//    layout.set_slicer(slicer);
-//    layout.get_height_map(hmap);
-//
-//    Eigen::MatrixXd V;
-//    V.resize(hmap.size(), 3);
-//
-//    //std::cout << hmap << std::endl;
-//
-//    int kd = 0;
-//    for(int id = 0; id < hmap.rows(); id++)
-//    {
-//        for(int jd = 0; jd < hmap.cols(); jd++)
-//        {
-//            double sq_width = settings.pad_size / settings.xy_sample_num_each_pin;
-//            V(kd, 0) = jd * sq_width + sq_width / 2;
-//            V(kd, 2) = id * sq_width + sq_width / 2;
-//            V(kd, 1) = hmap(id, jd);
-//            //V(kd, 1) = smap(id, jd) ? settings.pillar_standard_height * 5 : 0;
-//            kd++;
-//        }
-//    }
-//    viewer.core.point_size = 2;
-//    viewer.data.add_points(V, Eigen::RowVector3d(1, 0 ,0));
-
-    Eigen::MatrixXd hmap;
-    MeshLayout layout;
-    layout.set_slicer(slicer);
-    layout.get_height_map(hmap);
-    draw_image(hmap);
-    return;
-}
-
-void redmap()
-{
-    Eigen::MatrixXi smap;
-    MeshLayout layout;
-    double dx, dy;
-    layout.set_slicer(slicer);
-    layout.get_red_map(smap);
-
-    Eigen::MatrixXd V;
-    V.resize(smap.size(), 3);
-
-    int kd = 0;
-    for(int id = 0; id < smap.rows(); id++)
-    {
-        for(int jd = 0; jd < smap.cols(); jd++)
-        {
-            double sq_width = settings.pad_size / settings.xy_sample_num_each_pin;
-            V(kd, 0) = jd * sq_width + sq_width / 2;
-            V(kd, 2) = id * sq_width + sq_width / 2;
-            //V(kd, 1) = hmap(id, jd) < settings.maximum_height_map ? hmap(id, jd) : 0;
-            V(kd, 1) = smap(id, jd) > 0 ? settings.pillar_standard_height * 5 : 0;
-            kd++;
-        }
-    }
-    viewer.core.point_size = 2;
-    viewer.data.add_points(V, Eigen::RowVector3d(1, 0 ,0));
-}
-
-void xy_move()
-{
-    //loadModel();
-    SceneOrganizer organizer;
-    viewer.data.clear();
-    MeshLayout layout;
-    LayoutOptOutput opt;
-    layout.set_slicer(slicer);
-    opt = layout.xy_layout();
-
-    platform = opt.platform;
-    slicer.move_XY(opt.dx, opt.dy);
-
-    slicer.get_vertices_mat(V);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-
-    GeneratingPlatform platform_builder;
-    platform_builder.draw_platform(V, F, platform);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
-
-    Eigen::MatrixXd C;
-    organizer.get_mesh(V, F, C);
-    viewer.data.set_face_based(true);
-    viewer.data.set_mesh(V, F);
-    viewer.data.set_colors(C);
-}
-
-void rotate_move()
-{
-    //loadModel();
-    SceneOrganizer organizer;
-    viewer.data.clear();
-    MeshLayout layout;
-    LayoutOptOutput opt;
-    layout.set_slicer(slicer);
-    opt = layout.rotate_layout();
-
-    platform = opt.platform;
-    slicer.rotate(opt.center, opt.angle);
-    slicer.move_XY(opt.dx, opt.dy);
-
-    slicer.get_vertices_mat(V);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-
-    GeneratingPlatform platform_builder;
-    platform_builder.draw_platform(V, F, platform);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
-
-    Eigen::MatrixXd C;
-    organizer.get_mesh(V, F, C);
-    viewer.data.set_face_based(true);
-    viewer.data.set_mesh(V, F);
-    viewer.data.set_colors(C);
-}
-
-void rotate()
-{
-    SceneOrganizer organizer;
-    viewer.data.clear();
-
-    Eigen::Vector2d center(0, 0);
-    slicer.rotate(center, menu_input.angle / 180 * settings.PI);
-
-    slicer.get_vertices_mat(V);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-
-    GeneratingPlatform platform_builder;
-    platform_builder.draw_platform(V, F, platform);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
-
-    Eigen::MatrixXd C;
-    organizer.get_mesh(V, F, C);
-    viewer.data.set_face_based(true);
-    viewer.data.set_mesh(V, F);
-    viewer.data.set_colors(C);
-}
-
-void gcode()
-{
-    std::cout << TESTING_MODELS_PATH  "/" + pathname + "/" + pathname + ".gcode" << std::endl;
-
-    loadModel();
-    viewer.data.clear();
-    SceneOrganizer organizer;
-    std::vector<std::list<FermatEdge>> path_layer;
-    MeshSupport support;
-    support.fermat_spiral(path_layer, slicer, platform);
-    settings.toc();
-
-    slicer.get_vertices_mat(V);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-
-    GeneratingPlatform platform_builder;
-    platform_builder.draw_platform(V, F, platform);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(204.0f/255, 204.0/255 ,255.0f/255));
-
-    Eigen::MatrixXd C;
-    organizer.get_mesh(V, F, C);
-    viewer.data.set_face_based(true);
-    viewer.data.set_mesh(V, F);
-    viewer.data.set_colors(C);
-    Gcode gcode(TESTING_MODELS_PATH  "/"  + pathname + "/" + pathname + ".gcode");
-    gcode.get_minXY();
-    slicer.get_vertices_mat(V);
-    std::cout << "Gcode: MinX " << gcode.min_X  << ",\tMinY " << gcode.min_Y << std::endl;
-    std::cout << "Support: MinX "    << V.colwise().minCoeff()[0]  + settings.platform_zero_x
-              << ",\tMinY "          << -V.colwise().maxCoeff()[2] + settings.platform_zero_y;
-    gcode.move_XY( V.colwise().minCoeff()[0] + settings.platform_zero_x - gcode.min_X,
-                  -V.colwise().maxCoeff()[2] + settings.platform_zero_y - gcode.min_Y);
-    gcode.add_support(path_layer);
-    gcode.print(TESTING_MODELS_PATH  "/"  + pathname + "/" + pathname + "_new.gcode");
-}
-
-void virtual_support(SupportType type)
-{
-    SceneOrganizer organizer;
-    viewer.data.clear();
-    MeshLayout layout;
-    LayoutOptOutput opt;
-    layout.set_slicer(slicer);
-    Eigen::MatrixXd supportV;
-    Eigen::MatrixXi supportF;
-    if(type == Non)
-        opt = layout.non_pin_support(supportV, supportF);
-    else if(type == Pin)
-        opt = layout.stand_support(supportV, supportF);
-    else if(type == Pin_XY)
-        opt = layout.xy_opt_support(supportV, supportF);
-
-    output_model(supportV, supportF, "support");
-    organizer.add_mesh(supportV, supportF, Eigen::RowVector3d(1, 0 ,0));
-
-    platform = opt.platform;
-
-    if(opt.rotate) slicer.rotate(opt.center, opt.angle);
-    slicer.move_XY(opt.dx, opt.dy);
-
-    slicer.get_vertices_mat(V);
-    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
-    output_model(V, F, "model");
-
-    GeneratingPlatform platform_builder;
-    platform_builder.draw_platform(V, F, platform);
-    output_model(V, F, "platform");
-    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
-
-    Eigen::MatrixXd C;
-    organizer.get_mesh(V, F, C);
-    viewer.data.set_face_based(true);
-    viewer.data.set_mesh(V, F);
-    viewer.data.set_colors(C);
-}
-
-void none_pin_support()
-{
-    loadModel();
-    slicer.move_XY(menu_input.layout_dx, menu_input.layout_dy);
-    virtual_support(Non);
-}
-
-void pin_xy_support()
-{
-    loadModel();
-    virtual_support(Pin_XY);
-}
-
-void pin_support()
-{
-    loadModel();
-    std::cout << menu_input.layout_dx << ", " << menu_input.layout_dy << std::endl;
-    slicer.move_XY(menu_input.layout_dx, menu_input.layout_dy);
-    virtual_support(Pin);
-}
-
-int main(int argc, char *argv[])
-{
-    pathname = "arch";
+    menu_input.model_name = "arch";
     menu_input.layer = 0;
     menu_input.layer_step = 5;
     menu_input.angle = 0;
     menu_input.layout_dy = 0;
     menu_input.layout_dx = 0;
-    loadModel();
+}
+
+void load_model()
+{
+    void render_mesh(MatrixXd &V, MatrixXi &F);
+    string file_path = file(TESTING_MODELS_PATH, menu_input.model_name, "stl");
+    loadModel(scene_data.V, scene_data.F, file_path);
+
+    scene_data.slicer.clear();
+    scene_data.slicer.set_mesh(scene_data.V, scene_data.F);
+
+    render_mesh(scene_data.V, scene_data.F);
+}
+
+void render_mesh(MatrixXd &V, MatrixXi &F)
+{
+    viewer.data.clear();
+    viewer.data.set_mesh(V, F);
+    return;
+}
+
+void render_mesh(MatrixXd &V, MatrixXi &F, MatrixXd C)
+{
+    viewer.data.clear();
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
+    return;
+}
+
+void single_layer_slicing()
+{
+    MatrixXd V;
+    MatrixXi F;
+    if(slicing_for_one_layer(scene_data.slicer, menu_input.layer, V, F))
+        render_mesh(V, F);
+}
+
+void multi_layers_slicing()
+{
+    MatrixXd V;
+    MatrixXi F;
+    if(slicing_in_step(scene_data.slicer, menu_input.layer_step, V, F))
+        render_mesh(V, F);
+}
+
+void bottom_half()
+{
+    MatrixXd V;
+    MatrixXi F;
+    if(slicing_bottom_half(scene_data.slicer, V, F))
+        render_mesh(V, F);
+}
+
+void upper_half()
+{
+    MatrixXd V;
+    MatrixXi F;
+    if(slicing_upper_half(scene_data.slicer, V, F))
+        render_mesh(V, F);
+}
+
+void xz_opt()
+{
+    MatrixXd V, C;
+    MatrixXi F;
+    if(move_xy_opt(scene_data.slicer, V, F, C))
+        render_mesh(V, F, C);
+}
+
+int main(int argc, char *argv[])
+{
+    init();
+
     viewer.callback_init = [&](igl::viewer::Viewer& viewer)
     {
         viewer.ngui->addGroup("Model Loading");
-        viewer.ngui->addVariable("Model Name", pathname);
-        viewer.ngui->addButton("Load Model", loadModel);
-        viewer.ngui->addButton("Recovery", recover);
-        viewer.ngui->addButton("Output Screen", output_screen);
-        viewer.ngui->addButton("Output Printing", output_printing);
-//        viewer.ngui->addButton("Gcode", gcode);
+        viewer.ngui->addVariable("Model Name", menu_input.model_name);
+        viewer.ngui->addButton("Load Model", load_model);
 
-        viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Slicing & Overhang");
-        viewer.ngui->addGroup("Slicing");
+        viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Mesh Slicer Class");
+        viewer.ngui->addGroup("Basic Slicing");
         viewer.ngui->addVariable("layer", menu_input.layer);
+        viewer.ngui->addButton("Single Layer", single_layer_slicing);
         viewer.ngui->addVariable("layer step", menu_input.layer_step);
-        viewer.ngui->addButton("Slicing", show_slice);
-        viewer.ngui->addButton("Slicing in Step", series_slicing);
-        viewer.ngui->addButton("Bitmap", image);
+        viewer.ngui->addButton("Multiple Layer", multi_layers_slicing);
         viewer.ngui->addGroup("Overhang");
-        viewer.ngui->addButton("Overhang Bottom", overhang_bottom_slicing);
-        viewer.ngui->addButton("Overhang Upper", overhang_upper_slicing);
+        viewer.ngui->addButton("Bottom half", bottom_half);
+        viewer.ngui->addButton("Upper half", upper_half);
 
-        viewer.ngui->addWindow(Eigen::Vector2i(340,10),"Layout Optimization");
-        viewer.ngui->addGroup("Map");
-        viewer.ngui->addButton("Height Map", heightmap);
-        viewer.ngui->addButton("Red Map", redmap);
-        viewer.ngui->addGroup("Optimize");
-        viewer.ngui->addVariable("Angle", menu_input.angle);
-        viewer.ngui->addButton("XY Layout", xy_move);
-        //viewer.ngui->addButton("Rotate", rotate);
-        viewer.ngui->addButton("Rotate Layout", rotate_move);
-        viewer.ngui->addGroup("Virtual Support");
-        viewer.ngui->addVariable("dx", menu_input.layout_dx);
-        viewer.ngui->addVariable("dy", menu_input.layout_dy);
-        viewer.ngui->addButton("None Pin", none_pin_support);
-        viewer.ngui->addButton("Pin", pin_support);
-        viewer.ngui->addButton("Pin XY", pin_xy_support);
-
-        viewer.ngui->addWindow(Eigen::Vector2i(460,10),"Support");
-//        viewer.ngui->addButton("platform & mesh", platform_n_mesh);
-//        viewer.ngui->addButton("support", generating_support);
-        viewer.ngui->addButton("convex hull", convex_hull);
-        viewer.ngui->addButton("level set", level_set);
-        viewer.ngui->addButton("fermat", fermat_spiral);
-
-//        viewer.ngui->addWindow(Eigen::Vector2i(600,10),"Layout");
-//        viewer.ngui->addButton("Height Map", heightmap);
-//        viewer.ngui->addButton("Layout Optimization", layout_optimization);
+        viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Mesh Slicer Class");
+        viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Mesh Layout Class");
+        viewer.ngui->addGroup("Layout Opt");
+        viewer.ngui->addButton("XZ Opt", xz_opt);
         viewer.screen->performLayout();
         return false;
     };
 
-    viewer.callback_key_down = &key_down;
-
     viewer.launch();
+    return 0;
 }

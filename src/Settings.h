@@ -54,6 +54,7 @@ public:
         maximum_height_map = pillar_standard_height * 100;
         angle_sample_num = 360;
         angle_step = PI / angle_sample_num * 2;
+        edge_region_num = xy_sample_num_each_pin / 10;
 
         //gcode
         nF_printing_rest = 1800;
@@ -181,13 +182,13 @@ public:
     double expected_sample_num;
     double printing_max_angle;
 
-
     //layout
     int xy_sample_num_each_pin;
     int sample_width;
     int angle_sample_num;
     double angle_step;
     double maximum_height_map;
+    int edge_region_num;
 
     //gcode
     double nF_printing_first;

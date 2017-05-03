@@ -743,16 +743,28 @@
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/main.cpp">
 			<Option target="supporter_bin"/>
 		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/menu_function.h">
+			<Option target="supporter_bin"/>
+		</Unit>
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_layout.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_layout_base.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_layout_opt.h">
 			<Option target="supporter_bin"/>
 		</Unit>
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer.h">
 			<Option target="supporter_bin"/>
 		</Unit>
-		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_support.h">
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_base.h">
 			<Option target="supporter_bin"/>
 		</Unit>
-		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/normalizing_model.h">
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_overhang.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_support.h">
 			<Option target="supporter_bin"/>
 		</Unit>
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/scan_line_fill.h">
