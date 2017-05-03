@@ -14,6 +14,7 @@
 #include "igl/write_triangle_mesh.h"
 #include <igl/png/writePNG.h>
 #include <igl/png/readPNG.h>
+#include <igl/jet.h>
 
 //Std
 #include <iostream>
@@ -57,7 +58,17 @@ struct MenuInput
     int layer;
     int layer_step;
     double angle;
+    double layout_dx;
+    double layout_dy;
 }menu_input;
+
+enum SupportType
+{
+    Non,
+    Pin,
+    Pin_XY,
+    Pin_XY_Rotate
+};
 
 void loadModel()
 {
@@ -76,10 +87,6 @@ void loadModel()
         slicer.set_mesh(V, F);
         slicer.contour_construction();
         platform.setZero();
-
-        menu_input.layer = 0;
-        menu_input.layer_step = 5;
-        menu_input.angle = 0;
     }
 }
 
@@ -91,31 +98,69 @@ void slicing()
 
 void image()
 {
-    if(menu_input.layer > slicer.number_layer() - 1)
-        menu_input.layer = slicer.number_layer() - 1;
-    std::vector<ClipperLib::Paths> slices;
-    slicer.get_slices(slices);
-    Eigen::MatrixXi imag;
-    ScanLineFill filler;
-    filler.polygon_fill(slices[menu_input.layer], imag);
-    int nr = imag.rows();
-    int nc = imag.cols();
-    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> R(nc, nr);
-    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> G(nc ,nr);
-    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> B(nc ,nr);
-    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> A(nc ,nr);
-    for(int ir = 0; ir < nr; ir++)
+    for(int id = 0; id < slicer.number_layer(); id+= menu_input.layer_step)
     {
-        for(int ic = 0; ic < nc; ic++)
+        std::vector<ClipperLib::Paths> slices;
+        slicer.get_slices(slices);
+        Eigen::MatrixXi imag;
+        ScanLineFill filler;
+        filler.polygon_fill(slices[id], imag);
+        int nr = imag.rows();
+        int nc = imag.cols();
+        Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> R(nc, nr);
+        Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> G(nc ,nr);
+        Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> B(nc ,nr);
+        Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> A(nc ,nr);
+        for(int ir = 0; ir < nr; ir++)
         {
-            A(ic, ir) = 255;
-            if(imag(ir, ic))
-                R(ic, ir) = G(ic, ir) = B(ic, ir) = 0;
-            else
-                R(ic, ir) = G(ic, ir) = B(ic, ir) = 255;
+            for(int ic = 0; ic < nc; ic++)
+            {
+                A(ic, ir) = 255;
+                if(imag(ir, ic))
+                    R(ic, ir) = G(ic, ir) = B(ic, ir) = 0;
+                else
+                    R(ic, ir) = G(ic, ir) = B(ic, ir) = 255;
+            }
+        }
+
+        std::string output_path = TESTING_MODELS_PATH "/" + pathname + "/image/";
+        char num[100];
+        sprintf(num, "%d", id);
+        output_path = output_path + num + ".png";
+
+        igl::png::writePNG(R,G,B,A,output_path);
+    }
+}
+
+void draw_image(Eigen::MatrixXd map)
+{
+    int nr = map.rows();
+    int nc = map.cols();
+    typedef Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> ColorMatrix;
+    ColorMatrix R,G,B,A;
+    A = ColorMatrix::Zero(nc, nr);
+    R = ColorMatrix::Zero(nc, nr);
+    G = ColorMatrix::Zero(nc, nr);
+    B = ColorMatrix::Zero(nc, nr);
+    for(int id = 0; id < nr; id++)
+    {
+        for(int jd = 0; jd < nc; jd++)
+        {
+            double h = map(id, jd) / settings.maximum_height_map;
+            double r, g, b;
+            igl::jet(h, r, g, b);
+            R(jd, id) = r * 255;
+            B(jd, id) = g * 255;
+            G(jd, id) = b * 255;
+            A(jd, id) = 255;
         }
     }
-    igl::png::writePNG(R,G,B,A,"/Users/wangziqi/Desktop/USC Spring/Code/Supporter/out.png");
+
+    std::string output_path = TESTING_MODELS_PATH "/" + pathname + "/image/";
+    char num[100];
+    output_path = output_path + "height.png";
+
+    igl::png::writePNG(R,G,B,A,output_path);
 }
 
 void show_slice()
@@ -236,7 +281,28 @@ void overhang_upper_slicing()
 //        viewer.data.add_edges(SP.row(E(id, 0)), SP.row(E(id, 1)), Eigen::RowVector3d(1, 0, 0));
 //}
 //
-void output()
+
+void output_screen()
+{
+    igl::writeSTL(TESTING_MODELS_PATH "/" + pathname + "/" + pathname + "_tmp.stl",V, F);
+    return;
+}
+
+void output_model(Eigen::MatrixXd oV, Eigen::MatrixXi oF, std::string aprex)
+{
+    for(int id = 0; id < oV.rows(); id++)
+    {
+        double y = oV(id, 1);
+        double z = oV(id, 2);
+        oV(id, 0) *= 0.03;
+        oV(id, 1) = -z * 0.03;
+        oV(id, 2) = y * 0.03;
+    }
+    igl::writeSTL(TESTING_MODELS_PATH "/" + pathname + "/" + pathname + "_" + aprex + ".stl",oV, oF);
+    return;
+}
+
+void output_printing()
 {
     loadModel();
     SceneOrganizer organizer;
@@ -423,33 +489,40 @@ void fermat_spiral()
 //
 void heightmap()
 {
+//    Eigen::MatrixXd hmap;
+//    Eigen::MatrixXi smap;
+//    MeshLayout layout;
+//    double dx, dy;
+//    layout.set_slicer(slicer);
+//    layout.get_height_map(hmap);
+//
+//    Eigen::MatrixXd V;
+//    V.resize(hmap.size(), 3);
+//
+//    //std::cout << hmap << std::endl;
+//
+//    int kd = 0;
+//    for(int id = 0; id < hmap.rows(); id++)
+//    {
+//        for(int jd = 0; jd < hmap.cols(); jd++)
+//        {
+//            double sq_width = settings.pad_size / settings.xy_sample_num_each_pin;
+//            V(kd, 0) = jd * sq_width + sq_width / 2;
+//            V(kd, 2) = id * sq_width + sq_width / 2;
+//            V(kd, 1) = hmap(id, jd);
+//            //V(kd, 1) = smap(id, jd) ? settings.pillar_standard_height * 5 : 0;
+//            kd++;
+//        }
+//    }
+//    viewer.core.point_size = 2;
+//    viewer.data.add_points(V, Eigen::RowVector3d(1, 0 ,0));
+
     Eigen::MatrixXd hmap;
-    Eigen::MatrixXi smap;
     MeshLayout layout;
-    double dx, dy;
     layout.set_slicer(slicer);
     layout.get_height_map(hmap);
-
-    Eigen::MatrixXd V;
-    V.resize(hmap.size(), 3);
-
-    //std::cout << hmap << std::endl;
-
-    int kd = 0;
-    for(int id = 0; id < hmap.rows(); id++)
-    {
-        for(int jd = 0; jd < hmap.cols(); jd++)
-        {
-            double sq_width = settings.pad_size / settings.xy_sample_num_each_pin;
-            V(kd, 0) = jd * sq_width + sq_width / 2;
-            V(kd, 2) = id * sq_width + sq_width / 2;
-            V(kd, 1) = hmap(id, jd);
-            //V(kd, 1) = smap(id, jd) ? settings.pillar_standard_height * 5 : 0;
-            kd++;
-        }
-    }
-    viewer.core.point_size = 2;
-    viewer.data.add_points(V, Eigen::RowVector3d(1, 0 ,0));
+    draw_image(hmap);
+    return;
 }
 
 void redmap()
@@ -593,9 +666,75 @@ void gcode()
     gcode.print(TESTING_MODELS_PATH  "/"  + pathname + "/" + pathname + "_new.gcode");
 }
 
+void virtual_support(SupportType type)
+{
+    SceneOrganizer organizer;
+    viewer.data.clear();
+    MeshLayout layout;
+    LayoutOptOutput opt;
+    layout.set_slicer(slicer);
+    Eigen::MatrixXd supportV;
+    Eigen::MatrixXi supportF;
+    if(type == Non)
+        opt = layout.non_pin_support(supportV, supportF);
+    else if(type == Pin)
+        opt = layout.stand_support(supportV, supportF);
+    else if(type == Pin_XY)
+        opt = layout.xy_opt_support(supportV, supportF);
+
+    output_model(supportV, supportF, "support");
+    organizer.add_mesh(supportV, supportF, Eigen::RowVector3d(1, 0 ,0));
+
+    platform = opt.platform;
+
+    if(opt.rotate) slicer.rotate(opt.center, opt.angle);
+    slicer.move_XY(opt.dx, opt.dy);
+
+    slicer.get_vertices_mat(V);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1 ,0));
+    output_model(V, F, "model");
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(V, F, platform);
+    output_model(V, F, "platform");
+    organizer.add_mesh(V, F, Eigen::RowVector3d(0, 0 ,1));
+
+    Eigen::MatrixXd C;
+    organizer.get_mesh(V, F, C);
+    viewer.data.set_face_based(true);
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
+}
+
+void none_pin_support()
+{
+    loadModel();
+    slicer.move_XY(menu_input.layout_dx, menu_input.layout_dy);
+    virtual_support(Non);
+}
+
+void pin_xy_support()
+{
+    loadModel();
+    virtual_support(Pin_XY);
+}
+
+void pin_support()
+{
+    loadModel();
+    std::cout << menu_input.layout_dx << ", " << menu_input.layout_dy << std::endl;
+    slicer.move_XY(menu_input.layout_dx, menu_input.layout_dy);
+    virtual_support(Pin);
+}
+
 int main(int argc, char *argv[])
 {
     pathname = "arch";
+    menu_input.layer = 0;
+    menu_input.layer_step = 5;
+    menu_input.angle = 0;
+    menu_input.layout_dy = 0;
+    menu_input.layout_dx = 0;
     loadModel();
     viewer.callback_init = [&](igl::viewer::Viewer& viewer)
     {
@@ -603,7 +742,8 @@ int main(int argc, char *argv[])
         viewer.ngui->addVariable("Model Name", pathname);
         viewer.ngui->addButton("Load Model", loadModel);
         viewer.ngui->addButton("Recovery", recover);
-        viewer.ngui->addButton("Output", output);
+        viewer.ngui->addButton("Output Screen", output_screen);
+        viewer.ngui->addButton("Output Printing", output_printing);
 //        viewer.ngui->addButton("Gcode", gcode);
 
         viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Slicing & Overhang");
@@ -624,8 +764,14 @@ int main(int argc, char *argv[])
         viewer.ngui->addGroup("Optimize");
         viewer.ngui->addVariable("Angle", menu_input.angle);
         viewer.ngui->addButton("XY Layout", xy_move);
-        viewer.ngui->addButton("Rotate", rotate);
+        //viewer.ngui->addButton("Rotate", rotate);
         viewer.ngui->addButton("Rotate Layout", rotate_move);
+        viewer.ngui->addGroup("Virtual Support");
+        viewer.ngui->addVariable("dx", menu_input.layout_dx);
+        viewer.ngui->addVariable("dy", menu_input.layout_dy);
+        viewer.ngui->addButton("None Pin", none_pin_support);
+        viewer.ngui->addButton("Pin", pin_support);
+        viewer.ngui->addButton("Pin XY", pin_xy_support);
 
         viewer.ngui->addWindow(Eigen::Vector2i(460,10),"Support");
 //        viewer.ngui->addButton("platform & mesh", platform_n_mesh);

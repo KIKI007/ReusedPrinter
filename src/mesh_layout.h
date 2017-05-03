@@ -5,11 +5,16 @@
 #ifndef EXAMPLE_MESH_LAYOUT_H
 #define EXAMPLE_MESH_LAYOUT_H
 
+#define DRAW_SUPPORT 1
+
 #include "mesh_slicer.h"
 #include <cmath>
 #include <queue>
 #include <Eigen/Dense>
 
+#if DRAW_SUPPORT
+#include "scene_organizer.h"
+#endif
 
 
 typedef struct tagHeightMapNode
@@ -32,31 +37,37 @@ public:
         num_pin = 0;
         center = Eigen::Vector2d(0, 0);
         angle = 0;
+        edge_sample_num = 0;
+        rotate = false;
     }
 
 public:
 
     bool operator < (tagLayoutOptOutput &A)
     {
-        if(opt_value < A.opt_value
-        || (std::abs(opt_value - A.opt_value) < settings.ZERO_EPS && num_pin > A.num_pin))
-        {
+        if (opt_value < A.opt_value)
             return true;
-        }
-        else
+
+        if (std::abs(opt_value - A.opt_value) < settings.ZERO_EPS)
         {
-            return false;
+            if (num_pin > A.num_pin) return true;
+            if (num_pin == A.num_pin && edge_sample_num > A.edge_sample_num) return true;
         }
+
+        return false;
     }
 
 public:
 
     double opt_value;
     int num_pin;
+    int edge_sample_num;
     Eigen::MatrixXd platform;
 
     double dx;
     double dy;
+
+    bool rotate;
     double angle;
     Eigen::Vector2d center;
 
@@ -94,17 +105,35 @@ public:
 
 public:
 
-
-
     void get_height_map(Eigen::MatrixXd &height_map);
 
     void get_red_map(Eigen::MatrixXi &red_map);
+
+    void get_platform(Eigen::MatrixXd &platform, Eigen::MatrixXd &height_map, Eigen::MatrixXi &red_map);
 
     LayoutOptOutput xy_layout();
 
     LayoutOptOutput rotate_layout();
 
+#if DRAW_SUPPORT
+    LayoutOptOutput xy_opt_support(Eigen::MatrixXd &V, Eigen::MatrixXi &F);
+
+    LayoutOptOutput non_pin_support(Eigen::MatrixXd &V, Eigen::MatrixXi &F);
+
+    LayoutOptOutput stand_support(Eigen::MatrixXd &V, Eigen::MatrixXi &F);
+
+    void draw_support(Eigen::MatrixXd &platform,
+                      Eigen::MatrixXd &height_map,
+                      Eigen::MatrixXi &red_map,
+                      Eigen::MatrixXd &V,
+                      Eigen::MatrixXi &F);
+#endif
+
 protected:
+
+    void move_height_map(Eigen::MatrixXd &map, double x, double z);
+
+    void move_red_map(Eigen::MatrixXi &map, double x, double z);
 
     void rotate_height_map(Eigen::MatrixXd &map, Eigen::Vector2d &center, double angle = 0);
 
@@ -124,7 +153,7 @@ public:
 
     MeshSlicer slicer_;
 
-    Eigen::MatrixXd height_map_;
+    Eigen::MatrixXi height_map_;
 
     Eigen::MatrixXi red_map_;
 
@@ -137,7 +166,10 @@ void MeshLayout::get_height_map(Eigen::MatrixXd &height_map)
     {
         height_map_construction();
     }
-    height_map = height_map_;
+    height_map.resize(height_map_.rows(), height_map_.cols());
+    for(int ir = 0; ir < height_map_.rows(); ir++)
+        for(int ic = 0; ic < height_map_.cols(); ic++)
+            height_map(ir, ic) = slicer_.layer_pin_height(height_map_(ir, ic));
     return;
 }
 
@@ -234,6 +266,9 @@ LayoutOptOutput MeshLayout::xy_layout(Eigen::MatrixXd &height_map, Eigen::Matrix
 
 
     //optimization
+    int Er = settings.xy_sample_num_each_pin / 10;
+    int Ec = settings.xy_sample_num_each_pin / 10;
+
     LayoutOptOutput opt;
     for(int dr = 0; dr < settings.xy_sample_num_each_pin; dr++)
     {
@@ -258,6 +293,13 @@ LayoutOptOutput MeshLayout::xy_layout(Eigen::MatrixXd &height_map, Eigen::Matrix
                     int LT = r1 > 0 && c1 > 0 ? red_anchor(r1 - 1, c1 - 1) : 0;
                     int red_num =   red_anchor(r2, c2) - L - T + LT;
 
+
+                    int edge_red_num =  red_anchor(r2 - Er, c2 - Ec)
+                                       -red_anchor(r1 + Er - 1, c2 - Ec)
+                                       -red_anchor(r2 - Er, c1 + Ec - 1)
+                                       +red_anchor(r1 + Er - 1, c1 + Ec - 1);
+                    edge_red_num = red_num - edge_red_num;
+
                     //get minimum
                     int kr = std::log2(r2 - r1 + 1);
                     int kc = std::log2(c2 - c1 + 1);
@@ -269,17 +311,18 @@ LayoutOptOutput MeshLayout::xy_layout(Eigen::MatrixXd &height_map, Eigen::Matrix
 
                     //std::cout << "ir " << ir << ", ic " << ic << ", min " << minimum_height << std::endl;
 
-                    if(minimum_height < settings.maximum_height_map)
+                    if(minimum_height < settings.maximum_height_map && red_num > 0)
                     {
                         tmp.platform(ir, ic) = minimum_height;
                         tmp.opt_value += minimum_height * red_num;
+                        tmp.edge_sample_num+= edge_red_num;
                         if(red_num > 0 && minimum_height > 0) tmp.num_pin++;
                     }
 
                 }
             }
 
-//            std::cout << dr << ",\t" << dc << ",\t" << opt_tmp << ",\t" << num_pin_tmp << std::endl;
+            std::cout << dr << ",\t" << dc << ",\t" << tmp.opt_value << ",\t" << tmp.num_pin << ",\t" << tmp.edge_sample_num << std::endl;
 
             if(opt < tmp)
             {
@@ -300,21 +343,20 @@ void MeshLayout::height_map_construction()
 
     int nc = settings.pillar_column  * settings.xy_sample_num_each_pin;
     int nr = settings.pillar_row  * settings.xy_sample_num_each_pin;
-    height_map_ =  Eigen::MatrixXd::Ones(nr, nc) * settings.maximum_height_map;
+    height_map_ =  Eigen::MatrixXi::Ones(nr, nc) * slicer_.number_layer();
 
     VecMatrixXi bitmaps;
     slicer_.get_bitmaps(bitmaps);
 
     for(int layer = 0; layer < slicer_.number_layer(); layer++)
     {
-        double layer_height = slicer_.layer_pin_height(layer);
         for(int ir = 0; ir < nr; ir++)
         {
             for(int ic = 0; ic < nc; ic++)
             {
-                if(bitmaps[layer](ir, ic) && height_map_(ir, ic) > layer_height)
+                if(bitmaps[layer](ir, ic) && height_map_(ir, ic) > layer)
                 {
-                    height_map_(ir, ic) = layer_height;
+                    height_map_(ir, ic) = layer;
                 }
             }
         }
@@ -332,19 +374,18 @@ void MeshLayout::red_map_construction()
     std::vector<ClipperLib::Paths> bottom_half;
     slicer_.get_bottom_half(bottom_half);
 
+    ClipperLib::Paths downside;
     for(int layer = 1; layer < slicer_.number_layer(); layer++)
     {
-        Eigen::MatrixXi bitmap;
-        ScanLineFill fill;
-        fill.polygon_fill(bottom_half[layer], bitmap);
-        for(int ir = 0; ir < nr; ir++)
-        {
-            for(int ic = 0; ic < nc; ic++)
-            {
-                if(bitmap(ir, ic)) red_map_(ir, ic) = 1;
-            }
-        }
+        ClipperLib::Clipper clipper;
+        clipper.AddPaths(downside, ClipperLib::ptSubject, true);
+        clipper.AddPaths(bottom_half[layer], ClipperLib::ptClip, true);
+        clipper.Execute(ClipperLib::ctUnion, downside, ClipperLib::pftPositive, ClipperLib::pftPositive);
     }
+
+    Eigen::MatrixXi bitmap;
+    ScanLineFill fill(false);
+    fill.polygon_fill(downside, red_map_);
 }
 
 void MeshLayout::rotate_height_map(Eigen::MatrixXd &map, Eigen::Vector2d &center, double angle)
@@ -417,7 +458,9 @@ LayoutOptOutput MeshLayout::xy_layout()
 {
     if(height_map_.isZero()) height_map_construction();
     if(red_map_.isZero()) red_map_construction();
-    return xy_layout(height_map_, red_map_);
+    Eigen::MatrixXd height_map;
+    get_height_map(height_map);
+    return xy_layout(height_map, red_map_);
 }
 
 LayoutOptOutput MeshLayout::rotate_layout() {
@@ -445,7 +488,7 @@ LayoutOptOutput MeshLayout::rotate_layout() {
         std::cout << "angle: " << id * 360 / settings.angle_sample_num << std::endl;
         double angle = id * settings.angle_step;
         Eigen::MatrixXi red_map = red_map_;
-        Eigen::MatrixXd height_map = height_map_;
+        Eigen::MatrixXd height_map; get_height_map(height_map);
         LayoutOptOutput tmp;
         rotate_height_map(height_map, center, angle);
         rotate_red_map(red_map, center, angle);
@@ -460,6 +503,213 @@ LayoutOptOutput MeshLayout::rotate_layout() {
 
     return opt;
 }
+
+#if DRAW_SUPPORT
+LayoutOptOutput MeshLayout::xy_opt_support(Eigen::MatrixXd &V, Eigen::MatrixXi &F)
+{
+    LayoutOptOutput opt = xy_layout();
+    Eigen::MatrixXd height_map;
+    Eigen::MatrixXi red_map; get_red_map(red_map);
+
+    if(height_map_.isZero()) height_map_construction();
+    height_map.resize(height_map_.rows(), height_map_.cols());
+    for(int ir = 0; ir < height_map_.rows(); ir++)
+        for(int ic = 0; ic < height_map_.cols(); ic++)
+            height_map(ir, ic) = height_map_(ir, ic) * settings.layer_height;
+
+    move_height_map(height_map, opt.dx, opt.dy);
+    move_red_map(red_map, opt.dx, opt.dy);
+
+    Eigen::MatrixXd platform = opt.platform;
+    draw_support(platform, height_map, red_map, V, F);
+    return opt;
+}
+
+LayoutOptOutput MeshLayout::stand_support(Eigen::MatrixXd &V, Eigen::MatrixXi &F)
+{
+    LayoutOptOutput opt;
+
+    Eigen::MatrixXd height_map;
+    Eigen::MatrixXi red_map; get_red_map(red_map);
+
+    if(height_map_.isZero()) height_map_construction();
+    height_map.resize(height_map_.rows(), height_map_.cols());
+    for(int ir = 0; ir < height_map_.rows(); ir++)
+        for(int ic = 0; ic < height_map_.cols(); ic++)
+            height_map(ir, ic) = height_map_(ir, ic) * settings.layer_height;
+
+    get_platform(opt.platform, height_map, red_map);
+    Eigen::MatrixXd platform = opt.platform;
+    draw_support(platform, height_map, red_map, V, F);
+    return opt;
+}
+
+LayoutOptOutput MeshLayout::non_pin_support(Eigen::MatrixXd &V, Eigen::MatrixXi &F)
+{
+    LayoutOptOutput opt;
+    opt.platform = Eigen::MatrixXd::Zero(settings.pillar_row, settings.pillar_column);
+
+    Eigen::MatrixXd height_map;
+    Eigen::MatrixXi red_map; get_red_map(red_map);
+
+    if(height_map_.isZero()) height_map_construction();
+    height_map.resize(height_map_.rows(), height_map_.cols());
+    for(int ir = 0; ir < height_map_.rows(); ir++)
+        for(int ic = 0; ic < height_map_.cols(); ic++)
+            height_map(ir, ic) = height_map_(ir, ic) * settings.layer_height;
+
+    Eigen::MatrixXd platform = opt.platform;
+    draw_support(platform, height_map, red_map, V, F);
+    return opt;
+}
+
+void MeshLayout::draw_support(Eigen::MatrixXd &platform,
+                              Eigen::MatrixXd &height_map,
+                              Eigen::MatrixXi &red_map,
+                              Eigen::MatrixXd &V,
+                              Eigen::MatrixXi &F) {
+    SceneOrganizer organizer;
+    VecMatrixXi Fs;
+    VecMatrixXd Vs;
+    for(int ir = 0; ir < red_map.rows(); ir++)
+    {
+        for(int ic = 0; ic < red_map.cols(); ic++)
+        {
+            int pin_r = ir / settings.xy_sample_num_each_pin;
+            int pin_c = ic / settings.xy_sample_num_each_pin;
+            if(red_map(ir, ic) > 0)
+            {
+                Eigen::MatrixXd tV;
+                Eigen::MatrixXi tF;
+                Eigen::Vector3d bottom(settings.int2mm(settings.pin_center_x(ic)),
+                                       platform(pin_r, pin_c),
+                                       settings.int2mm(settings.pin_center_y(ir)));
+                double height = height_map(ir, ic) - platform(pin_r, pin_c) - settings.layer_height;
+
+                if(height >= settings.layer_height) {
+                    organizer.draw_pillar(bottom, settings.pad_size / settings.xy_sample_num_each_pin, height, tV, tF);
+                    Vs.push_back(tV);
+                    Fs.push_back(tF);
+                }
+            }
+        }
+    }
+    V.setZero();
+    F.setZero();
+    int nv = 0, nf = 0;
+    for(int id = 0; id < Vs.size(); id ++)
+    {
+        nv += Vs[id].rows(); nf += Fs[id].rows();
+    }
+    V.resize(nv, 3); F.resize(nf, 3);
+    nv = 0; nf = 0;
+    for(int id = 0; id < Vs.size(); id ++)
+    {
+        //F
+        for(int jd = 0; jd < Fs[id].rows(); jd++)
+        {
+            F.row(nf ++) = Fs[id].row(jd) + Eigen::RowVector3i(nv, nv, nv);
+        }
+
+        //V
+        for(int jd = 0; jd < Vs[id].rows(); jd++)
+        {
+            V.row(nv ++) = Vs[id].row(jd);
+        }
+    }
+
+    return;
+}
+
+#endif
+
+void MeshLayout::move_height_map(Eigen::MatrixXd &map, double x, double z)
+{
+    Eigen::MatrixXd new_map;
+    int nc = settings.pillar_column  * settings.xy_sample_num_each_pin;
+    int nr = settings.pillar_row  * settings.xy_sample_num_each_pin;
+
+    //init
+    new_map =  Eigen::MatrixXd::Ones(nr, nc) * settings.maximum_height_map;
+
+    for(int ir = 0; ir < nr; ir++)
+    {
+        for (int ic = 0; ic < nc; ic++)
+        {
+            Eigen::Vector2d p(settings.pin_center_x(ic), settings.pin_center_y(ir));
+            p+= Eigen::Vector2d(settings.mm2int(x), settings.mm2int(z));
+
+            int new_ir = std::floor(p(1) / settings.sample_width);
+            int new_ic = std::floor(p(0) / settings.sample_width);
+            if(0 <= new_ir && new_ir < nr && 0 <= new_ic && new_ic < nc)
+                new_map(new_ir, new_ic) = map(ir, ic);
+        }
+    }
+
+    map = new_map;
+    return;
+}
+
+void MeshLayout::move_red_map(Eigen::MatrixXi &map, double x, double z)
+{
+    Eigen::MatrixXi new_map;
+    int nc = settings.pillar_column  * settings.xy_sample_num_each_pin;
+    int nr = settings.pillar_row  * settings.xy_sample_num_each_pin;
+
+    //init
+    new_map =  Eigen::MatrixXi::Zero(nr, nc);
+
+    for(int ir = 0; ir < nr; ir++)
+    {
+        for (int ic = 0; ic < nc; ic++)
+        {
+            Eigen::Vector2d p(settings.pin_center_x(ic), settings.pin_center_y(ir));
+            p+= Eigen::Vector2d(settings.mm2int(x), settings.mm2int(z));
+
+            int new_ir = std::floor(p(1) / settings.sample_width);
+            int new_ic = std::floor(p(0) / settings.sample_width);
+            if(0 <= new_ir && new_ir < nr && 0 <= new_ic && new_ic < nc)
+                new_map(new_ir, new_ic) = map(ir, ic);
+        }
+    }
+
+    map = new_map;
+    return;
+}
+
+void MeshLayout::get_platform(Eigen::MatrixXd &platform, Eigen::MatrixXd &height_map, Eigen::MatrixXi &red_map)
+{
+    platform = Eigen::MatrixXd::Zero(9, 11);
+
+    for(int ir = 0; ir < settings.pillar_row; ir++)
+    {
+        for(int ic = 0; ic < settings.pillar_column; ic++)
+        {
+            int r1 = ir * settings.xy_sample_num_each_pin  ;
+            int r2 = (ir + 1) * settings.xy_sample_num_each_pin - 1;
+            int c1 = ic * settings.xy_sample_num_each_pin ;
+            int c2 = (ic + 1) * settings.xy_sample_num_each_pin - 1;
+
+            int num_red = 0;
+            double minimum_height = settings.MAX_DOUBLE;
+            for(int id = r1; id <= r2; id++)
+            {
+                for(int jd = c1; jd <= c2; jd++)
+                {
+                    if(minimum_height > height_map(id, jd)) minimum_height = height_map(id, jd);
+                    num_red += red_map(id, jd);
+                }
+            }
+
+            if(num_red > 0)
+                platform(ir, ic) = (int)(minimum_height / settings.pillar_standard_height) * settings.pillar_standard_height;
+        }
+    }
+
+    return;
+}
+
+
 
 //void MeshLayout::layer_projecting(Eigen::MatrixXi &map, std::vector<ClipperLib::Paths> &slices)
 //{

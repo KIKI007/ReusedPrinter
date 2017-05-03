@@ -24,6 +24,7 @@
 #include <igl/triangle/triangulate.h>
 
 typedef std::vector< Eigen::MatrixXi, Eigen::aligned_allocator<Eigen::MatrixXi>> VecMatrixXi;
+typedef std::vector< Eigen::MatrixXd, Eigen::aligned_allocator<Eigen::MatrixXd>> VecMatrixXd;
 
 class EdgeHash;
 
@@ -543,6 +544,7 @@ void MeshSlicer::get_bottom_half(std::vector<ClipperLib::Paths> &bottom_half)
     settings.print_TsN("OVERHANG");
 
     ClipperLib::Paths downward = layer_slices[0];
+    bottom_half[0] = layer_slices[0];
     for(int layer = 1; layer < layer_slices.size(); layer++)
     {
         memset(settings.tmp_str, 0, sizeof(settings.tmp_str));
@@ -579,8 +581,12 @@ bool MeshSlicer::check_polygon(ClipperLib::Path poly)
 
 double MeshSlicer::layer_pin_height(int id)
 {
-    int num_standard_pin = layer_height(id) / settings.pillar_standard_height;
-    return num_standard_pin * settings.pillar_standard_height;
+    if(id >= number_layer()) return settings.maximum_height_map;
+    else
+    {
+        int num_standard_pin = layer_height(id) / settings.pillar_standard_height;
+        return num_standard_pin * settings.pillar_standard_height;
+    }
 }
 
 void MeshSlicer::get_intersecting_surface(int layer, Eigen::MatrixXd &V2, Eigen::MatrixXi &F2)

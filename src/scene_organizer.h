@@ -60,6 +60,46 @@ public:
 
 public:
 
+
+    void draw_pillar(Eigen::Vector3d &bottom_center, double bottom_width, double height, Eigen::MatrixXd &V, Eigen::MatrixXi &F)
+    {
+        Eigen::Vector3d pts[8];
+        pts[0] = bottom_center + Eigen::Vector3d(-bottom_width/ 2, 0,  bottom_width / 2);
+        pts[1] = bottom_center + Eigen::Vector3d( bottom_width/ 2, 0,  bottom_width / 2);
+        pts[2] = bottom_center + Eigen::Vector3d( bottom_width/ 2, 0, -bottom_width / 2);
+        pts[3] = bottom_center + Eigen::Vector3d(-bottom_width/ 2, 0, -bottom_width / 2);
+
+        pts[4] = bottom_center + Eigen::Vector3d(-bottom_width/ 2, height,  bottom_width / 2);
+        pts[5] = bottom_center + Eigen::Vector3d( bottom_width/ 2, height,  bottom_width / 2);
+        pts[6] = bottom_center + Eigen::Vector3d( bottom_width/ 2, height, -bottom_width / 2);
+        pts[7] = bottom_center + Eigen::Vector3d(-bottom_width/ 2, height, -bottom_width / 2);
+
+        F.resize(12, 3);
+        //lateral
+        for(int id = 0; id < 4; id++)
+        {
+            F(2 * id, 0) = id;
+            F(2 * id, 1) = (id + 1) % 4;
+            F(2 * id, 2) = 4 + (id + 1) % 4;
+
+            F(2 * id + 1, 0) = 4 + (id + 1) % 4;
+            F(2 * id + 1, 1) = 4 +  id % 4;
+            F(2 * id + 1, 2) = id;
+        }
+
+        //bottom
+        F(8,  0) = 0; F(8,  1) = 3; F(8,  2) = 2;
+        F(9,  0) = 2; F(9,  1) = 1; F(9,  2) = 0;
+        F(10, 0) = 4; F(10, 1) = 5; F(10, 2) = 6;
+        F(11, 0) = 6; F(11, 1) = 7; F(11, 2) = 4;
+
+        V.resize(8, 3);
+        for(int id = 0; id < 8; id++)
+            V.row(id) = pts[id];
+
+        return;
+    }
+
 public:
 
     size_t Vrows() {return V_.rows();}
@@ -146,11 +186,12 @@ public:
         F = Eigen::MatrixXi::Zero(num_faces_single_obj(), 3);
 
         //cube
+        double cube_size = settings_.pad_size - 0.2;
         int dx[4] = {-1, -1, 1, 1};
         int dz[4] = {-1, 1, 1, -1};
         for (size_t id = 0; id < 4; id++) {
-            V.row(id) = Eigen::RowVector3d(settings_.pad_size / 2 * dx[id], 0, settings_.pad_size / 2 * dz[id]);
-            V.row(id + 4) = Eigen::RowVector3d(settings_.pad_size / 2 * dx[id], -settings_.pad_thickness, settings_.pad_size / 2 * dz[id]);
+            V.row(id) = Eigen::RowVector3d(cube_size / 2 * dx[id], 0, cube_size / 2 * dz[id]);
+            V.row(id + 4) = Eigen::RowVector3d(cube_size / 2 * dx[id], -settings_.pad_thickness, cube_size / 2 * dz[id]);
         }
 
         size_t f_id = 0;
@@ -196,7 +237,6 @@ public:
             F.row(f_id++) = Eigen::RowVector3i(v1, v0, u0);
         }
     }
-
 public:
 
     Settings settings_;

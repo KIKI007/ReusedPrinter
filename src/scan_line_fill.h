@@ -28,7 +28,7 @@ class ScanLineFill
 
 public:
 
-    ScanLineFill(bool expand_fill = true)
+    ScanLineFill(bool expand_fill = false)
     {
         N = settings.xy_sample_num_each_pin;
         sample_width = settings.sample_width;
