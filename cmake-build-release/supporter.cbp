@@ -1,0 +1,879 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="supporter"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="clang"/>
+		<Option virtualFolders="CMake Files\;CMake Files\external\;CMake Files\external\nanogui\;CMake Files\external\nanogui\ext\;CMake Files\external\nanogui\ext\glfw\;CMake Files\external\nanogui\ext\glfw\CMake\;CMake Files\external\nanogui\ext\glfw\CMake\modules\;CMake Files\external\nanogui\ext\glfw\src\;CMake Files\external\stb_image\;CMake Files\external\triangle\;CMake Files\shared\;CMake Files\shared\cmake\;CMake Files\cmake\;CMake Files\src\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="list_install_components">
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 list_install_components"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install">
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 install"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/strip">
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 install/strip"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="install/local">
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 install/local"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="nanogui">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/libnanogui.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCORO_SJLJ"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/nanovg/src"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/coro"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 nanogui"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="nanogui/fast">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/libnanogui.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DCORO_SJLJ"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/nanovg/src"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/coro"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 nanogui/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="nanogui-obj">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/CMakeFiles/nanogui-obj.dir/nanogui-obj.objlib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DNANOGUI_BUILD"/>
+					<Add option="-DCORO_SJLJ"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/nanovg/src"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/coro"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 nanogui-obj"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="nanogui-obj/fast">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/CMakeFiles/nanogui-obj.dir/nanogui-obj.objlib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DNANOGUI_BUILD"/>
+					<Add option="-DCORO_SJLJ"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/nanovg/src"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/coro"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 nanogui-obj/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glfw_objects">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/CMakeFiles/glfw_objects.dir/glfw_objects.objlib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-D_GLFW_USE_CONFIG_H"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 glfw_objects"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glfw_objects/fast">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/CMakeFiles/glfw_objects.dir/glfw_objects.objlib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-D_GLFW_USE_CONFIG_H"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 glfw_objects/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glfw">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/libglfw3.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 glfw"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glfw/fast">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/libglfw3.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 glfw/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="stb_image">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/stb_image/libstb_image.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/stb_image"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DSTBI_WRITE"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/stb_image/Makefile&quot;  VERBOSE=1 stb_image"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/stb_image/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/stb_image/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/stb_image/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="stb_image/fast">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/stb_image/libstb_image.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/stb_image"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DSTBI_WRITE"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/stb_image/Makefile&quot;  VERBOSE=1 stb_image/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/stb_image/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/stb_image/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/stb_image/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="triangle">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/triangle/libtriangle.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/triangle"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DTRILIBRARY"/>
+					<Add option="-DANSI_DECLARATORS"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/triangle/Makefile&quot;  VERBOSE=1 triangle"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/triangle/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/triangle/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/triangle/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="triangle/fast">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/triangle/libtriangle.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/triangle"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DTRILIBRARY"/>
+					<Add option="-DANSI_DECLARATORS"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/triangle/Makefile&quot;  VERBOSE=1 triangle/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/triangle/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/triangle/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/libigl/triangle/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="supporter_bin">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/src/supporter_bin" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="."/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DIGL_NO_MOSEK"/>
+					<Add option="-DIGL_VIEWER_WITH_NANOGUI"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/eigen"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../include"/>
+					<Add directory="/opt/local/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/glfw/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/nanovg/src"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/stb_image"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/triangle"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/src/Makefile&quot;  VERBOSE=1 supporter_bin"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="supporter_bin/fast">
+				<Option output="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/src/supporter_bin" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="."/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add option="-DIGL_NO_MOSEK"/>
+					<Add option="-DIGL_VIEWER_WITH_NANOGUI"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/eigen"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../include"/>
+					<Add directory="/opt/local/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/glfw/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/include"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/nanovg/src"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/stb_image"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/triangle"/>
+					<Add directory="/Users/wangziqi/Desktop/USC Spring/Code/Supporter"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/src/Makefile&quot;  VERBOSE=1 supporter_bin/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/wangziqi/Desktop/USC\ Spring/Code/Supporter/cmake-build-release/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release/libigl/nanogui/ext_build/glfw/src/glfw_config.h">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/include/GLFW/glfw3.h">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/include/GLFW/glfw3native.h">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/cocoa_init.m">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/cocoa_joystick.h">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/cocoa_joystick.m">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/cocoa_monitor.m">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/cocoa_platform.h">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/cocoa_time.c">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/cocoa_window.m">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/context.c">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/init.c">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/input.c">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/internal.h">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/monitor.c">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/nsgl_context.h">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/nsgl_context.m">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/posix_tls.c">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/posix_tls.h">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/vulkan.c">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/window.c">
+			<Option target="glfw_objects"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/nanovg/src/nanovg.c">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/nanovg/src/nanovg.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/button.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/checkbox.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/colorpicker.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/colorwheel.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/combobox.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/common.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/formhelper.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/glcanvas.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/glutil.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/graph.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/imagepanel.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/imageview.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/label.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/layout.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/messagedialog.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/nanogui.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/opengl.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/popup.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/popupbutton.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/progressbar.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/screen.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/serializer/core.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/serializer/opengl.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/serializer/sparse.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/slider.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/stackedwidget.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/tabheader.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/tabwidget.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/textbox.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/theme.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/toolbutton.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/vscrollpanel.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/widget.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/include/nanogui/window.h">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/button.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/checkbox.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/colorpicker.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/colorwheel.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/combobox.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/common.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/darwin.mm">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/glcanvas.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/glutil.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/graph.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/imagepanel.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/imageview.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/label.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/layout.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/messagedialog.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/popup.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/popupbutton.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/progressbar.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/screen.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/serializer.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/slider.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/stackedwidget.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/tabheader.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/tabwidget.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/textbox.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/theme.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/vscrollpanel.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/widget.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/src/window.cpp">
+			<Option target="nanogui-obj"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/stb_image.cpp">
+			<Option target="stb_image"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/stb_image.h">
+			<Option target="stb_image"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/stb_image_write.h">
+			<Option target="stb_image"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/triangle/triangle.c">
+			<Option target="triangle"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/triangle/triangle.h">
+			<Option target="triangle"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/clipper.cpp">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/clipper.hpp">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/fermat_spirals.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/gcode.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/hash_edge.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/main.cpp">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_layout.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_support.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/normalizing_model.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/scan_line_fill.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/scene_organizer.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\nanogui\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\nanogui\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\nanogui\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/CMake/modules/FindVulkan.cmake">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\CMake\modules\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/CMake/modules/FindVulkan.cmake">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\CMake\modules\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/CMake/modules/FindVulkan.cmake">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\CMake\modules\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/CMake/modules/FindVulkan.cmake">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\CMake\modules\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/glfw/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\nanogui\ext\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\stb_image\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\stb_image\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\stb_image\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/triangle/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\triangle\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/triangle/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\triangle\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/triangle/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external\triangle\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\shared\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\shared\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake/FindLIBIGL.cmake">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
