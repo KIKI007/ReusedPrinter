@@ -34,6 +34,7 @@ public:
         support_center_area = 0.25; //mm
         fermat_cut_width = 0.5; //mm
 
+
         face_overhang_angle = 50 * PI / 180;
         expected_sample_num = 2000;
         printing_max_angle = 45 * PI / 180;
@@ -46,6 +47,7 @@ public:
         pillar_standard_height = 12.7; //mm 0.5inch
         pillar_row = 9;
         pillar_column = 11;
+        group_expand_size = std::ceil(extrusion_width /(pad_size / xy_sample_num_each_pin));
 
         //layout
         xy_sample_num_each_pin = 50;
@@ -181,6 +183,8 @@ public:
     double face_overhang_angle;
     double expected_sample_num;
     double printing_max_angle;
+
+    int group_expand_size;
 
     //layout
     int xy_sample_num_each_pin;

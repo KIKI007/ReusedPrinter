@@ -7,7 +7,6 @@ add_executable(${PROJECT_NAME}_bin main.cpp
         hash_edge.h
         scene_organizer.h
         fermat_spirals.h
-        mesh_support.h
         gcode.h
         scan_line_fill.h
         mesh_slicer_base.h
@@ -16,7 +15,7 @@ add_executable(${PROJECT_NAME}_bin main.cpp
         mesh_layout_base.h
         mesh_layout_opt.h
         mesh_slicer_shift.h
-        fermat_curve.h)
+        fermat_curve.h mesh_support_base.h)
         #testing_models_path.h
         #detecting_overhangs.h
         #rendering_tree_support.h

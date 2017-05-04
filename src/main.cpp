@@ -124,7 +124,8 @@ void rotate()
 
 void test()
 {
-    test_fermat_curve(viewer);
+    test_convex_hull(scene_data.slicer, viewer);
+    //test_fermat_curve(viewer);
 }
 
 int main(int argc, char *argv[])

@@ -13,9 +13,12 @@
 
 using std::vector;
 using Eigen::RowVector2d;
+using Eigen::Vector2d;
 using ClipperLib::Path;
 using ClipperLib::Paths;
 using ClipperLib::IntPoint;
+
+
 
 class FermatCurve
 {

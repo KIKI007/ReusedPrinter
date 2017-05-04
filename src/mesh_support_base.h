@@ -1,0 +1,411 @@
+//
+// Created by 汪子琦 on 5/4/17.
+//
+
+#ifndef SUPPORTER_MESH_SUPPORT_BASE_H
+#define SUPPORTER_MESH_SUPPORT_BASE_H
+
+#include "mesh_slicer_base.h"
+#include "fermat_curve.h"
+#include <iostream>
+#include <queue>
+
+using ClipperLib::IntPoint;
+using ClipperLib::Path;
+using ClipperLib::Paths;
+using Eigen::RowVector2i;
+typedef  vector<IntPoint> PointsCluster;
+typedef  vector< vector<IntPoint>> VecPointsCluster;
+using std::queue;
+
+typedef struct tagConvexHullPoint {
+public:
+
+    tagConvexHullPoint() {
+        pi = IntPoint(0, 0);
+        pd = Vector2d::Zero(2);
+    }
+
+    tagConvexHullPoint(IntPoint p, Settings &settings) {
+        pi = p;
+        pd = Vector2d(settings.int2mm(p.X), settings.int2mm(p.Y));
+    }
+
+public:
+    IntPoint pi;
+    Vector2d pd;
+}ConvexHullPoint;
+
+bool ConvexHullPoint_Yi_Increase(ConvexHullPoint& p1, ConvexHullPoint& p2)
+{
+    if(p1.pd.y() < p2.pd.y())
+        return true;
+    if(p1.pd.y() == p2.pd.y() && p1.pd.x() < p2.pd.x())
+        return true;
+    return false;
+}
+
+bool ConvexHullPoint_TurnLeft(ConvexHullPoint& p1, ConvexHullPoint& p2)
+{
+    double cross = p1.pd.x() * p2.pd.y() - p1.pd.y() * p2.pd.x();
+    if(cross > 0)
+        return true;
+    if(cross == 0 && p1.pd.norm() < p2.pd.norm())
+        return true;
+    return false;
+}
+
+class MeshSupportBase
+{
+public:
+    MeshSupportBase()
+    {
+
+    }
+
+public:
+
+    void set_slicer(MeshSlicerBase &slicer_base);
+
+    void set_map(MatrixXi &hmap, MatrixXi &smap, MatrixXd &plfm);
+
+    void get_fermat_curves(vector<Paths> &fermat_curves);
+
+    virtual void get_fermat_curves(int layer, Paths &fermat_curves);
+
+protected:
+
+    void group_support_points();
+
+    void group_support_points(int ir, int ic);
+
+    int convex_hull(PointsCluster &cluster, Path &polygon);
+
+    virtual void fermat_curves_construction();
+
+    void fermat_curves_difference_from_model(int layer, Path &path);
+
+    void maximum_pin_layer_height();
+
+    bool is_cluster_line(PointsCluster &cluster);
+
+    void cluster_bounding_box(PointsCluster &cluster, double &width, double &height);
+
+    void line_construction(PointsCluster &cluster, Path &polygon);
+
+protected:
+
+    MeshSlicerBase slicer;
+
+    MatrixXi height_map, support_map;
+
+    MatrixXd platform, maximum_height;
+
+    vector<Paths> pin_fermat_curves;
+
+    vector<VecPointsCluster> pin_clusters;
+
+    Settings settings;
+};
+
+void MeshSupportBase::set_slicer(MeshSlicerBase &slicer_base)
+{
+    slicer = slicer_base;
+    settings = slicer_base.return_settings();
+}
+
+void MeshSupportBase::set_map(MatrixXi &hmap, MatrixXi &smap, MatrixXd &plfm) {
+    height_map = hmap;
+    support_map= smap;
+    platform = plfm;
+}
+
+
+void MeshSupportBase::get_fermat_curves(vector<Paths> &fermat_curves)
+{
+
+    if(pin_clusters.empty()) group_support_points();
+    if(maximum_height.isZero()) maximum_pin_layer_height();
+
+    fermat_curves.resize(slicer.number_layer());
+    for(int id = 1; id < slicer.number_layer(); id++)
+    {
+        Paths curves;
+        get_fermat_curves(id, curves);
+        fermat_curves[id] = curves;
+    }
+
+    return;
+}
+
+void MeshSupportBase::get_fermat_curves(int layer, Paths &fermat_curves) {
+    for(int ir = 0; ir < settings.pillar_row; ir++)
+    {
+        for(int ic = 0 ; ic < settings.pillar_row; ic++)
+        {
+            double layer_height = slicer.layer_height(layer);
+            double max_layer_height = slicer.layer_height(maximum_height(ir, ic));
+            double min_layer_height = platform(ir, ic);
+
+            int pin_id = ir * settings.pillar_column + ic;
+            if(min_layer_height < layer_height && layer_height <= max_layer_height)
+            {
+                //for(int id = 0; id < pin_fermat_curves[pin_id].size(); id++)
+                Paths &curves = pin_fermat_curves[pin_id];
+                fermat_curves.insert(fermat_curves.end(), curves.begin(), curves.end());
+            }
+        }
+    }
+
+    return;
+}
+
+void MeshSupportBase::group_support_points()
+{
+    pin_clusters.resize(settings.pillar_column * settings.pillar_row);
+
+    for(int ir = 0; ir < settings.pillar_row; ir++)
+    {
+        for(int ic = 0; ic < settings.pillar_row; ic++)
+        {
+            group_support_points(ir, ic);
+        }
+    }
+
+    return;
+}
+
+void MeshSupportBase::group_support_points(int ir, int ic)
+{
+    int r1 = ir * settings.xy_sample_num_each_pin;
+    int r2 = (ir + 1) * settings.xy_sample_num_each_pin - 1;
+    int c1 = ic * settings.xy_sample_num_each_pin;
+    int c2 = (ic + 1) * settings.xy_sample_num_each_pin - 1;
+
+    MatrixXi visited = MatrixXi::Zero(r2 - r1 + 1, c2 - c1 + 1);
+    MatrixXi group = MatrixXi::Zero(r2 - r1 + 1, c2 - c1 + 1);
+    VecPointsCluster clusters;
+    int group_index = 0;
+
+
+    for(int id = r1; id <= r2; id++)
+    {
+        for(int jd = c1; jd <= c2; jd++)
+        {
+            if(!visited(id - r1, jd - c1) && support_map(id, jd))
+            {
+                queue<RowVector2i> Q;
+                Q.push(RowVector2i(id, jd));
+                group_index ++;
+                clusters.push_back(PointsCluster());
+                while(!Q.empty())
+                {
+                    RowVector2i  u = Q.front();
+                    group(u(0) - r1, u(1) - c1) = group_index;
+                    IntPoint point(settings.pin_center_x(u(0)), settings.pin_center_x(u(1)));
+                    clusters.back().push_back(point);
+
+                    Q.pop();
+                    for(int dr = -settings.group_expand_size; dr <= settings.group_expand_size; dr++)
+                    {
+                        for(int dc = -settings.group_expand_size; dc <= settings.group_expand_size; dc++)
+                        {
+                            int vr = u(0) + dr;
+                            int vc = u(1) + dc;
+                            if(r1 <= vr && vr <= r2 && c1 <= vc && vc <= c2)
+                            {
+                                if(!visited(vr - r1, vc - c1) && support_map(vr, vc))
+                                {
+                                    Q.push(RowVector2i(vr, vc));
+                                    visited(vr - r1, vc - c1) = false;
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+    pin_clusters[ir * settings.pillar_column + ic] = clusters;
+    return;
+}
+
+int MeshSupportBase::convex_hull(PointsCluster &cluster, Path &polygon)
+{
+    if(cluster.empty()) return 0;
+
+    polygon.clear();
+    std::vector<ConvexHullPoint> pointslist;
+    for(int id = 0; id < cluster.size(); id++)
+    {
+        ConvexHullPoint cpoint(cluster[id], settings);
+        pointslist.push_back(cpoint);
+        polygon.push_back(cluster[id]);
+    }
+
+    if(pointslist.size() <= 2 ) {
+        return pointslist.size();
+    }
+
+
+    std::sort(pointslist.begin(), pointslist.end(), ConvexHullPoint_Yi_Increase);
+    for(int id = 1; id < pointslist.size(); id++)
+        pointslist[id].pd -= pointslist[0].pd;
+    std::sort(pointslist.begin() + 1, pointslist.end(), ConvexHullPoint_TurnLeft);
+    for(int id = 1; id < pointslist.size(); id++)
+        pointslist[id].pd += pointslist[0].pd;
+
+    std::vector<int> stack;
+    stack.push_back(0);
+
+    for(int id = 1; id < pointslist.size(); id++)
+    {
+        Vector2d p0, p1, p2 = pointslist[id].pd;
+        int p1_id = 0;
+        double cross = 0;
+        do
+        {
+            p1 = pointslist[stack.back()].pd;
+            p1_id = stack.back();
+            stack.pop_back();
+            if(!stack.empty())
+            {
+                p0 = pointslist[stack.back()].pd;
+                cross = (p1 - p0).x() * (p2 - p1).y() - (p1 - p0).y() * (p2 - p1).x();
+            } else
+            {
+                break;
+            }
+        }while(cross < 0);
+        stack.push_back(p1_id);
+        stack.push_back(id);
+    }
+
+    polygon.clear();
+    for(int id = 0; id < stack.size(); id++)
+        polygon.push_back(pointslist[stack[id]].pi);
+
+    return polygon.size();
+}
+
+void MeshSupportBase::fermat_curves_construction() {
+
+    pin_fermat_curves.resize(settings.pillar_row * settings.pillar_column);
+    for(int ir = 0; ir < settings.pillar_row; ir++)
+    {
+        for(int ic = 0; ic < settings.pillar_column; ic++)
+        {
+            int pin_id = ir * settings.pillar_column + ic;
+            if(!pin_clusters[pin_id].empty())
+            {
+                for(int id = 0; id < pin_clusters[pin_id].size(); id++)
+                {
+                    PointsCluster cluster = pin_clusters[pin_id][id];
+                    Path polygon;
+
+                    if(is_cluster_line(cluster))
+                    {
+                        line_construction(cluster, polygon);
+                    } else{
+                        convex_hull(cluster, polygon);
+                        FermatCurve curve;
+                        curve.set_boundary(polygon, polygon[0], polygon[0]);
+                        curve.output_curve(polygon);
+                    }
+                    pin_fermat_curves[pin_id].push_back(polygon);
+                }
+            }
+        }
+    }
+}
+
+void MeshSupportBase::fermat_curves_difference_from_model(int layer, Path &path) {
+    return;
+}
+
+void MeshSupportBase::maximum_pin_layer_height() {
+    maximum_height = MatrixXd::Zero(settings.pillar_row, settings.pillar_column);
+
+    for (int ir = 0; ir < settings.pillar_row; ir++) {
+        for (int ic = 0; ic < settings.pillar_column; ic++) {
+
+            int r1 = ir * settings.xy_sample_num_each_pin;
+            int r2 = (ir + 1) * settings.xy_sample_num_each_pin - 1;
+            int c1 = ic * settings.xy_sample_num_each_pin;
+            int c2 = (ic + 1) * settings.xy_sample_num_each_pin - 1;
+
+            int maximum = 0;
+            for(int id = r1; id <= r2; id++)
+            {
+                for(int jd = c1; jd <= c2; jd++)
+                {
+                    if(support_map(id, jd) && maximum < height_map(id, jd))
+                        maximum = height_map(id, jd);
+                }
+            }
+
+            maximum_height(ir, ic) = maximum;
+        }
+    }
+}
+
+bool MeshSupportBase::is_cluster_line(PointsCluster &cluster) {
+    double width, height;
+    cluster_bounding_box(cluster, width, height);
+    if(width < settings.fermat_cut_width * 2 || height < settings.fermat_cut_width)
+        return true;
+    return false;
+}
+
+void MeshSupportBase::cluster_bounding_box(PointsCluster &cluster, double &width, double &height)
+{
+    int max_x = -settings.MAX_DOUBLE;
+    int min_x = settings.MAX_DOUBLE;
+    int max_y = -settings.MAX_DOUBLE;
+    int min_y = settings.MAX_DOUBLE;
+
+    for(int id = 0; id < cluster.size(); id++)
+    {
+        if(max_x < cluster[id].X) max_x = cluster[id].X;
+        if(min_x > cluster[id].X) min_x = cluster[id].X;
+        if(max_y < cluster[id].Y) max_y = cluster[id].Y;
+        if(min_y > cluster[id].Y) min_y = cluster[id].Y;
+    }
+
+    width = settings.int2mm(max_x - min_x);
+    height = settings.int2mm(max_y - min_y);
+
+    return;
+}
+
+void MeshSupportBase::line_construction(PointsCluster &cluster, Path &polygon)
+{
+    int max_x = -settings.MAX_DOUBLE;
+    int min_x = settings.MAX_DOUBLE;
+    int max_y = -settings.MAX_DOUBLE;
+    int min_y = settings.MAX_DOUBLE;
+
+    for(int id = 0; id < cluster.size(); id++)
+    {
+        if(max_x < cluster[id].X) max_x = cluster[id].X;
+        if(min_x > cluster[id].X) min_x = cluster[id].X;
+        if(max_y < cluster[id].Y) max_y = cluster[id].Y;
+        if(min_y > cluster[id].Y) min_y = cluster[id].Y;
+    }
+
+    double width = settings.int2mm(max_x - min_x);
+    double height = settings.int2mm(max_y - min_y);
+
+    polygon.push_back(IntPoint(min_x,min_y));
+    polygon.push_back(IntPoint(max_x,min_y));
+    polygon.push_back(IntPoint(max_x,max_y));
+    polygon.push_back(IntPoint(min_x,max_y));
+
+    return;
+}
+
+#endif //SUPPORTER_MESH_SUPPORT_BASE_H

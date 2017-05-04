@@ -30,6 +30,7 @@
 #include "fermat_curve.h"
 #include "scene_organizer.h"
 #include "clipper.hpp"
+#include "mesh_support_base.h"
 
 
 //Model path
@@ -257,6 +258,51 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C)
 
     organizer.get_mesh(V, F, C);
 
+
+    return true;
+}
+
+bool test_convex_hull(MeshSlicerShift &slicer, igl::viewer::Viewer &viewer)
+{
+    if(slicer.empty()) return false;
+
+    MeshLayoutOpt layouter;
+    layouter.set_slicer(slicer);
+
+    MatrixXi F; MatrixXd V;
+    slicer.get_vertices_mat(V);
+    slicer.get_faces_mat(F);
+    viewer.data.clear();
+    viewer.data.set_mesh(V, F);
+
+    MatrixXi hmap, smap;
+    layouter.get_height_map(hmap);
+    layouter.get_height_map(smap);
+    MatrixXd platform= MatrixXd::Zero(9, 11);
+
+    MeshSupportBase supporter;
+    supporter.set_slicer(slicer);
+    supporter.set_map(hmap, smap, platform);
+
+    Paths curves; supporter.get_fermat_curves(1, curves);
+
+    Settings settings;
+    for(int jd = 0; jd < curves.size(); jd++)
+    {
+        Path output = curves[jd];
+        for(int id = 1; id < output.size(); id++)
+        {
+            RowVector3d p1(settings.int2mm(output[id].X),
+                           0,
+                           settings.int2mm(output[id].Y));
+
+            RowVector3d p0(settings.int2mm(output[id - 1].X),
+                           0,
+                           settings.int2mm(output[id - 1].Y));
+
+            viewer.data.add_edges(p0, p1, RowVector3d(1, 1, 0));
+        }
+    }
 
     return true;
 }

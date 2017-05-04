@@ -29,24 +29,24 @@ bool MSTGraphNodeComparator(MSTGraphNode &n0, MSTGraphNode &n1)
     return false;
 }
 
-bool ConvexHullPoint_Yi_Increase(ConvexHullPoint& p1, ConvexHullPoint& p2)
-{
-    if(p1.pd.y() < p2.pd.y())
-        return true;
-    if(p1.pd.y() == p2.pd.y() && p1.pd.x() < p2.pd.x())
-        return true;
-    return false;
-}
-
-bool ConvexHullPoint_TurnLeft(ConvexHullPoint& p1, ConvexHullPoint& p2)
-{
-    double cross = p1.pd.x() * p2.pd.y() - p1.pd.y() * p2.pd.x();
-    if(cross > 0)
-        return true;
-    if(cross == 0 && p1.pd.norm() < p2.pd.norm())
-        return true;
-    return false;
-}
+//bool ConvexHullPoint_Yi_Increase(ConvexHullPoint& p1, ConvexHullPoint& p2)
+//{
+//    if(p1.pd.y() < p2.pd.y())
+//        return true;
+//    if(p1.pd.y() == p2.pd.y() && p1.pd.x() < p2.pd.x())
+//        return true;
+//    return false;
+//}
+//
+//bool ConvexHullPoint_TurnLeft(ConvexHullPoint& p1, ConvexHullPoint& p2)
+//{
+//    double cross = p1.pd.x() * p2.pd.y() - p1.pd.y() * p2.pd.x();
+//    if(cross > 0)
+//        return true;
+//    if(cross == 0 && p1.pd.norm() < p2.pd.norm())
+//        return true;
+//    return false;
+//}
 
 
 class MeshSupport
