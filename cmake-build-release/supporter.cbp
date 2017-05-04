@@ -731,6 +731,9 @@
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/clipper.hpp">
 			<Option target="supporter_bin"/>
 		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/fermat_curve.h">
+			<Option target="supporter_bin"/>
+		</Unit>
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/fermat_spirals.h">
 			<Option target="supporter_bin"/>
 		</Unit>
@@ -746,16 +749,10 @@
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/menu_function.h">
 			<Option target="supporter_bin"/>
 		</Unit>
-		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_layout.h">
-			<Option target="supporter_bin"/>
-		</Unit>
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_layout_base.h">
 			<Option target="supporter_bin"/>
 		</Unit>
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_layout_opt.h">
-			<Option target="supporter_bin"/>
-		</Unit>
-		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer.h">
 			<Option target="supporter_bin"/>
 		</Unit>
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_base.h">

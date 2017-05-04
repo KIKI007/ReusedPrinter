@@ -4,12 +4,19 @@ project(supporter)
 add_executable(${PROJECT_NAME}_bin main.cpp
         clipper.hpp
         clipper.cpp
-        mesh_slicer.h hash_edge.h
+        hash_edge.h
         scene_organizer.h
         fermat_spirals.h
-        mesh_layout.h
         mesh_support.h
-        gcode.h scan_line_fill.h mesh_slicer_base.h menu_function.h mesh_slicer_overhang.h mesh_layout_base.h mesh_layout_opt.h mesh_slicer_shift.h)
+        gcode.h
+        scan_line_fill.h
+        mesh_slicer_base.h
+        menu_function.h
+        mesh_slicer_overhang.h
+        mesh_layout_base.h
+        mesh_layout_opt.h
+        mesh_slicer_shift.h
+        fermat_curve.h)
         #testing_models_path.h
         #detecting_overhangs.h
         #rendering_tree_support.h

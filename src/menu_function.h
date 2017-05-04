@@ -27,8 +27,10 @@
 #include "mesh_slicer_shift.h"
 #include "mesh_layout_base.h"
 #include "mesh_layout_opt.h"
+#include "fermat_curve.h"
 #include "scene_organizer.h"
 #include "clipper.hpp"
+
 
 //Model path
 #include "testing_models_path.h"
@@ -257,6 +259,39 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C)
 
 
     return true;
+}
+
+void test_fermat_curve(igl::viewer::Viewer &viewer)
+{
+    IntPoint p[4];
+    p[0] = IntPoint(0, 0);
+    p[1] = IntPoint(30000, 0);
+    p[2] = IntPoint(30000, 30000);
+    p[3] = IntPoint(0, 30000);
+
+    FermatCurve curver;
+    Path bdary;
+    for(int id = 0; id < 4; id++) bdary.push_back(p[id]);
+    curver.set_boundary(bdary, p[0], p[3]);
+
+    Path output;
+    curver.output_curve(output);
+
+    Settings settings;
+    for(int id = 1; id < output.size(); id++)
+    {
+        RowVector3d p1(settings.int2mm(output[id].X),
+                    0,
+                    settings.int2mm(output[id].Y));
+
+        RowVector3d p0(settings.int2mm(output[id - 1].X),
+                    0,
+                    settings.int2mm(output[id - 1].Y));
+
+        viewer.data.add_edges(p0, p1, RowVector3d(1, 1, 0));
+    }
+
+    return;
 }
 
 #else

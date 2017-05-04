@@ -122,6 +122,10 @@ void rotate()
         render_mesh(V, F, C);
 }
 
+void test()
+{
+    test_fermat_curve(viewer);
+}
 
 int main(int argc, char *argv[])
 {
@@ -147,6 +151,10 @@ int main(int argc, char *argv[])
         viewer.ngui->addGroup("Layout Opt");
         viewer.ngui->addButton("XZ Opt", xz_opt);
         viewer.ngui->addButton("Rotate Opt", rotate);
+
+        viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Test");
+        viewer.ngui->addGroup("Test");
+        viewer.ngui->addButton("Test", test);
         viewer.screen->performLayout();
         return false;
     };
