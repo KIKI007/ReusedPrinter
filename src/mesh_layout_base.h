@@ -131,7 +131,7 @@ void MeshLayoutBase::get_height_map(MatrixXd &hmap) {
 void MeshLayoutBase::get_support_map(MatrixXi &smap) {
     if(support_map.isZero())
         support_map_construction();
-    smap = height_map;
+    smap = support_map;
 }
 
 void MeshLayoutBase::height_map_construction()
@@ -208,8 +208,9 @@ void MeshLayoutBase::get_platform(MatrixXi &hmap, MatrixXi &smap, MatrixXd &plat
             {
                 for(int jd = c1; jd <= c2; jd++)
                 {
-                    if(minimum_layer > height_map(id, jd)) minimum_layer = height_map(id, jd);
-                    num_red += support_map(id, jd);
+                    if(minimum_layer > hmap(id, jd))
+                        minimum_layer = hmap(id, jd);
+                    num_red += smap(id, jd);
                 }
             }
 

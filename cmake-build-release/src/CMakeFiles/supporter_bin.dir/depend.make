@@ -459,6 +459,7 @@ src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../src/mesh_layout_base.h
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../src/mesh_layout_opt.h
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../src/mesh_slicer_base.h
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../src/mesh_slicer_overhang.h
+src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../src/mesh_slicer_shift.h
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../src/scan_line_fill.h
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../src/scene_organizer.h
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../src/settings.h

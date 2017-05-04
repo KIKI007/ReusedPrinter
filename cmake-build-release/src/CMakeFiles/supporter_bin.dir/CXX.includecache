@@ -3153,6 +3153,8 @@ mesh_slicer_base.h
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_base.h
 mesh_slicer_overhang.h
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_overhang.h
+mesh_slicer_shift.h
+/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_shift.h
 mesh_layout_base.h
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_layout_base.h
 mesh_layout_opt.h
@@ -3205,6 +3207,10 @@ hash_edge.h
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_overhang.h
 mesh_slicer_base.h
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_base.h
+
+/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_shift.h
+mesh_slicer_overhang.h
+/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_overhang.h
 
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/scan_line_fill.h
 igl/readOFF.h

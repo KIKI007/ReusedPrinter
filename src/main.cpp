@@ -22,7 +22,7 @@ struct Scene_Data
 {
     MatrixXd V; //original model vertices
     MatrixXi F; //original model faces
-    MeshSlicerOverhang slicer;
+    MeshSlicerShift slicer;
 }scene_data;
 
 struct Scene_Color
@@ -114,6 +114,15 @@ void xz_opt()
         render_mesh(V, F, C);
 }
 
+void rotate()
+{
+    MatrixXd V, C;
+    MatrixXi F;
+    if(rotate_opt(scene_data.slicer, V, F, C))
+        render_mesh(V, F, C);
+}
+
+
 int main(int argc, char *argv[])
 {
     init();
@@ -134,10 +143,10 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("Bottom half", bottom_half);
         viewer.ngui->addButton("Upper half", upper_half);
 
-        viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Mesh Slicer Class");
         viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Mesh Layout Class");
         viewer.ngui->addGroup("Layout Opt");
         viewer.ngui->addButton("XZ Opt", xz_opt);
+        viewer.ngui->addButton("Rotate Opt", rotate);
         viewer.screen->performLayout();
         return false;
     };

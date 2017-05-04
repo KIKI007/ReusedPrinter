@@ -20,7 +20,15 @@ public:
         center = Vector2d(0, 0);
         angle = 0;
         edge_sample_num = 0;
-        rotate = false;
+    }
+
+    LayoutOptResult(const LayoutOptResult &A)
+    {
+        dx = A.dx;
+        dz = A.dz;
+        material_save = A.material_save;
+        angle = A.angle;
+        edge_sample_num = A.edge_sample_num;
     }
 
 public:
@@ -30,7 +38,7 @@ public:
         if (material_save < A.material_save)
             return true;
 
-        if (std::abs(material_save - A.material_save) < settings.ZERO_EPS)
+        if (std::abs(material_save - A.material_save) < 1e-3)
         {
             if (num_pin > A.num_pin) return true;
             if (num_pin == A.num_pin && edge_sample_num > A.edge_sample_num) return true;
@@ -44,16 +52,12 @@ public:
     double material_save;
     int num_pin;
     int edge_sample_num;
-    MatrixXd platform;
 
     double dx;
     double dz;
 
-    bool rotate;
     double angle;
     Vector2d center;
-
-    Settings settings;
 };
 
 class MeshLayoutOpt : public  MeshLayoutBase
@@ -83,6 +87,8 @@ protected:
 
     LayoutOptResult opt_xy_layout(MatrixXi &hmap, MatrixXi &smap);
 
+    void get_model_center(MatrixXi &hmap, Vector2d &center);
+
 protected:
     MatrixXi opt_hmap;
 
@@ -101,20 +107,70 @@ void MeshLayoutOpt::request_layout_xz_opt(LayoutOptResult &result)
     opt_hmap.setZero();
     opt_smap.setZero();
     opt_platform.setZero();
+
     if(height_map.isZero()) height_map_construction();
     if(support_map.isZero()) support_map_construction();
+
     result = opt_xy_layout(height_map, support_map);
+
     opt_hmap = height_map;
     opt_smap = support_map;
-    opt_platform = result.platform;
+
+
     transform_map_xz(opt_hmap, result.dx, result.dz, slicer.number_layer());
     transform_map_xz(opt_smap, result.dx, result.dz, 0);
+
+    get_platform(opt_hmap, opt_smap, opt_platform);
+
     return;
 }
 
 void MeshLayoutOpt::request_layout_rotate_opt(LayoutOptResult &result)
 {
+    opt_hmap.setZero();
+    opt_smap.setZero();
+    opt_platform.setZero();
 
+    if(height_map.isZero()) height_map_construction();
+    if(support_map.isZero()) support_map_construction();
+
+    Eigen::Vector2d center(0, 0);
+    get_model_center(height_map, center);
+
+    LayoutOptResult opt_result;
+    for(int id = 0; id < settings.angle_sample_num; id++)
+    {
+
+        double angle = id * settings.angle_step;
+        std::cout << "Rotate Opt\t" << angle << std::endl;
+
+        Eigen::MatrixXi smap = support_map;
+        Eigen::MatrixXi hmap = height_map;
+
+
+        rotate_map_yaxis(hmap, angle, center, slicer.number_layer());
+        rotate_map_yaxis(smap, angle, center, 0);
+
+        LayoutOptResult tmp_result = opt_xy_layout(hmap, smap);
+        if(opt_result < tmp_result)
+        {
+            opt_result = tmp_result;
+            opt_result.center = center;
+            opt_result.angle = angle;
+        }
+    }
+
+    result = opt_result;
+
+    opt_hmap = height_map;
+    rotate_map_yaxis(opt_hmap, result.angle, result.center, slicer.number_layer());
+    transform_map_xz(opt_hmap, result.dx, result.dz, slicer.number_layer());
+
+    opt_smap = support_map;
+    rotate_map_yaxis(opt_smap, result.angle, result.center, 0);
+    transform_map_xz(opt_smap, result.dx, result.dz, 0);
+
+    get_platform(opt_hmap, opt_smap, opt_platform);
 }
 
 void MeshLayoutOpt::get_opt_hmap(MatrixXi &hmap)
@@ -144,6 +200,7 @@ LayoutOptResult MeshLayoutOpt::opt_xy_layout(MatrixXi &hmap, MatrixXi &smap) {
 
     assert(!hmap.isZero() && !smap.isZero());
 
+    //settings.tic("red Anchor");
     //Red Anchor
     Eigen::MatrixXi sum_smap;
     sum_smap = Eigen::MatrixXi::Zero(smap.rows(), smap.cols());
@@ -158,7 +215,9 @@ LayoutOptResult MeshLayoutOpt::opt_xy_layout(MatrixXi &hmap, MatrixXi &smap) {
             sum_smap(id, jd) = L + T - LT + smap(id, jd);
         }
     }
+    //settings.toc();
 
+    //settings.tic("MiniHmap");
     //min_hmap
     int n = settings.pillar_row * settings.xy_sample_num_each_pin;
     int m = settings.pillar_column * settings.xy_sample_num_each_pin;
@@ -218,20 +277,19 @@ LayoutOptResult MeshLayoutOpt::opt_xy_layout(MatrixXi &hmap, MatrixXi &smap) {
             }
         }
     }
-
+    //settings.toc();
 
     //optimization
     int Er = settings.edge_region_num;
     int Ec = settings.edge_region_num;
 
+    //settings.tic("Main");
     LayoutOptResult opt_result;
-    opt_result.platform = MatrixXd::Zero(settings.pillar_row, settings.pillar_column);
     for(int dr = 0; dr < settings.xy_sample_num_each_pin; dr++)
     {
         for(int dc = 0; dc < settings.xy_sample_num_each_pin; dc++)
         {
             LayoutOptResult tmp_result;
-            tmp_result.platform = MatrixXd::Zero(settings.pillar_row, settings.pillar_column);
             for(int ir = 0; ir < settings.pillar_row; ir++)
             {
                 for(int ic = 0; ic < settings.pillar_column; ic ++)
@@ -250,7 +308,7 @@ LayoutOptResult MeshLayoutOpt::opt_xy_layout(MatrixXi &hmap, MatrixXi &smap) {
                     int red_num =   sum_smap(r2, c2) - L - T + LT;
 
 
-                    int edge_red_num =  sum_smap(r2 - Er, c2 - Ec)
+                    int edge_red_num =   sum_smap(r2 - Er, c2 - Ec)
                                         -sum_smap(r1 + Er - 1, c2 - Ec)
                                         -sum_smap(r2 - Er, c1 + Ec - 1)
                                         +sum_smap(r1 + Er - 1, c1 + Ec - 1);
@@ -260,9 +318,9 @@ LayoutOptResult MeshLayoutOpt::opt_xy_layout(MatrixXi &hmap, MatrixXi &smap) {
                     int kr = std::log2(r2 - r1 + 1);
                     int kc = std::log2(c2 - c1 + 1);
                     int min_hmap_1 = std::min(min_hmap[kr][r1]                [kc][c1],
-                                                min_hmap[kr][r1]                [kc][c2 + 1 - (1 << kc)]);
+                                              min_hmap[kr][r1]                [kc][c2 + 1 - (1 << kc)]);
                     int min_hmap_2 = std::min(min_hmap[kr][r2 + 1 - (1 << kr)][kc][c1],
-                                                min_hmap[kr][r2 + 1 - (1 << kr)][kc][c2 + 1 - (1 << kc)]);
+                                              min_hmap[kr][r2 + 1 - (1 << kr)][kc][c2 + 1 - (1 << kc)]);
                     int min_hmap_h = std::min(min_hmap_1, min_hmap_2);
 
                     //std::cout << "ir " << ir << ", ic " << ic << ", min " << min_hmap_height << std::endl;
@@ -270,7 +328,7 @@ LayoutOptResult MeshLayoutOpt::opt_xy_layout(MatrixXi &hmap, MatrixXi &smap) {
                     if(min_hmap_h < slicer.number_layer() && red_num > 0)
                     {
                         double h = slicer.layer_pin_height(min_hmap_h);
-                        tmp_result.platform(ir, ic) = h;
+                        //tmp_result.platform(ir, ic) = h;
                         tmp_result.material_save += h * red_num;
                         tmp_result.edge_sample_num+= edge_red_num;
                         if(red_num > 0 && min_hmap_h > 0) tmp_result.num_pin++;
@@ -289,6 +347,7 @@ LayoutOptResult MeshLayoutOpt::opt_xy_layout(MatrixXi &hmap, MatrixXi &smap) {
             }
         }
     }
+    //settings.toc();
 
     return opt_result;
 }
@@ -299,6 +358,24 @@ void MeshLayoutOpt::clear()
     opt_hmap.setZero();
     opt_smap.setZero();
     opt_platform.setZero();
+}
+
+void MeshLayoutOpt::get_model_center(MatrixXi &hmap, Vector2d &center)
+{
+    int num_pts = 0;
+    center = Vector2d(0, 0);
+    for(int ir = 0; ir < hmap.rows(); ir++)
+    {
+        for(int ic = 0; ic < hmap.cols(); ic++)
+        {
+            if(hmap(ir, ic) < slicer.number_layer())
+            {
+                center += Vector2d(settings.pin_center_x(ic), settings.pin_center_y(ir));
+                num_pts++;
+            }
+        }
+    }
+    center /= num_pts;
 }
 
 #endif //SUPPORTER_MESH_LAYOUT_OPT_H

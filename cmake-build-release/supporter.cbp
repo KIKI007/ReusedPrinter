@@ -764,6 +764,9 @@
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_overhang.h">
 			<Option target="supporter_bin"/>
 		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_shift.h">
+			<Option target="supporter_bin"/>
+		</Unit>
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_support.h">
 			<Option target="supporter_bin"/>
 		</Unit>

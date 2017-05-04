@@ -58,9 +58,9 @@ public: /* input & utility */
     void clear();
 
     //direct computing the layer_height without using some vector's size
-    inline int number_layer() { return (max_Y() - min_Y()) / settings.mm2int_Even(settings.layer_height) + 1; }
+    inline int number_layer() { return (maxY - minY) / settings.mm2int_Even(settings.layer_height) + 1; }
 
-    double layer_height(int id) { return settings.int2mm(min_Y()) + id * settings.layer_height; }
+    double layer_height(int id) { return settings.int2mm(minY) + id * settings.layer_height; }
 
     //different from layer height,
     // a pin height is the maximum position that a metal pin can reach below the its layer height
@@ -122,6 +122,10 @@ protected:
     std::vector< ClipperLib::Paths> layer_slices;
 
     Settings settings;
+
+    int minY;
+
+    int maxY;
 };
 
 void MeshSlicerBase::set_mesh(Eigen::MatrixXd &in_V, Eigen::MatrixXi &in_F)
@@ -132,6 +136,9 @@ void MeshSlicerBase::set_mesh(Eigen::MatrixXd &in_V, Eigen::MatrixXi &in_F)
     for(size_t id = 0; id < V.rows(); id++)
         for(size_t jd = 0; jd < V.cols(); jd++)
             V(id, jd) = settings.mm2int_Even(in_V(id, jd));
+
+    minY = min_Y();
+    maxY = max_Y();
 
     contour_construction();
     return;
@@ -210,7 +217,7 @@ void MeshSlicerBase::clear()
     F.setZero();
     P.clear();
     layer_slices.clear();
-
+    minY = maxY = 0;
     return;
 }
 

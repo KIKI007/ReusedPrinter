@@ -24,6 +24,7 @@
 //Self Class
 #include "mesh_slicer_base.h"
 #include "mesh_slicer_overhang.h"
+#include "mesh_slicer_shift.h"
 #include "mesh_layout_base.h"
 #include "mesh_layout_opt.h"
 #include "scene_organizer.h"
@@ -176,7 +177,7 @@ bool slicing_upper_half(MeshSlicerOverhang &slicer, MatrixXd &V, MatrixXi &F)
     return false;
 }
 
-bool move_xy_opt(MeshSlicerOverhang &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C)
+bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C)
 {
     if(slicer.empty()) return false;
 
@@ -204,16 +205,56 @@ bool move_xy_opt(MeshSlicerOverhang &slicer, MatrixXd &V, MatrixXi &F, MatrixXd 
     organizer.add_mesh(spV, spF, RowVector3d(1, 0 , 0));
 
     //mesh
+    slicer.move_xz(result.dx, result.dz);
     slicer.get_vertices_mat(V);
     slicer.get_faces_mat(F);
-    for(int id = 0; id < V.rows(); id++)
-    {
-        V(id, 0) += result.dx;
-        V(id, 2) += result.dz;
-    }
     organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
 
     organizer.get_mesh(V, F, C);
+    return true;
+}
+
+bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C)
+{
+    if(slicer.empty()) return false;
+
+    Settings settings;
+
+    MeshLayoutOpt layouter;
+    layouter.set_slicer(slicer);
+    SceneOrganizer organizer;
+
+    LayoutOptResult result;
+    settings.tic("Rotate");
+    layouter.request_layout_rotate_opt(result);
+    settings.toc();
+    MatrixXd spV, plV;
+    MatrixXi spF, plF;
+
+    //platform
+    MatrixXd platform; layouter.get_opt_platform(platform);
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(plV, plF, platform);
+    organizer.add_mesh(plV, plF, RowVector3d(0, 0 , 1));
+
+    //support
+    MatrixXi hmap, smap;
+    layouter.get_opt_hmap(hmap);
+    layouter.get_opt_smap(smap);
+    layouter.get_volume_support(hmap, smap, platform, spV, spF);
+    organizer.add_mesh(spV, spF, RowVector3d(1, 0 , 0));
+
+    //mesh
+    cout << result.angle << ", " << result.center << endl;
+    slicer.rotate_yaxis(result.angle, result.center);
+    cout << result.dx << ", " << result.dz << endl;
+    slicer.move_xz(result.dx, result.dz);
+    slicer.get_vertices_mat(V);
+    slicer.get_faces_mat(F);
+    organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
+
+    organizer.get_mesh(V, F, C);
+
 
     return true;
 }
