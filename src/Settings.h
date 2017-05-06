@@ -27,17 +27,13 @@ public:
 
         //rendering
         maximum_model_heigh = 40; //mm
+        blender_scale_factor = 0.03; //mm
 
         //support generation
         overhang_offset = 0.3; //mm
         extrusion_width = 0.6; //mm
-        support_center_area = 0.25; //mm
+        support_center_factor = 4; //mm
         fermat_cut_width = 0.5; //mm
-
-
-        face_overhang_angle = 50 * PI / 180;
-        expected_sample_num = 2000;
-        printing_max_angle = 45 * PI / 180;
 
         //platform
         pad_size = 12.7; //mm 0.5inch
@@ -47,11 +43,9 @@ public:
         pillar_standard_height = 12.7; //mm 0.5inch
         pillar_row = 9;
         pillar_column = 11;
-        group_expand_size = std::ceil(extrusion_width /(pad_size / xy_sample_num_each_pin));
 
         //layout
         xy_sample_num_each_pin = 50;
-        //xy_sample_num_each_pin = 16;
         sample_width = mm2int(pad_size / xy_sample_num_each_pin);
         maximum_height_map = pillar_standard_height * 100;
         angle_sample_num = 360;
@@ -65,6 +59,8 @@ public:
         nF_reversing = 4800;
         platform_zero_x = -60;
         platform_zero_y = 50;
+
+        group_expand_size = (int)std::ceil( extrusion_width /(pad_size / xy_sample_num_each_pin));
     }
 
 public:
@@ -173,17 +169,13 @@ public:
 
     //rendering
     double maximum_model_heigh; //to shrink the model inside the rendering space
+    double blender_scale_factor;
 
     //support generation
     double overhang_offset;
     double extrusion_width;
-    double support_center_area;
     double fermat_cut_width;
-
-    double face_overhang_angle;
-    double expected_sample_num;
-    double printing_max_angle;
-
+    int support_center_factor;
     int group_expand_size;
 
     //layout
@@ -199,6 +191,8 @@ public:
     double nF_printing_rest;
     double nF_moving;
     double nF_reversing;
+
+
 
 public:
     char tmp_str[1024];

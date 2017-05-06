@@ -31,7 +31,7 @@
 #include "scene_organizer.h"
 #include "clipper.hpp"
 #include "mesh_support_base.h"
-
+#include "gcode.h"
 
 //Model path
 #include "testing_models_path.h"
@@ -86,12 +86,17 @@ private:
 };
 
 
-string file(string path, string name, string ext)
+string file(string path, string name, string extend, string ext)
 {
-    return path + '/' + name + '/' + name + '.' + ext;
+    return path + '/' + name + '/' + name + extend + '.' + ext;
 }
 
-void loadModel(MatrixXd &V, MatrixXi &F, string file_path)
+string sub_file(string path, string name, string subfolder, string extend ,string ext)
+{
+    return path + '/' + name + '/' + subfolder +  '/' + name + '_' + extend + '.' + ext;
+}
+
+bool loadModel(MatrixXd &V, MatrixXi &F, string file_path)
 {
     Eigen::MatrixXd temp_V, N;
     bool success = igl::readSTL(file_path, V, F, N);
@@ -100,7 +105,30 @@ void loadModel(MatrixXd &V, MatrixXi &F, string file_path)
         NormalizingModel normaler;
         normaler.size_normalize(V);
     }
-    return;
+    return success;
+}
+
+bool writeModelXYZ(MatrixXd V, MatrixXi F, string file_path)
+{
+    Settings settings;
+    V *= settings.blender_scale_factor;
+    bool sucess = igl::writeSTL(file_path, V, F);
+    return sucess;
+}
+
+bool writeModelXZY(MatrixXd V, MatrixXi F, string file_path)
+{
+    for(int id = 0; id < V.rows(); id++)
+    {
+        double y = V(id ,1);
+        double z = V(id, 2);
+        V(id, 1) = -z;
+        V(id, 2) = y;
+    }
+    Settings settings;
+    V *= settings.blender_scale_factor;
+    bool sucess = igl::writeSTL(file_path, V, F);
+    return sucess;
 }
 
 bool slicing_for_one_layer(MeshSlicerBase &slicer, int &layer, MatrixXd &V, MatrixXi &F)
@@ -180,7 +208,49 @@ bool slicing_upper_half(MeshSlicerOverhang &slicer, MatrixXd &V, MatrixXi &F)
     return false;
 }
 
-bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C)
+bool non_move_support(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, bool output, string name)
+{
+    if(slicer.empty()) return false;
+
+    MeshLayoutOpt layouter;
+    layouter.set_slicer(slicer);
+    SceneOrganizer organizer;
+
+    LayoutOptResult result;
+    MatrixXi hmap, smap;
+
+    layouter.get_height_map(hmap);
+    layouter.get_support_map(smap);
+
+    MatrixXd spV, plV;
+    MatrixXi spF, plF;
+
+    //platform
+    MatrixXd platform; layouter.get_platform(hmap, smap, platform);
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(plV, plF, platform);
+    organizer.add_mesh(plV, plF, RowVector3d(0, 0 , 1));
+    if(output) writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+    std::cout << platform << std::endl;
+
+    //support
+    layouter.get_volume_support(hmap, smap, platform, spV, spF);
+    if(output) writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "stl"));
+    organizer.add_mesh(spV, spF, RowVector3d(1, 0 , 0));
+
+    //mesh
+    slicer.move_xz(result.dx, result.dz);
+    slicer.get_vertices_mat(V);
+    slicer.get_faces_mat(F);
+    if(output) writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
+    organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
+
+    organizer.get_mesh(V, F, C);
+    return true;
+}
+
+
+bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, bool output, string name)
 {
     if(slicer.empty()) return false;
 
@@ -199,25 +269,29 @@ bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C)
     GeneratingPlatform platform_builder;
     platform_builder.draw_platform(plV, plF, platform);
     organizer.add_mesh(plV, plF, RowVector3d(0, 0 , 1));
+    if(output) writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+    std::cout << platform << std::endl;
 
     //support
     MatrixXi hmap, smap;
     layouter.get_opt_hmap(hmap);
     layouter.get_opt_smap(smap);
     layouter.get_volume_support(hmap, smap, platform, spV, spF);
+    if(output) writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "stl"));
     organizer.add_mesh(spV, spF, RowVector3d(1, 0 , 0));
 
     //mesh
     slicer.move_xz(result.dx, result.dz);
     slicer.get_vertices_mat(V);
     slicer.get_faces_mat(F);
+    if(output) writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
     organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
 
     organizer.get_mesh(V, F, C);
     return true;
 }
 
-bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C)
+bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, bool output, string name)
 {
     if(slicer.empty()) return false;
 
@@ -238,6 +312,7 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C)
     MatrixXd platform; layouter.get_opt_platform(platform);
     GeneratingPlatform platform_builder;
     platform_builder.draw_platform(plV, plF, platform);
+    if(output) writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
     organizer.add_mesh(plV, plF, RowVector3d(0, 0 , 1));
 
     //support
@@ -245,6 +320,7 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C)
     layouter.get_opt_hmap(hmap);
     layouter.get_opt_smap(smap);
     layouter.get_volume_support(hmap, smap, platform, spV, spF);
+    if(output) writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
     organizer.add_mesh(spV, spF, RowVector3d(1, 0 , 0));
 
     //mesh
@@ -254,6 +330,7 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C)
     slicer.move_xz(result.dx, result.dz);
     slicer.get_vertices_mat(V);
     slicer.get_faces_mat(F);
+    if(output) writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
     organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
 
     organizer.get_mesh(V, F, C);
@@ -273,31 +350,37 @@ bool test_convex_hull(MeshSlicerShift &slicer, igl::viewer::Viewer &viewer)
     slicer.get_vertices_mat(V);
     slicer.get_faces_mat(F);
     viewer.data.clear();
-    viewer.data.set_mesh(V, F);
+    //viewer.data.set_mesh(V, F);
 
     MatrixXi hmap, smap;
+
     layouter.get_height_map(hmap);
-    layouter.get_height_map(smap);
+    layouter.get_support_map(smap);
     MatrixXd platform= MatrixXd::Zero(9, 11);
 
     MeshSupportBase supporter;
     supporter.set_slicer(slicer);
     supporter.set_map(hmap, smap, platform);
+    supporter.group_support_points();
+    supporter.fermat_curves_construction();
+    supporter.maximum_pin_layer_height();
 
-    Paths curves; supporter.get_fermat_curves(1, curves);
+    vector<Paths> curves;
+    supporter.get_fermat_curves(curves);
 
     Settings settings;
-    for(int jd = 0; jd < curves.size(); jd++)
+    for(int kd = 190; kd < curves.size(); kd += 1)
+    for(int jd = 0; jd < curves[kd].size(); jd++)
     {
-        Path output = curves[jd];
+        Path output = curves[kd][jd];
         for(int id = 1; id < output.size(); id++)
         {
             RowVector3d p1(settings.int2mm(output[id].X),
-                           0,
+                           slicer.layer_height(kd),
                            settings.int2mm(output[id].Y));
 
             RowVector3d p0(settings.int2mm(output[id - 1].X),
-                           0,
+                           slicer.layer_height(kd),
                            settings.int2mm(output[id - 1].Y));
 
             viewer.data.add_edges(p0, p1, RowVector3d(1, 1, 0));
@@ -315,7 +398,8 @@ void test_fermat_curve(igl::viewer::Viewer &viewer)
     p[2] = IntPoint(30000, 30000);
     p[3] = IntPoint(0, 30000);
 
-    FermatCurve curver;
+    Settings settings;
+    FermatCurve curver(settings);
     Path bdary;
     for(int id = 0; id < 4; id++) bdary.push_back(p[id]);
     curver.set_boundary(bdary, p[0], p[3]);
@@ -323,7 +407,7 @@ void test_fermat_curve(igl::viewer::Viewer &viewer)
     Path output;
     curver.output_curve(output);
 
-    Settings settings;
+
     for(int id = 1; id < output.size(); id++)
     {
         RowVector3d p1(settings.int2mm(output[id].X),
@@ -338,6 +422,120 @@ void test_fermat_curve(igl::viewer::Viewer &viewer)
     }
 
     return;
+}
+
+bool model_move(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, double dx, double dz)
+{
+    if(slicer.empty()) return false;
+    SceneOrganizer organizer;
+
+    MatrixXd plV, platform;
+    MatrixXi plF;
+
+    slicer.move_xz(dx, dz);
+    slicer.get_vertices_mat(V);
+    slicer.get_faces_mat(F);
+    organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));
+
+    GeneratingPlatform platform_builder;
+    platform = Eigen::MatrixXd::Zero(9, 11);
+    platform_builder.draw_platform(plV, plF, platform);
+    organizer.add_mesh(plV, plF, Eigen::RowVector3d(0, 0, 1));
+
+    organizer.get_mesh(V, F, C);
+    return true;
+}
+
+bool support_previwer(igl::viewer::Viewer &viewer ,MeshSlicerOverhang &slicer, int layer_step, bool metal_pin, vector<Paths> &curves)
+{
+    if(slicer.empty()) return false;
+
+    SceneOrganizer organizer;
+
+    MeshLayoutOpt layouter;
+    layouter.set_slicer(slicer);
+
+    MatrixXi F, plF; MatrixXd V, plV, C;
+    slicer.get_vertices_mat(V);
+    slicer.get_faces_mat(F);
+    organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
+
+    MatrixXi hmap, smap;
+
+    layouter.get_height_map(hmap);
+    layouter.get_support_map(smap);
+    MatrixXd platform;
+    Settings settings;
+    if(metal_pin) layouter.get_platform(hmap, smap, platform);
+    else platform = MatrixXd::Zero(settings.pillar_row, settings.pillar_column);
+
+    GeneratingPlatform platform_builder;
+    platform_builder.draw_platform(plV, plF, platform);
+    organizer.add_mesh(plV, plF, RowVector3d(0, 0, 1));
+
+    organizer.get_mesh(V, F, C);
+    viewer.data.clear();
+    viewer.data.set_mesh(V, F);
+    viewer.data.set_colors(C);
+
+    MeshSupportBase supporter;
+    supporter.set_slicer(slicer);
+    supporter.set_map(hmap, smap, platform);
+
+    curves.clear();
+    supporter.get_fermat_curves(curves);
+
+    for(int kd = 0; kd < curves.size(); kd += layer_step)
+        for(int jd = 0; jd < curves[kd].size(); jd++)
+        {
+            Path output = curves[kd][jd];
+            for(int id = 1; id < output.size(); id++)
+            {
+                RowVector3d p1(settings.int2mm(output[id].X),
+                               slicer.layer_height(kd),
+                               settings.int2mm(output[id].Y));
+
+                RowVector3d p0(settings.int2mm(output[id - 1].X),
+                               slicer.layer_height(kd),
+                               settings.int2mm(output[id - 1].Y));
+
+                viewer.data.add_edges(p0, p1, RowVector3d(1, 1, 0));
+            }
+        }
+
+    return true;
+}
+
+void write_gcode_model(MeshSlicerBase &slicer, string name)
+{
+    MatrixXd V;
+    MatrixXi F;
+    slicer.get_vertices_mat(V);
+    slicer.get_faces_mat(F);
+
+    Settings settings;
+    for(int id = 0; id < V.rows(); id++)
+    {
+        double y = V(id, 1);
+        double z = V(id, 2);
+        V(id, 0) += settings.platform_zero_x;
+        V(id, 1) = -z + settings.platform_zero_y;
+        V(id, 2) = y;
+    }
+    igl::writeSTL(file(TESTING_MODELS_PATH, name, "_print", "stl"), V, F);
+}
+
+void write_gcode(MeshSlicerBase &slicer, vector<Paths> &curves, string name)
+{
+    Gcode gcode(file(TESTING_MODELS_PATH, name, "", "gcode"));
+    gcode.get_minXY();
+    MatrixXd V;
+    slicer.get_vertices_mat(V);
+    Settings settings;
+    gcode.move_XY( V.colwise().minCoeff()[0] + settings.platform_zero_x - gcode.min_X,
+                   -V.colwise().maxCoeff()[2] + settings.platform_zero_y - gcode.min_Y);
+    gcode.add_support(curves);
+    gcode.print(file(TESTING_MODELS_PATH, name, "_new", "gcode"));
 }
 
 #else

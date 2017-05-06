@@ -121,11 +121,13 @@ protected:
 
     std::vector< ClipperLib::Paths> layer_slices;
 
-    Settings settings;
-
     int minY;
 
     int maxY;
+
+public:
+
+    Settings settings;
 };
 
 void MeshSlicerBase::set_mesh(Eigen::MatrixXd &in_V, Eigen::MatrixXi &in_F)

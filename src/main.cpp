@@ -16,6 +16,8 @@ struct MenuInput
     double layout_dy;
     string model_name;
     int layout_opt_type;
+    bool layout_output;
+    bool metal_pin;
 }menu_input;
 
 struct Scene_Data
@@ -23,6 +25,7 @@ struct Scene_Data
     MatrixXd V; //original model vertices
     MatrixXi F; //original model faces
     MeshSlicerShift slicer;
+    vector<Paths> tool_path;
 }scene_data;
 
 struct Scene_Color
@@ -39,34 +42,48 @@ public:
 
 void init()
 {
-    menu_input.model_name = "arch";
+    menu_input.model_name = "Gymnastics";
     menu_input.layer = 0;
     menu_input.layer_step = 5;
     menu_input.angle = 0;
     menu_input.layout_dy = 0;
     menu_input.layout_dx = 0;
+    menu_input.layout_output = false;
 }
 
 void load_model()
 {
-    void render_mesh(MatrixXd &V, MatrixXi &F);
-    string file_path = file(TESTING_MODELS_PATH, menu_input.model_name, "stl");
-    loadModel(scene_data.V, scene_data.F, file_path);
-
-    scene_data.slicer.clear();
-    scene_data.slicer.set_mesh(scene_data.V, scene_data.F);
-
-    render_mesh(scene_data.V, scene_data.F);
+    void render_mesh(MatrixXd &V, MatrixXi &F, MatrixXd &C);
+    string file_path = file(TESTING_MODELS_PATH, menu_input.model_name, "", "stl");
+    if(loadModel(scene_data.V, scene_data.F, file_path))
+    {
+        scene_data.slicer.clear();
+        scene_data.slicer.set_mesh(scene_data.V, scene_data.F);
+        SceneOrganizer organizer;
+        organizer.add_mesh(scene_data.V, scene_data.F, RowVector3d(1, 1, 0));
+        GeneratingPlatform platform_builder;
+        MatrixXd V, plV, C, platform; MatrixXi F, plF;
+        Settings settings;
+        platform = MatrixXd::Zero(settings.pillar_row, settings.pillar_column);
+        platform_builder.draw_platform(plV, plF, platform);
+        organizer.add_mesh(plV, plF, RowVector3d(0, 0, 1));
+        organizer.get_mesh(V, F, C);
+        render_mesh(V, F, C);
+        viewer.core.align_camera_center(scene_data.V ,scene_data.F);
+    }
+    return;
 }
 
 void render_mesh(MatrixXd &V, MatrixXi &F)
 {
     viewer.data.clear();
     viewer.data.set_mesh(V, F);
+
+
     return;
 }
 
-void render_mesh(MatrixXd &V, MatrixXi &F, MatrixXd C)
+void render_mesh(MatrixXd &V, MatrixXi &F, MatrixXd &C)
 {
     viewer.data.clear();
     viewer.data.set_mesh(V, F);
@@ -110,7 +127,7 @@ void xz_opt()
 {
     MatrixXd V, C;
     MatrixXi F;
-    if(move_xy_opt(scene_data.slicer, V, F, C))
+    if(move_xy_opt(scene_data.slicer, V, F, C, menu_input.layout_output, menu_input.model_name))
         render_mesh(V, F, C);
 }
 
@@ -118,7 +135,15 @@ void rotate()
 {
     MatrixXd V, C;
     MatrixXi F;
-    if(rotate_opt(scene_data.slicer, V, F, C))
+    if(rotate_opt(scene_data.slicer, V, F, C, menu_input.layout_output, menu_input.model_name))
+        render_mesh(V, F, C);
+}
+
+void none_opt()
+{
+    MatrixXd V, C;
+    MatrixXi F;
+    if(non_move_support(scene_data.slicer, V, F, C, menu_input.layout_output, menu_input.model_name))
         render_mesh(V, F, C);
 }
 
@@ -126,6 +151,30 @@ void test()
 {
     test_convex_hull(scene_data.slicer, viewer);
     //test_fermat_curve(viewer);
+}
+
+void gcode_viewer()
+{
+    support_previwer(viewer, scene_data.slicer, menu_input.layer_step, menu_input.metal_pin, scene_data.tool_path);
+}
+
+void move_model()
+{
+    MatrixXd V, C;
+    MatrixXi F;
+    if(model_move(scene_data.slicer, V, F, C, menu_input.layout_dx, menu_input.layout_dy))
+        render_mesh(V, F, C);
+}
+
+void gcode_model_output()
+{
+    write_gcode_model(scene_data.slicer, menu_input.model_name);
+}
+
+void gcode_output()
+{
+    if(!scene_data.tool_path.empty())
+        write_gcode(scene_data.slicer, scene_data.tool_path, menu_input.model_name);
 }
 
 int main(int argc, char *argv[])
@@ -148,14 +197,31 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("Bottom half", bottom_half);
         viewer.ngui->addButton("Upper half", upper_half);
 
-        viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Mesh Layout Class");
-        viewer.ngui->addGroup("Layout Opt");
-        viewer.ngui->addButton("XZ Opt", xz_opt);
-        viewer.ngui->addButton("Rotate Opt", rotate);
+        viewer.ngui->addWindow(Eigen::Vector2i(220,295),"Mesh Layout Class");
+        viewer.ngui->addGroup("Move Model");
+        viewer.ngui->addVariable("+X", menu_input.layout_dx);
+        viewer.ngui->addVariable("+Y", menu_input.layout_dy);
+        viewer.ngui->addButton("move", move_model);
+        viewer.ngui->addGroup("Virtual Support");
+        viewer.ngui->addVariable("Output", menu_input.layout_output);
+        viewer.ngui->addButton("None Layout Opt", none_opt);
+        viewer.ngui->addButton("XZ Layout Opt", xz_opt);
+        viewer.ngui->addButton("Rotate Layout Opt", rotate);
 
-        viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Test");
-        viewer.ngui->addGroup("Test");
-        viewer.ngui->addButton("Test", test);
+        viewer.ngui->addWindow(Eigen::Vector2i(390,10),"Mesh Support Class");
+        viewer.ngui->addGroup("Parameter");
+        viewer.ngui->addVariable("Gap width", scene_data.slicer.settings.fermat_cut_width);
+        viewer.ngui->addVariable("Center size",  scene_data.slicer.settings.support_center_factor);
+        viewer.ngui->addVariable("Group size", scene_data.slicer.settings.group_expand_size);
+
+        viewer.ngui->addGroup("Previewer");
+        viewer.ngui->addVariable("Metal Pin", menu_input.metal_pin);
+        viewer.ngui->addButton("Gcode Preview", gcode_viewer);
+
+        viewer.ngui->addGroup("Generate Gcode");
+        viewer.ngui->addButton("Model Output", gcode_model_output);
+        viewer.ngui->addButton("Gcode Output", gcode_output);
+
         viewer.screen->performLayout();
         return false;
     };

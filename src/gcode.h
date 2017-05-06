@@ -14,7 +14,7 @@
 #include <fstream>
 #include "settings.h"
 #include <boost/algorithm/string.hpp>
-#include "fermat_spirals.h"
+#include "clipper.hpp"
 
 #define MAX_CHAR_NUM_LINE 1024
 
@@ -27,6 +27,10 @@ const unsigned X_Type = 32;
 const unsigned Y_Type = 64;
 const unsigned Z_Type = 128;
 const unsigned Comment_Type = 256;
+
+using std::vector;
+using ClipperLib::Paths;
+using ClipperLib::Path;
 
 class GcodeLine
 {
@@ -584,13 +588,12 @@ public:
         }
     }
 
-    void add_support(std::vector<std::list<FermatEdge>> &path_layer)
+    void add_support(vector<Paths> &fermat_curves)
     {
         get_dE_D_dL();
         double X = 0, Y = 0, F = 0;
-        for(int layer = 1; layer < path_layer.size(); layer++)
+        for(int layer = 1; layer < fermat_curves.size(); layer++)
         {
-            std::vector<GcodeLine> support;
             GcodeLine code;
             for(int id = 0; id < lines_layer[layer].size(); id++)
             {
@@ -604,36 +607,43 @@ public:
             }
 
             code.set_G92E0();
+
+            vector<GcodeLine> support;
             support.push_back(code);
+
             double E = 0;
-            std::list<FermatEdge>::iterator it;
+            int curve_id = 0;
             bool new_speed = true;
-            for(it = path_layer[layer].begin(); it != path_layer[layer].end(); it++)
+
+            for(curve_id = 0; curve_id != fermat_curves[layer].size(); curve_id++)
             {
-                FermatEdge fe = *it;
-                double X1 = fe.p0.x() + settings.platform_zero_x;
-                double Y1 = -fe.p0.y() + settings.platform_zero_y;
-                double X2 = fe.p1.x() + settings.platform_zero_x;
-                double Y2 = -fe.p1.y() + settings.platform_zero_y;
-
-                if(std::abs(X1 - X) > settings.ZERO_EPS || std::abs(Y1 - Y) > settings.ZERO_EPS)
+                Path path = fermat_curves[layer][curve_id];
+                for(int id = 1; id < path.size(); id++)
                 {
-                    code.set_G1_XYF(X1, Y1, settings.nF_moving);
+                    double X1 = settings.int2mm(path[id - 1].X) + settings.platform_zero_x;
+                    double Y1 = -settings.int2mm(path[id - 1].Y) + settings.platform_zero_y;
+                    double X2 = settings.int2mm(path[id].X) + settings.platform_zero_x;
+                    double Y2 = -settings.int2mm(path[id].Y) + settings.platform_zero_y;
+
+                    if(std::abs(X1 - X) > settings.ZERO_EPS || std::abs(Y1 - Y) > settings.ZERO_EPS)
+                    {
+                        code.set_G1_XYF(X1, Y1, settings.nF_moving);
+                        support.push_back(code);
+                        new_speed = true;
+                    }
+
+                    double dL = std::sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1));
+                    E += dL * dEdL[layer];
+                    if(new_speed)
+                    {
+                        code.set_G1_XYEF(X2, Y2, E, F);
+                    }
+                    else code.set_G1_XYE(X2, Y2, E);
                     support.push_back(code);
-                    new_speed = true;
+                    X = X2;
+                    Y = Y2;
+                    new_speed = false;
                 }
-
-                double dL = std::sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1));
-                E += dL * dEdL[layer];
-                if(new_speed)
-                {
-                    code.set_G1_XYEF(X2, Y2, E, F);
-                }
-                else code.set_G1_XYE(X2, Y2, E);
-                support.push_back(code);
-                X = X2;
-                Y = Y2;
-                new_speed = false;
             }
             lines_layer[layer].insert(lines_layer[layer].end(), support.begin(), support.end());
         }

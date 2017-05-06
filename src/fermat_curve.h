@@ -19,9 +19,15 @@ using ClipperLib::Paths;
 using ClipperLib::IntPoint;
 
 
-
 class FermatCurve
 {
+public:
+
+    FermatCurve (Settings s)
+    {
+        settings = s;
+    }
+
 public:/*I/O*/
     bool set_boundary(Path &bdary, IntPoint sta, IntPoint end);
 
@@ -57,7 +63,7 @@ protected: /*geometry*/
 
     IntPoint close_point(IntPoint p, IntPoint q, IntPoint m);
 
-protected:
+public:
 
     vector<Path> polygon_curve;
 
@@ -78,6 +84,11 @@ bool FermatCurve::set_boundary(Path &bdary, IntPoint sta, IntPoint end)
 
 bool FermatCurve::set_boundary(int layer, IntPoint sta, IntPoint end) {
 
+    Path polygon = polygon_curve[layer];
+    shrink_boundary(polygon);
+    double cut_width = settings.fermat_cut_width;
+    double next_level_length = closed_path_length(polygon);
+
     double s1 = get_arc_length(layer, sta);
     double s2 = get_arc_length(layer, end);
     sta = get_point(layer, s1);
@@ -89,18 +100,19 @@ bool FermatCurve::set_boundary(int layer, IntPoint sta, IntPoint end) {
 
     double sta_end_length = s2;
     double end_sta_length = polygon_length[layer] - s2;
-    double cut_width = settings.fermat_cut_width;
     Path path;
-    if(sta_end_length + end_sta_length < 8 * cut_width)
+
+    if(next_level_length < settings.support_center_factor * cut_width)
     {
         if(layer == 0)
         {
-            upper_curve.push_back(polygon_curve[layer]);
+            path = polygon_curve[layer];
+            path.push_back(polygon_curve[layer].front());
+            upper_curve.push_back(path);
             return false;
         }
         else {
-            if(sta_end_length < cut_width) {sta_end_length += cut_width;}
-            if(end_sta_length < cut_width) {sta_end_length -= cut_width;}
+
             if (sta_end_length > end_sta_length) {
                 get_path(path, layer, 0, sta_end_length);
                 upper_curve.push_back(path);
@@ -126,18 +138,20 @@ bool FermatCurve::set_boundary(int layer, IntPoint sta, IntPoint end) {
     upper_curve.push_back(path);
 
     get_path(path, layer, sta_end_length,  polygon_length[layer] - cut_width);
+
     lower_curve.push_back(path);
 
-    Path polygon = polygon_curve[layer];
-    shrink_boundary(polygon);
+
     polygon_curve.push_back(polygon);
-    polygon_length.push_back(closed_path_length(polygon));
+    polygon_length.push_back(next_level_length);
 
     return set_boundary(layer + 1, sta, end);
 }
 
 void FermatCurve::output_curve(Path &curve)
 {
+    curve.clear();
+
     int num_circle = polygon_curve.size();
     int orientation = 1;
     Path path;
@@ -186,7 +200,7 @@ void FermatCurve::rearrage_origin(int layer, double s)
         {
             IntPoint q = point(p0, p1, s / edge_length);
             new_polygon.push_back(q);
-            for(int jd = id + 1; jd != id; jd = (jd + 1) % polygon.size())
+            for(int jd = (id + 1) % polygon.size(); jd != id; jd = (jd + 1) % polygon.size())
             {
                 new_polygon.push_back(polygon[jd]);
             }
@@ -248,8 +262,14 @@ void FermatCurve::shrink_boundary(Path &bdary) {
     co.AddPath(bdary, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
     ClipperLib::Paths sol;
     co.Execute(sol, -settings.mm2int(settings.extrusion_width * 2));
+
     ClipperLib::SimplifyPolygons(sol);
-    bdary = sol[0];
+    bdary.clear();
+    for(int id = 0; id < sol.size(); id++)
+    {
+        if(bdary.size() < sol[id].size())
+            bdary = sol[id];
+    }
 }
 
 void FermatCurve::get_path(Path &path, int layer, double s1, double s2) {
@@ -280,7 +300,7 @@ void FermatCurve::get_path(Path &path, int layer, double s1, double s2) {
             else
             {
                 s2 -= dist;
-                for(int jd = id + 1; jd < polygon.size(); jd++)
+                for(int jd = (id + 1) % polygon.size(); ; jd = (jd + 1) % polygon.size())
                 {
                     p0 = polygon[jd];
                     p1 = polygon[(jd + 1) % polygon.size()];
