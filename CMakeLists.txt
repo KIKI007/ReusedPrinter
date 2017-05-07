@@ -42,7 +42,7 @@ option(LIBIGL_WITH_PNG         "Use PNG"            ON)
 option(LIBIGL_WITH_TETGEN      "Use Tetgen"         OFF)
 option(LIBIGL_WITH_TRIANGLE    "Use Triangle"       ON)
 option(LIBIGL_WITH_XML         "Use XML"            OFF)
-option(LIBIGL_WITH_BOOST        "Use Boost"         ON)
+option(LIBIGL_WITH_BOOST        "Use Boost"         OFF)
 option(LIBIGL_WITH_LIM         "Use LIM"            OFF)
 option(LIBIGL_WITH_COMISO      "Use CoMiso"         OFF)
 option(LIBIGL_WITH_MATLAB      "Use Matlab"         OFF) # This option is not supported yet

@@ -13,7 +13,6 @@
 #include <assert.h>
 #include <fstream>
 #include "settings.h"
-#include <boost/algorithm/string.hpp>
 #include "clipper.hpp"
 
 #define MAX_CHAR_NUM_LINE 1024
@@ -62,7 +61,24 @@ public:
         comment = "";
         zero_eps = 1e-6;
     }
+
 public:
+
+    void SplitString(const std::string& s, std::vector<std::string>& v, const std::string& c)
+    {
+        std::string::size_type pos1, pos2;
+        pos2 = s.find(c);
+        pos1 = 0;
+        while(std::string::npos != pos2)
+        {
+            v.push_back(s.substr(pos1, pos2-pos1));
+
+            pos1 = pos2 + c.size();
+            pos2 = s.find(c, pos1);
+        }
+        if(pos1 != s.length())
+            v.push_back(s.substr(pos1));
+    }
 
     void read(std::string &str)
     {
@@ -75,7 +91,8 @@ public:
         {
             if(remove_comment(str)) return;
             std::vector<std::string> split_strs;
-            boost::split(split_strs, str, boost::is_any_of(" "));
+            std::string c = " ";
+            SplitString(str, split_strs, c);
             std::vector<char> signs(split_strs.size());
             std::vector<double> nums(split_strs.size());
             std::string name;
@@ -377,6 +394,16 @@ public:
         nE = 0;
     }
 
+    void set_G1EF(double E, double F)
+    {
+        clear();
+        type = G_E_F_Code;
+        nG = 1;
+        nE = E;
+        nF = F;
+        return;
+    }
+
 public:
     unsigned Empty;
     unsigned Comment;
@@ -590,30 +617,56 @@ public:
 
     void add_support(vector<Paths> &fermat_curves)
     {
-        get_dE_D_dL();
-        double X = 0, Y = 0, F = 0;
+        get_dE_D_dL();                      //get the ratio between dE and dL
+        double X = 0, Y = 0, F = 0, E = 0, dL;  //present status value
+        GcodeLine code;                     //temporary gcode term
+        bool first_move_touch, new_speed;
         for(int layer = 1; layer < fermat_curves.size(); layer++)
         {
-            GcodeLine code;
+            first_move_touch = true;        //to address problem of the filament real in and off
             for(int id = 0; id < lines_layer[layer].size(); id++)
             {
                 code = lines_layer[layer][id];
+
+                //The first G1E code is to real in the filament
+                //Once we add the support, this code no longer meaning real in 7mm filament
+                //We need to find the previous layer's E and minus 7
+                if(code.is_G1E())
+                {
+                    if(first_move_touch && layer > 1)
+                    {
+                        lines_layer[layer][id].nE = E - 7;
+                        first_move_touch = false;
+                    }
+                    E = code.nE;
+                }
+
+                //To locate the position of the printing nozzel and find the travel speed;
                 if(code.is_G1XY()) {
                     X = code.nX;
                     Y = code.nY;
-                    if(code.is_G1EF()) F = code.nF;
+                    if(code.is_G1EF())
+                    {
+                        F = code.nF;
+                    }
                 }
 
             }
 
-            code.set_G92E0();
-
             vector<GcodeLine> support;
+
+
+            //real in 7mm material
+            code.set_G1EF(E - 7, 4800);
             support.push_back(code);
 
-            double E = 0;
+            //set E to the orgin;
+            code.set_G92E0();
+            support.push_back(code);
+
             int curve_id = 0;
-            bool new_speed = true;
+            new_speed = false;
+            first_move_touch = true;
 
             for(curve_id = 0; curve_id != fermat_curves[layer].size(); curve_id++)
             {
@@ -625,23 +678,35 @@ public:
                     double X2 = settings.int2mm(path[id].X) + settings.platform_zero_x;
                     double Y2 = -settings.int2mm(path[id].Y) + settings.platform_zero_y;
 
+                    //if(X1 != X, Y1 != Y), we have to move the printing nozzel
                     if(std::abs(X1 - X) > settings.ZERO_EPS || std::abs(Y1 - Y) > settings.ZERO_EPS)
                     {
+                        //we first move the nozzel
                         code.set_G1_XYF(X1, Y1, settings.nF_moving);
                         support.push_back(code);
+
+                        //if this move from mesh to the support
+                        //we have to reel off 7.1mm material to make sure the new filament can be attached to the support
+                        if(first_move_touch)
+                        {
+                            code.set_G1EF(7.1, 4800);
+                            support.push_back(code);
+                            first_move_touch = false;
+                            E = 7.1;
+                        }
+
                         new_speed = true;
                     }
 
-                    double dL = std::sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1));
+
+                    dL = std::sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1)); //compute the travel distance
                     E += dL * dEdL[layer];
-                    if(new_speed)
-                    {
-                        code.set_G1_XYEF(X2, Y2, E, F);
-                    }
+
+                    if(new_speed) code.set_G1_XYEF(X2, Y2, E, F); //the new_speed means to set the travel speed as same as the mesh
                     else code.set_G1_XYE(X2, Y2, E);
                     support.push_back(code);
-                    X = X2;
-                    Y = Y2;
+
+                    X = X2; Y = Y2;
                     new_speed = false;
                 }
             }

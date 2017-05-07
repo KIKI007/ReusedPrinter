@@ -131,6 +131,86 @@ bool writeModelXZY(MatrixXd V, MatrixXi F, string file_path)
     return sucess;
 }
 
+void draw_height_map(MeshSlicerOverhang &slicer, string model_name)
+{
+    if(slicer.empty()) return;
+    MeshLayoutBase layouter;
+    layouter.set_slicer(slicer);
+    Eigen::MatrixXi height_map;
+    layouter.get_height_map(height_map);
+
+    int nr = height_map.rows();
+    int nc = height_map.cols();
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> R(nc, nr);
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> G(nc ,nr);
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> B(nc ,nr);
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> A(nc ,nr);
+    for(int ir = 0; ir < nr; ir++)
+    {
+        for(int ic = 0; ic < nc; ic++)
+        {
+            double ratio = (double)height_map(ir, ic) / slicer.number_layer();
+            double r, g, b;
+            igl::jet(ratio, r, g, b);
+            R(ic, ir) = r * 255;
+            B(ic, ir) = g * 255;
+            G(ic, ir) = b * 255;
+            A(ic, ir) = 255;
+        }
+    }
+
+    for(int ir = 0; ir < nr / 20; ir++)
+    {
+        for(int ic = nc * 4 / 5; ic < nc; ic ++)
+        {
+            double ratio = (double)(ic - (nc * 4 / 5)) / (nc / 5);
+            double r, g, b;
+            igl::jet(ratio, r, g, b);
+            R(ic, ir) = r * 255;
+            B(ic, ir) = g * 255;
+            G(ic, ir) = b * 255;
+            A(ic, ir) = 255;
+        }
+    }
+
+    string output_path = sub_file(TESTING_MODELS_PATH, model_name, "image", "height", "png");
+    igl::png::writePNG(R, G, B, A, output_path);
+}
+
+void draw_support_map(MeshSlicerOverhang &slicer, string model_name)
+{
+    if(slicer.empty()) return;
+    MeshLayoutBase layouter;
+    layouter.set_slicer(slicer);
+    Eigen::MatrixXi support_map;
+    layouter.get_support_map(support_map);
+
+    int nr = support_map.rows();
+    int nc = support_map.cols();
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> R(nc, nr);
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> G(nc ,nr);
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> B(nc ,nr);
+    Eigen::Matrix<unsigned char,Eigen::Dynamic,Eigen::Dynamic> A(nc ,nr);
+    for(int ir = 0; ir < nr; ir++)
+    {
+        for(int ic = 0; ic < nc; ic++)
+        {
+            A(ic, ir) = 255;
+            if(support_map(ir, ic))
+            {
+                R(ic, ir) =  255;
+                G(ic, ir) = B(ic, ir) = 0;
+            }
+            else
+            {
+                R(ic, ir) = G(ic, ir) = B(ic, ir) = 255;
+            }
+        }
+    }
+    string output_path = sub_file(TESTING_MODELS_PATH, model_name, "image", "support", "png");
+    igl::png::writePNG(R, G, B, A, output_path);
+}
+
 bool slicing_for_one_layer(MeshSlicerBase &slicer, int &layer, MatrixXd &V, MatrixXi &F)
 {
     if(slicer.empty()) return false;

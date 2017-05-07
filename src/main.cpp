@@ -177,6 +177,16 @@ void gcode_output()
         write_gcode(scene_data.slicer, scene_data.tool_path, menu_input.model_name);
 }
 
+void height_map()
+{
+    draw_height_map(scene_data.slicer, menu_input.model_name);
+}
+
+void support_map()
+{
+    draw_support_map(scene_data.slicer, menu_input.model_name);
+}
+
 int main(int argc, char *argv[])
 {
     init();
@@ -207,6 +217,9 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("None Layout Opt", none_opt);
         viewer.ngui->addButton("XZ Layout Opt", xz_opt);
         viewer.ngui->addButton("Rotate Layout Opt", rotate);
+        viewer.ngui->addGroup("Color Map");
+        viewer.ngui->addButton("Height Map", height_map);
+        viewer.ngui->addButton("Support Map", support_map);
 
         viewer.ngui->addWindow(Eigen::Vector2i(390,10),"Mesh Support Class");
         viewer.ngui->addGroup("Parameter");
