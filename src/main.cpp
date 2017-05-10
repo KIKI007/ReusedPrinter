@@ -19,6 +19,7 @@ struct MenuInput
     bool layout_output;
     bool metal_pin;
     bool load_platform;
+    bool single_layer;
 }menu_input;
 
 struct Scene_Data
@@ -43,13 +44,14 @@ public:
 
 void init()
 {
-    menu_input.model_name = "Gymnastics";
+    menu_input.model_name = "arch";
     menu_input.layer = 0;
     menu_input.layer_step = 5;
     menu_input.angle = 0;
     menu_input.layout_dy = 0;
     menu_input.layout_dx = 0;
     menu_input.layout_output = false;
+    menu_input.single_layer = false;
 }
 
 void load_model()
@@ -161,7 +163,8 @@ void gcode_viewer()
                      menu_input.metal_pin,
                      scene_data.tool_path,
                      menu_input.load_platform,
-                     menu_input.model_name);
+                     menu_input.model_name,
+                     menu_input.single_layer);
 }
 
 void move_model()
@@ -236,6 +239,7 @@ int main(int argc, char *argv[])
         viewer.ngui->addGroup("Previewer");
         viewer.ngui->addVariable("Metal Pin", menu_input.metal_pin);
         viewer.ngui->addVariable("Load .plf", menu_input.load_platform);
+        viewer.ngui->addVariable("single layer", menu_input.single_layer);
         viewer.ngui->addButton("Gcode Preview", gcode_viewer);
 
         viewer.ngui->addGroup("Generate Gcode");

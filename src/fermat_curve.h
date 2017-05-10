@@ -33,6 +33,8 @@ public:/*I/O*/
 
     void output_curve(Path &curve);
 
+    bool is_line();
+
 protected:
 
     bool set_boundary(int layer, IntPoint sta, IntPoint end);
@@ -381,6 +383,13 @@ IntPoint FermatCurve::close_point(IntPoint p, IntPoint q, IntPoint m) {
     if(ratio < 0) return p;
     else if(ratio > 1) return q;
     else return point(p, q, ratio);
+}
+
+bool FermatCurve::is_line() {
+    if(polygon_curve.size() <= 1)
+        return true;
+    else
+        return false;
 }
 
 #endif //SUPPORTER_FERMAT_CURVE_H

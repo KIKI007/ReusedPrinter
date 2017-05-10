@@ -12,13 +12,11 @@
     <list default="true" id="a495e7fd-8e8c-490b-a3fb-8666f6bedf6a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-release/src/supporter_bin" afterPath="$PROJECT_DIR$/cmake-build-release/src/supporter_bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-release/src/CMakeFiles/supporter_bin.dir/CXX.includecache" afterPath="$PROJECT_DIR$/cmake-build-release/src/CMakeFiles/supporter_bin.dir/CXX.includecache" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-release/src/CMakeFiles/supporter_bin.dir/depend.internal" afterPath="$PROJECT_DIR$/cmake-build-release/src/CMakeFiles/supporter_bin.dir/depend.internal" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-release/src/CMakeFiles/supporter_bin.dir/depend.make" afterPath="$PROJECT_DIR$/cmake-build-release/src/CMakeFiles/supporter_bin.dir/depend.make" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Settings.h" afterPath="$PROJECT_DIR$/src/Settings.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/gcode.h" afterPath="$PROJECT_DIR$/src/gcode.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-release/CMakeFiles/Makefile2" afterPath="$PROJECT_DIR$/cmake-build-release/CMakeFiles/Makefile2" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/fermat_curve.h" afterPath="$PROJECT_DIR$/src/fermat_curve.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main.cpp" afterPath="$PROJECT_DIR$/src/main.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/menu_function.h" afterPath="$PROJECT_DIR$/src/menu_function.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/mesh_support_base.h" afterPath="$PROJECT_DIR$/src/mesh_support_base.h" />
     </list>
     <list id="e035093c-242f-4886-9763-a220557534fb" name="Rejected commit: Default" comment="" />
     <ignored path="$PROJECT_DIR$/cmake-build-release/" />
@@ -43,16 +41,16 @@
         <entry file="file://$PROJECT_DIR$/src/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="401">
-              <caret line="237" column="44" lean-forward="false" selection-start-line="237" selection-start-column="44" selection-end-line="237" selection-end-column="44" />
+              <caret line="241" column="46" lean-forward="false" selection-start-line="241" selection-start-column="46" selection-end-line="241" selection-end-column="46" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="true">
+      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
+            <state relative-caret-position="105">
               <caret line="40" column="12" lean-forward="false" selection-start-line="40" selection-start-column="12" selection-end-line="40" selection-end-column="12" />
               <folding />
             </state>
@@ -62,12 +60,12 @@
       <file leaf-file-name="menu_function.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/menu_function.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
-              <caret line="583" column="28" lean-forward="false" selection-start-line="583" selection-start-column="28" selection-end-line="583" selection-end-column="28" />
+            <state relative-caret-position="-12271">
+              <caret line="349" column="0" lean-forward="false" selection-start-line="349" selection-start-column="0" selection-end-line="349" selection-end-column="0" />
               <folding>
                 <element signature="e#193#228#0" expanded="true" />
                 <element signature="e#457#486#0" expanded="true" />
-                <element signature="e#19630#35872#0" expanded="true" />
+                <element signature="e#19900#36142#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -76,9 +74,41 @@
       <file leaf-file-name="fermat_curve.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/fermat_curve.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
-              <caret line="260" column="29" lean-forward="false" selection-start-line="260" selection-start-column="16" selection-end-line="260" selection-end-column="29" />
+            <state relative-caret-position="3985">
+              <caret line="391" column="21" lean-forward="false" selection-start-line="391" selection-start-column="21" selection-end-line="391" selection-end-column="21" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="vector" pinned="false" current-in-tab="false">
+        <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="53">
+              <caret line="1611" column="0" lean-forward="false" selection-start-line="1611" selection-start-column="0" selection-end-line="1611" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="mesh_slicer_overhang.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/mesh_slicer_overhang.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-825">
+              <caret line="16" column="24" lean-forward="false" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="mesh_support_base.h" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/mesh_support_base.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="24">
+              <caret line="454" column="27" lean-forward="false" selection-start-line="454" selection-start-column="27" selection-end-line="454" selection-end-column="27" />
+              <folding>
+                <element signature="e#113#142#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -86,11 +116,9 @@
       <file leaf-file-name="mesh_layout_base.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/mesh_layout_base.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="87">
+            <state relative-caret-position="-63">
               <caret line="136" column="21" lean-forward="false" selection-start-line="136" selection-start-column="21" selection-end-line="136" selection-end-column="21" />
-              <folding>
-                <element signature="e#111#144#0" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -98,53 +126,9 @@
       <file leaf-file-name="mesh_layout_opt.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/mesh_layout_opt.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2813">
-              <caret line="69" column="17" lean-forward="false" selection-start-line="69" selection-start-column="17" selection-end-line="69" selection-end-column="17" />
+            <state relative-caret-position="158">
+              <caret line="119" column="0" lean-forward="false" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Settings.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Settings.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="24" column="15" lean-forward="true" selection-start-line="24" selection-start-column="15" selection-end-line="24" selection-end-column="15" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="gcode.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/gcode.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="679" column="29" lean-forward="true" selection-start-line="679" selection-start-column="29" selection-end-line="679" selection-end-column="29" />
-              <folding>
-                <element signature="e#86#103#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/shared/cmake/CMakeLists.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2685">
-              <caret line="179" column="17" lean-forward="false" selection-start-line="179" selection-start-column="12" selection-end-line="179" selection-end-column="17" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="mesh_support_base.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/mesh_support_base.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1645">
-              <caret line="162" column="5" lean-forward="true" selection-start-line="162" selection-start-column="5" selection-end-line="162" selection-end-column="5" />
-              <folding>
-                <element signature="e#113#142#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -153,9 +137,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>cout</find>
-      <find>ver</find>
-      <find>support_map</find>
       <find>height_map</find>
       <find>clear</find>
       <find>lines</find>
@@ -180,8 +161,11 @@
       <find>writePlatform</find>
       <find>output</find>
       <find>if(output</find>
-      <find>load</find>
       <find>boost</find>
+      <find>singleline_curvegroup_construction</find>
+      <find>M</find>
+      <find>load</find>
+      <find>maximum_pin_layer_height_construction</find>
       <find>ClipperOff</find>
     </findStrings>
     <replaceStrings>
@@ -211,13 +195,13 @@
         <option value="$PROJECT_DIR$/src/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/src/mesh_layout_base.h" />
         <option value="$PROJECT_DIR$/src/mesh_slicer_base.h" />
-        <option value="$PROJECT_DIR$/src/fermat_curve.h" />
-        <option value="$PROJECT_DIR$/src/mesh_support_base.h" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/src/Settings.h" />
-        <option value="$PROJECT_DIR$/src/main.cpp" />
-        <option value="$PROJECT_DIR$/src/menu_function.h" />
         <option value="$PROJECT_DIR$/src/gcode.h" />
+        <option value="$PROJECT_DIR$/src/menu_function.h" />
+        <option value="$PROJECT_DIR$/src/main.cpp" />
+        <option value="$PROJECT_DIR$/src/fermat_curve.h" />
+        <option value="$PROJECT_DIR$/src/mesh_support_base.h" />
       </list>
     </option>
   </component>
@@ -495,7 +479,7 @@
       <workItem from="1493330330531" duration="22000" />
       <workItem from="1493330384355" duration="30692000" />
       <workItem from="1493781606395" duration="53132000" />
-      <workItem from="1493930155369" duration="41834000" />
+      <workItem from="1493930155369" duration="49984000" />
     </task>
     <task id="LOCAL-00001" summary="add clipper">
       <created>1493330500699</created>
@@ -574,11 +558,18 @@
       <option name="project" value="LOCAL" />
       <updated>1494200886418</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Add some code for fabrication. Decide to rewrite mesh_support_base.h">
+      <created>1494388509043</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1494388509044</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="125812000" />
+    <option name="totallyTimeSpent" value="133962000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="51" width="1440" height="799" extended-state="0" />
@@ -642,7 +633,8 @@
     <MESSAGE value="MeshSupport DEBUGING" />
     <MESSAGE value="Good to go" />
     <MESSAGE value="Remove Boost" />
-    <option name="LAST_COMMIT_MESSAGE" value="Remove Boost" />
+    <MESSAGE value="Add some code for fabrication. Decide to rewrite mesh_support_base.h" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add some code for fabrication. Decide to rewrite mesh_support_base.h" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -658,12 +650,12 @@
           <option name="timeStamp" value="364" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/mesh_layout_opt.h</url>
-          <line>119</line>
-          <option name="timeStamp" value="434" />
+          <url>file://$PROJECT_DIR$/src/fermat_curve.h</url>
+          <line>98</line>
+          <option name="timeStamp" value="538" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="535" />
+      <option name="time" value="539" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -719,14 +711,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
           <caret line="100" column="0" lean-forward="false" selection-start-line="100" selection-start-column="0" selection-end-line="100" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/external/nanogui/ext/glfw/src/cocoa_window.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="432" column="0" lean-forward="false" selection-start-line="432" selection-start-column="0" selection-end-line="432" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -879,14 +863,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="53">
-          <caret line="1592" column="0" lean-forward="false" selection-start-line="1592" selection-start-column="0" selection-end-line="1592" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/fermat_spirals.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="817">
@@ -962,14 +938,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/mesh_slicer_overhang.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="24" lean-forward="true" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/mesh_slicer_base.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1125">
@@ -994,85 +962,107 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/menu_function.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="583" column="28" lean-forward="false" selection-start-line="583" selection-start-column="28" selection-end-line="583" selection-end-column="28" />
-          <folding>
-            <element signature="e#193#228#0" expanded="true" />
-            <element signature="e#457#486#0" expanded="true" />
-            <element signature="e#19630#35872#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="237" column="44" lean-forward="false" selection-start-line="237" selection-start-column="44" selection-end-line="237" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/gcode.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="679" column="29" lean-forward="true" selection-start-line="679" selection-start-column="29" selection-end-line="679" selection-end-column="29" />
           <folding>
-            <element signature="e#86#103#0" expanded="true" />
+            <element signature="e#86#103#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Settings.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="24" column="15" lean-forward="true" selection-start-line="24" selection-start-column="15" selection-end-line="24" selection-end-column="15" />
+        <state relative-caret-position="315">
+          <caret line="24" column="15" lean-forward="false" selection-start-line="24" selection-start-column="15" selection-end-line="24" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="401">
+          <caret line="241" column="46" lean-forward="false" selection-start-line="241" selection-start-column="46" selection-end-line="241" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/mesh_layout_opt.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="158">
+          <caret line="119" column="0" lean-forward="false" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="53">
+          <caret line="1611" column="0" lean-forward="false" selection-start-line="1611" selection-start-column="0" selection-end-line="1611" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/external/nanogui/ext/glfw/src/cocoa_window.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="158">
+          <caret line="1351" column="0" lean-forward="false" selection-start-line="1351" selection-start-column="0" selection-end-line="1351" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/menu_function.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-12271">
+          <caret line="349" column="0" lean-forward="false" selection-start-line="349" selection-start-column="0" selection-end-line="349" selection-end-column="0" />
+          <folding>
+            <element signature="e#193#228#0" expanded="true" />
+            <element signature="e#457#486#0" expanded="true" />
+            <element signature="e#19900#36142#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="40" column="12" lean-forward="false" selection-start-line="40" selection-start-column="12" selection-end-line="40" selection-end-column="12" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/mesh_layout_base.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="87">
+        <state relative-caret-position="-63">
           <caret line="136" column="21" lean-forward="false" selection-start-line="136" selection-start-column="21" selection-end-line="136" selection-end-column="21" />
-          <folding>
-            <element signature="e#111#144#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/mesh_layout_opt.h">
+    <entry file="file://$PROJECT_DIR$/src/mesh_slicer_overhang.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2813">
-          <caret line="69" column="17" lean-forward="false" selection-start-line="69" selection-start-column="17" selection-end-line="69" selection-end-column="17" />
+        <state relative-caret-position="-825">
+          <caret line="16" column="24" lean-forward="false" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/fermat_curve.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3985">
+          <caret line="391" column="21" lean-forward="false" selection-start-line="391" selection-start-column="21" selection-end-line="391" selection-end-column="21" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/mesh_support_base.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1645">
-          <caret line="162" column="5" lean-forward="true" selection-start-line="162" selection-start-column="5" selection-end-line="162" selection-end-column="5" />
+        <state relative-caret-position="24">
+          <caret line="454" column="27" lean-forward="false" selection-start-line="454" selection-start-column="27" selection-end-line="454" selection-end-column="27" />
           <folding>
             <element signature="e#113#142#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/fermat_curve.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="260" column="29" lean-forward="false" selection-start-line="260" selection-start-column="16" selection-end-line="260" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="40" column="12" lean-forward="false" selection-start-line="40" selection-start-column="12" selection-end-line="40" selection-end-column="12" />
-          <folding />
         </state>
       </provider>
     </entry>

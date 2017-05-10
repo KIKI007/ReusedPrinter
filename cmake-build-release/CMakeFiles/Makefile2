@@ -425,8 +425,8 @@ src/preinstall:
 
 # All Build rule for target.
 src/CMakeFiles/supporter_bin.dir/all: libigl/nanogui/CMakeFiles/nanogui.dir/all
-src/CMakeFiles/supporter_bin.dir/all: libigl/nanogui/ext_build/glfw/src/CMakeFiles/glfw.dir/all
 src/CMakeFiles/supporter_bin.dir/all: libigl/stb_image/CMakeFiles/stb_image.dir/all
+src/CMakeFiles/supporter_bin.dir/all: libigl/nanogui/ext_build/glfw/src/CMakeFiles/glfw.dir/all
 src/CMakeFiles/supporter_bin.dir/all: libigl/triangle/CMakeFiles/triangle.dir/all
 	$(MAKE) -f src/CMakeFiles/supporter_bin.dir/build.make src/CMakeFiles/supporter_bin.dir/depend
 	$(MAKE) -f src/CMakeFiles/supporter_bin.dir/build.make src/CMakeFiles/supporter_bin.dir/build

@@ -438,52 +438,51 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
 
 bool test_convex_hull(MeshSlicerShift &slicer, igl::viewer::Viewer &viewer)
 {
-    if(slicer.empty()) return false;
-
-    MeshLayoutOpt layouter;
-    layouter.set_slicer(slicer);
-
-    MatrixXi F; MatrixXd V;
-    slicer.get_vertices_mat(V);
-    slicer.get_faces_mat(F);
-    viewer.data.clear();
-    //viewer.data.set_mesh(V, F);
-
-    MatrixXi hmap, smap;
-
-    layouter.get_height_map(hmap);
-    layouter.get_support_map(smap);
-    MatrixXd platform= MatrixXd::Zero(9, 11);
-
-    MeshSupportBase supporter;
-    supporter.set_slicer(slicer);
-    supporter.set_map(hmap, smap, platform);
-    supporter.group_support_points();
-    supporter.fermat_curves_construction();
-    supporter.maximum_pin_layer_height();
-
-    vector<Paths> curves;
-    supporter.get_fermat_curves(curves);
-
-    Settings settings;
-    for(int kd = 190; kd < curves.size(); kd += 1)
-    for(int jd = 0; jd < curves[kd].size(); jd++)
-    {
-        Path output = curves[kd][jd];
-        for(int id = 1; id < output.size(); id++)
-        {
-            RowVector3d p1(settings.int2mm(output[id].X),
-                           slicer.layer_height(kd),
-                           settings.int2mm(output[id].Y));
-
-            RowVector3d p0(settings.int2mm(output[id - 1].X),
-                           slicer.layer_height(kd),
-                           settings.int2mm(output[id - 1].Y));
-
-            viewer.data.add_edges(p0, p1, RowVector3d(1, 1, 0));
-        }
-    }
-
+//    if(slicer.empty()) return false;
+//
+//    MeshLayoutOpt layouter;
+//    layouter.set_slicer(slicer);
+//
+//    MatrixXi F; MatrixXd V;
+//    slicer.get_vertices_mat(V);
+//    slicer.get_faces_mat(F);
+//    viewer.data.clear();
+//    //viewer.data.set_mesh(V, F);
+//
+//    MatrixXi hmap, smap;
+//
+//    layouter.get_height_map(hmap);
+//    layouter.get_support_map(smap);
+//    MatrixXd platform= MatrixXd::Zero(9, 11);
+//
+//    MeshSupportBase supporter;
+//    supporter.set_slicer(slicer);
+//    supporter.set_map(hmap, smap, platform);
+//    supporter.fermat_curves_construction();
+//    supporter.maximum_pin_layer_height_construction();
+//
+//    vector<Paths> curves;
+//    supporter.get_fermat_curves(curves);
+//
+//    Settings settings;
+//    for(int kd = 190; kd < curves.size(); kd += 1)
+//    for(int jd = 0; jd < curves[kd].size(); jd++)
+//    {
+//        Path output = curves[kd][jd];
+//        for(int id = 1; id < output.size(); id++)
+//        {
+//            RowVector3d p1(settings.int2mm(output[id].X),
+//                           slicer.layer_height(kd),
+//                           settings.int2mm(output[id].Y));
+//
+//            RowVector3d p0(settings.int2mm(output[id - 1].X),
+//                           slicer.layer_height(kd),
+//                           settings.int2mm(output[id - 1].Y));
+//
+//            viewer.data.add_edges(p0, p1, RowVector3d(1, 1, 0));
+//        }
+//    }
+//
     return true;
 }
 
@@ -605,7 +604,14 @@ void writePlatform(MatrixXd platform, string model_name)
     }
 }
 
-bool support_previwer(igl::viewer::Viewer &viewer ,MeshSlicerOverhang &slicer, int layer_step, bool metal_pin, vector<Paths> &curves, bool load_platform, string model_name)
+bool support_previwer(igl::viewer::Viewer &viewer ,
+                      MeshSlicerOverhang &slicer,
+                      int layer_step,
+                      bool metal_pin,
+                      vector<Paths> &curves,
+                      bool load_platform,
+                      string model_name,
+                      bool single_layer)
 {
     if(slicer.empty()) return false;
 
@@ -646,12 +652,10 @@ bool support_previwer(igl::viewer::Viewer &viewer ,MeshSlicerOverhang &slicer, i
     curves.clear();
     supporter.get_fermat_curves(curves);
 
-    for(int kd = 0; kd < curves.size(); kd += layer_step)
-        for(int jd = 0; jd < curves[kd].size(); jd++)
-        {
+    for(int kd = 0; kd < curves.size(); kd += layer_step) {
+        for (int jd = 0; jd < curves[kd].size(); jd++) {
             Path output = curves[kd][jd];
-            for(int id = 1; id < output.size(); id++)
-            {
+            for (int id = 1; id < output.size(); id++) {
                 RowVector3d p1(settings.int2mm(output[id].X),
                                slicer.layer_height(kd),
                                settings.int2mm(output[id].Y));
@@ -663,7 +667,8 @@ bool support_previwer(igl::viewer::Viewer &viewer ,MeshSlicerOverhang &slicer, i
                 viewer.data.add_edges(p0, p1, RowVector3d(1, 1, 0));
             }
         }
-
+        if(single_layer && kd > 1) break;
+    }
     return true;
 }
 
