@@ -404,6 +404,15 @@ public:
         return;
     }
 
+    void set_G1ZF(double Z, double F)
+    {
+        clear();
+        type = G_Z_F_Code;
+        nG = 1;
+        nZ = Z;
+        nF = F;
+    }
+
 public:
     unsigned Empty;
     unsigned Comment;
@@ -455,7 +464,7 @@ public:
                 lines.push_back(line);
             }
             layering(lines);
-            remove_G1Z_code_inside_layer();
+            //remove_G1Z_code_inside_layer();
         }
     }
 
@@ -664,6 +673,10 @@ public:
             code.set_G92E0();
             support.push_back(code);
 
+            //move Z a layer height to avoid collision
+            code.set_G1ZF((layer + 1) * settings.layer_height, 1800);
+            support.push_back(code);
+
             int curve_id = 0;
             new_speed = false;
             first_move_touch = true;
@@ -689,8 +702,14 @@ public:
                         //we have to reel off 7.1mm material to make sure the new filament can be attached to the support
                         if(first_move_touch)
                         {
+                            //move down nozzel
+                            code.set_G1ZF(layer * settings.layer_height, 1800);
+                            support.push_back(code);
+
+                            //reel off material
                             code.set_G1EF(7.1, 4800);
                             support.push_back(code);
+
                             first_move_touch = false;
                             E = 7.1;
                         }

@@ -18,6 +18,7 @@ struct MenuInput
     int layout_opt_type;
     bool layout_output;
     bool metal_pin;
+    bool load_platform;
 }menu_input;
 
 struct Scene_Data
@@ -155,7 +156,12 @@ void test()
 
 void gcode_viewer()
 {
-    support_previwer(viewer, scene_data.slicer, menu_input.layer_step, menu_input.metal_pin, scene_data.tool_path);
+    support_previwer(viewer, scene_data.slicer,
+                     menu_input.layer_step,
+                     menu_input.metal_pin,
+                     scene_data.tool_path,
+                     menu_input.load_platform,
+                     menu_input.model_name);
 }
 
 void move_model()
@@ -229,6 +235,7 @@ int main(int argc, char *argv[])
 
         viewer.ngui->addGroup("Previewer");
         viewer.ngui->addVariable("Metal Pin", menu_input.metal_pin);
+        viewer.ngui->addVariable("Load .plf", menu_input.load_platform);
         viewer.ngui->addButton("Gcode Preview", gcode_viewer);
 
         viewer.ngui->addGroup("Generate Gcode");

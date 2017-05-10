@@ -17,6 +17,7 @@
 #include <igl/png/writePNG.h>
 #include <igl/png/readPNG.h>
 #include <igl/jet.h>
+#include <fstream>
 
 //Std
 #include <iostream>
@@ -35,6 +36,8 @@
 
 //Model path
 #include "testing_models_path.h"
+
+#define MAXBUFSIZE  ((int) 1e6)
 
 using Eigen::MatrixXd;
 using Eigen::MatrixXi;
@@ -310,7 +313,12 @@ bool non_move_support(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixX
     GeneratingPlatform platform_builder;
     platform_builder.draw_platform(plV, plF, platform);
     organizer.add_mesh(plV, plF, RowVector3d(0, 0 , 1));
-    if(output) writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+    if(output)
+    {
+        writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+        void writePlatform(MatrixXd, string);
+        writePlatform(platform, name);
+    }
     std::cout << platform << std::endl;
 
     //support
@@ -349,8 +357,12 @@ bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C,
     GeneratingPlatform platform_builder;
     platform_builder.draw_platform(plV, plF, platform);
     organizer.add_mesh(plV, plF, RowVector3d(0, 0 , 1));
-    if(output) writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
-    std::cout << platform << std::endl;
+    if(output)
+    {
+        writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+        void writePlatform(MatrixXd, string);
+        writePlatform(platform, name);
+    }
 
     //support
     MatrixXi hmap, smap;
@@ -392,7 +404,12 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
     MatrixXd platform; layouter.get_opt_platform(platform);
     GeneratingPlatform platform_builder;
     platform_builder.draw_platform(plV, plF, platform);
-    if(output) writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+    if(output)
+    {
+        writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+        void writePlatform(MatrixXd, string);
+        writePlatform(platform, name);
+    }
     organizer.add_mesh(plV, plF, RowVector3d(0, 0 , 1));
 
     //support
@@ -526,7 +543,69 @@ bool model_move(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
     return true;
 }
 
-bool support_previwer(igl::viewer::Viewer &viewer ,MeshSlicerOverhang &slicer, int layer_step, bool metal_pin, vector<Paths> &curves)
+MatrixXd readMatrix(std::ifstream &infile)
+{
+    int cols = 0, rows = 0;
+    double buff[MAXBUFSIZE];
+
+    // Read numbers from file into buffer.
+    while (! infile.eof())
+    {
+        string line;
+        getline(infile, line);
+
+        int temp_cols = 0;
+        std::stringstream stream(line);
+        while(! stream.eof())
+            stream >> buff[cols*rows+temp_cols++];
+
+        if (temp_cols == 0)
+            continue;
+
+        if (cols == 0)
+            cols = temp_cols;
+
+        rows++;
+    }
+
+    infile.close();
+
+    rows--;
+
+    // Populate matrix with numbers.
+    MatrixXd result(rows,cols);
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++)
+            result(i,j) = buff[ cols*i+j ];
+
+    return result;
+};
+
+void LoadPlatform(MatrixXd &platform, string model_name)
+{
+    string file_path = file(TESTING_MODELS_PATH, model_name, "_platform", "plf");
+    std::ifstream fin; fin.open(file_path);
+    Settings settings;
+    if(fin.is_open())
+    {
+        platform = readMatrix(fin);
+    } else{
+        platform = MatrixXd::Zero(settings.pillar_row, settings.pillar_column);
+    }
+}
+
+void writePlatform(MatrixXd platform, string model_name)
+{
+    string file_path = file(TESTING_MODELS_PATH, model_name, "_platform", "plf");
+    std::ofstream fout; fout.open(file_path);
+    Settings settings;
+    if(fout.is_open())
+    {
+        fout << platform;
+    }
+}
+
+bool support_previwer(igl::viewer::Viewer &viewer ,MeshSlicerOverhang &slicer, int layer_step, bool metal_pin, vector<Paths> &curves, bool load_platform, string model_name)
 {
     if(slicer.empty()) return false;
 
@@ -546,7 +625,9 @@ bool support_previwer(igl::viewer::Viewer &viewer ,MeshSlicerOverhang &slicer, i
     layouter.get_support_map(smap);
     MatrixXd platform;
     Settings settings;
-    if(metal_pin) layouter.get_platform(hmap, smap, platform);
+
+    if(load_platform) LoadPlatform(platform, model_name);
+    else if(metal_pin) layouter.get_platform(hmap, smap, platform);
     else platform = MatrixXd::Zero(settings.pillar_row, settings.pillar_column);
 
     GeneratingPlatform platform_builder;

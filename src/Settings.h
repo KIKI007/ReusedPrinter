@@ -30,8 +30,8 @@ public:
         blender_scale_factor = 0.03; //mm
 
         //support generation
-        overhang_offset = 0.3; //mm
-        extrusion_width = 0.6; //mm
+        overhang_offset = 0.2; //mm
+        extrusion_width = 0.5; //mm
         support_center_factor = 4; //mm
         fermat_cut_width = 0.5; //mm
 
