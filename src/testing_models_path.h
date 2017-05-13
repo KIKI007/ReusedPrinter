@@ -4,7 +4,7 @@
 #ifndef TESTING_MODELS_PATH
 #ifdef _WIN32
 #define TESTING_MODELS_PATH "C:/Users/Administrator/Ziqi/Dropbox/Yang_Ziqi/Printing Model"
-#elif
+#elif __APPLE__
 	#define TESTING_MODELS_PATH "/Users/wangziqi/Dropbox/Yang_Ziqi/Printing Model"
 #endif
 #endif

@@ -3034,46 +3034,6 @@ string
 write_triangle_mesh.cpp
 ../shared/cmake/../../include/igl/write_triangle_mesh.cpp
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector
-__config
--
-__bit_reference
--
-type_traits
--
-climits
--
-limits
--
-initializer_list
--
-memory
--
-stdexcept
--
-algorithm
--
-cstring
--
-__split_buffer
--
-__functional_base
--
-__undef_min_max
--
-__debug
--
-
-/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen/Eigen/StdVector
-Core
-/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen/Eigen/Core
-vector
--
-src/StlSupport/StdVector.h
-/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen/Eigen/src/StlSupport/StdVector.h
-
-/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen/Eigen/src/Core/Matrix.h
-
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/Settings.h
 limits
 -
@@ -3177,6 +3137,10 @@ igl/triangle/triangulate.h
 -
 igl/read_triangle_mesh.h
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/igl/read_triangle_mesh.h
+igl/readOBJ.h
+/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/igl/readOBJ.h
+igl/writeOBJ.h
+/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/igl/writeOBJ.h
 igl/readSTL.h
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/igl/readSTL.h
 igl/writeSTL.h
@@ -3247,12 +3211,12 @@ settings.h
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/settings.h
 hash_edge.h
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/hash_edge.h
-../external/nanogui/ext/eigen/Eigen/src/Core/Matrix.h
-/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen/Eigen/src/Core/Matrix.h
-../../../../../../../Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector
-../external/nanogui/ext/eigen/Eigen/StdVector
-/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen/Eigen/StdVector
+Eigen/Dense
+-
+vector
+-
+Eigen/StdVector
+-
 
 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/mesh_slicer_overhang.h
 mesh_slicer_base.h

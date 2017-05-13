@@ -449,9 +449,6 @@ src/CMakeFiles/supporter_bin.dir/main.cpp.o
  ../shared/cmake/../../include/igl/writeWRL.h
  ../shared/cmake/../../include/igl/write_triangle_mesh.cpp
  ../shared/cmake/../../include/igl/write_triangle_mesh.h
- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector
- /Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen/Eigen/StdVector
- /Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/nanogui/ext/eigen/Eigen/src/Core/Matrix.h
  /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/Settings.h
  /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/clipper.hpp
  /Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/fermat_curve.h

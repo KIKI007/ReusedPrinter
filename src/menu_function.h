@@ -345,7 +345,7 @@ bool non_move_support(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixX
 	{
 #ifdef _WIN32
 		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "obj"));
-#elif
+#elif __APPLE__
 		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "stl"));
 #endif
 	}
@@ -358,7 +358,7 @@ bool non_move_support(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixX
 	if (output) {
 #ifdef _WIN32
 		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "obj"));
-#elif
+#elif __APPLE__
 		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
 #endif
 	}
@@ -408,7 +408,7 @@ bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C,
 	{
 #ifdef _WIN32
 		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "obj"));
-#elif
+#elif __APPLE__
 		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "stl"));
 #endif
 	}
@@ -422,7 +422,7 @@ bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C,
 	{
 #ifdef _WIN32
 		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "obj"));
-#elif
+#elif __APPLE__
 		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
 #endif
 	}
@@ -474,7 +474,7 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
 	{
 #ifdef _WIN32
 		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "obj"));
-#elif
+#elif __APPLE__
 		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "stl"));
 #endif
 	}
@@ -491,8 +491,8 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
 	{
 #ifdef _WIN32
 		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "obj"));
-#elif
-		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
+#elif __APPLE__
+        writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
 #endif
 	}
     organizer.add_mesh(V, F, RowVector3d(1, 1, 0));

@@ -59,7 +59,7 @@ void load_model()
 	void render_mesh(MatrixXd &V, MatrixXi &F, MatrixXd &C);
 #ifdef _WIN32
 	string file_path = file(TESTING_MODELS_PATH, menu_input.model_name, "", "OBJ");
-#elif
+#elif __APPLE__
     string file_path = file(TESTING_MODELS_PATH, menu_input.model_name, "", "STL");
 #endif
     if(loadModel(scene_data.V, scene_data.F, file_path))
