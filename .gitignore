@@ -32,3 +32,17 @@
 *.swp
 
 build/*
+
+*.opendb
+
+*.db
+
+vs2015/x64/
+
+*.pdb
+
+vs2015/CMakeFiles/
+
+vs2015/\.vs/
+
+external/

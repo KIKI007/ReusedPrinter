@@ -1,0 +1,430 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{9C30F6A6-DFDF-369F-8106-B8BE906E4230}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>nanogui-obj</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nanogui-obj.dir\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nanogui-obj.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nanogui-obj</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nanogui-obj.dir\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nanogui-obj.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nanogui-obj</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">nanogui-obj.dir\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">nanogui-obj.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">nanogui-obj</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">nanogui-obj.dir\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">nanogui-obj.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">nanogui-obj</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalOptions>%(AdditionalOptions)  /bigobj /bigobj /w</AdditionalOptions>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>EIGEN_DONT_ALIGN;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NANOGUI_BUILD;NANOGUI_GLAD;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NANOGUI_BUILD;NANOGUI_GLAD;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions)  /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalOptions>%(AdditionalOptions)  /bigobj /bigobj /w</AdditionalOptions>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;NANOGUI_BUILD;NANOGUI_GLAD;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;NANOGUI_BUILD;NANOGUI_GLAD;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions)  /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalOptions>%(AdditionalOptions)  /bigobj /bigobj /w</AdditionalOptions>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;NANOGUI_BUILD;NANOGUI_GLAD;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;NANOGUI_BUILD;NANOGUI_GLAD;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions)  /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalOptions>%(AdditionalOptions)  /bigobj /bigobj /w</AdditionalOptions>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;NANOGUI_BUILD;NANOGUI_GLAD;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;NANOGUI_BUILD;NANOGUI_GLAD;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Ziqi\external\nanogui\ext\glad\include;E:\Ziqi\external\nanogui\ext\eigen;E:\Ziqi\external\nanogui\ext\glfw\include;E:\Ziqi\external\nanogui\ext\nanovg\src;E:\Ziqi\external\nanogui\include;E:\Ziqi\vs2015\libigl\nanogui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions)  /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Ziqi\external\nanogui\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule E:/Ziqi/external/nanogui/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HE:/Ziqi -BE:/Ziqi/vs2015 --check-stamp-file E:/Ziqi/vs2015/libigl/nanogui/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">E:/Ziqi/external/nanogui/CMakeLists.txt;E:\Ziqi\external\nanogui\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXSourceRuns.cmake;E:\Ziqi\external\nanogui\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">E:\Ziqi\vs2015\libigl\nanogui\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule E:/Ziqi/external/nanogui/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HE:/Ziqi -BE:/Ziqi/vs2015 --check-stamp-file E:/Ziqi/vs2015/libigl/nanogui/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">E:/Ziqi/external/nanogui/CMakeLists.txt;E:\Ziqi\external\nanogui\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXSourceRuns.cmake;E:\Ziqi\external\nanogui\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">E:\Ziqi\vs2015\libigl\nanogui\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule E:/Ziqi/external/nanogui/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HE:/Ziqi -BE:/Ziqi/vs2015 --check-stamp-file E:/Ziqi/vs2015/libigl/nanogui/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">E:/Ziqi/external/nanogui/CMakeLists.txt;E:\Ziqi\external\nanogui\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXSourceRuns.cmake;E:\Ziqi\external\nanogui\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">E:\Ziqi\vs2015\libigl\nanogui\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule E:/Ziqi/external/nanogui/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HE:/Ziqi -BE:/Ziqi/vs2015 --check-stamp-file E:/Ziqi/vs2015/libigl/nanogui/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">E:/Ziqi/external/nanogui/CMakeLists.txt;E:\Ziqi\external\nanogui\CMakeLists.txt;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.8\Modules\CheckCXXSourceRuns.cmake;E:\Ziqi\external\nanogui\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">E:\Ziqi\vs2015\libigl\nanogui\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Ziqi\vs2015\CMakeFiles\128b0f27501d4de64649bc41da5dd401\nanogui_resources.cpp.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Running bin2c</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -DOUTPUT_C=nanogui_resources.cpp -DOUTPUT_H=nanogui_resources.h -DINPUT_FILES=E:/Ziqi/external/nanogui/resources/Roboto-Bold.ttf,E:/Ziqi/external/nanogui/resources/Roboto-Regular.ttf,E:/Ziqi/external/nanogui/resources/entypo.ttf -P E:/Ziqi/external/nanogui/resources/bin2c.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">E:/Ziqi/vs2015/CMakeFiles/128b0f27501d4de64649bc41da5dd401/nanogui_resources.cpp.rule;E:\Ziqi\external\nanogui\resources\Roboto-Bold.ttf;E:\Ziqi\external\nanogui\resources\Roboto-Regular.ttf;E:\Ziqi\external\nanogui\resources\entypo.ttf;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">E:\Ziqi\vs2015\libigl\nanogui\nanogui_resources.cpp;E:\Ziqi\vs2015\libigl\nanogui\nanogui_resources.h</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Running bin2c</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -DOUTPUT_C=nanogui_resources.cpp -DOUTPUT_H=nanogui_resources.h -DINPUT_FILES=E:/Ziqi/external/nanogui/resources/Roboto-Bold.ttf,E:/Ziqi/external/nanogui/resources/Roboto-Regular.ttf,E:/Ziqi/external/nanogui/resources/entypo.ttf -P E:/Ziqi/external/nanogui/resources/bin2c.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">E:/Ziqi/vs2015/CMakeFiles/128b0f27501d4de64649bc41da5dd401/nanogui_resources.cpp.rule;E:\Ziqi\external\nanogui\resources\Roboto-Bold.ttf;E:\Ziqi\external\nanogui\resources\Roboto-Regular.ttf;E:\Ziqi\external\nanogui\resources\entypo.ttf;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">E:\Ziqi\vs2015\libigl\nanogui\nanogui_resources.cpp;E:\Ziqi\vs2015\libigl\nanogui\nanogui_resources.h</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Running bin2c</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -DOUTPUT_C=nanogui_resources.cpp -DOUTPUT_H=nanogui_resources.h -DINPUT_FILES=E:/Ziqi/external/nanogui/resources/Roboto-Bold.ttf,E:/Ziqi/external/nanogui/resources/Roboto-Regular.ttf,E:/Ziqi/external/nanogui/resources/entypo.ttf -P E:/Ziqi/external/nanogui/resources/bin2c.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">E:/Ziqi/vs2015/CMakeFiles/128b0f27501d4de64649bc41da5dd401/nanogui_resources.cpp.rule;E:\Ziqi\external\nanogui\resources\Roboto-Bold.ttf;E:\Ziqi\external\nanogui\resources\Roboto-Regular.ttf;E:\Ziqi\external\nanogui\resources\entypo.ttf;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">E:\Ziqi\vs2015\libigl\nanogui\nanogui_resources.cpp;E:\Ziqi\vs2015\libigl\nanogui\nanogui_resources.h</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Running bin2c</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -DOUTPUT_C=nanogui_resources.cpp -DOUTPUT_H=nanogui_resources.h -DINPUT_FILES=E:/Ziqi/external/nanogui/resources/Roboto-Bold.ttf,E:/Ziqi/external/nanogui/resources/Roboto-Regular.ttf,E:/Ziqi/external/nanogui/resources/entypo.ttf -P E:/Ziqi/external/nanogui/resources/bin2c.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">E:/Ziqi/vs2015/CMakeFiles/128b0f27501d4de64649bc41da5dd401/nanogui_resources.cpp.rule;E:\Ziqi\external\nanogui\resources\Roboto-Bold.ttf;E:\Ziqi\external\nanogui\resources\Roboto-Regular.ttf;E:\Ziqi\external\nanogui\resources\entypo.ttf;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">E:\Ziqi\vs2015\libigl\nanogui\nanogui_resources.cpp;E:\Ziqi\vs2015\libigl\nanogui\nanogui_resources.h</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\Ziqi\external\nanogui\ext\glad\include\glad\glad.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\ext\glad\include\KHR\khrplatform.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\glutil.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\common.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\widget.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\theme.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\layout.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\screen.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\label.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\window.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\popup.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\checkbox.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\button.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\popupbutton.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\combobox.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\progressbar.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\slider.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\messagedialog.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\textbox.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\imagepanel.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\imageview.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\vscrollpanel.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\colorwheel.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\colorpicker.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\graph.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\stackedwidget.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\tabheader.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\tabwidget.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\glcanvas.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\formhelper.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\toolbutton.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\opengl.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\nanogui.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\serializer\core.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\serializer\opengl.h" />
+    <ClInclude Include="E:\Ziqi\external\nanogui\include\nanogui\serializer\sparse.h" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\ext\nanovg\src\nanovg.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4005;4456;4457;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NVG_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4005;4456;4457;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NVG_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsC</CompileAs>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">4005;4456;4457;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">NVG_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsC</CompileAs>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">4005;4456;4457;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">NVG_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="E:\Ziqi\external\nanogui\ext\glad\src\glad.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4055;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4055;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsC</CompileAs>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">4055;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsC</CompileAs>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">4055;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="E:\Ziqi\vs2015\libigl\nanogui\nanogui_resources.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\glutil.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\common.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\widget.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\theme.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\layout.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\screen.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\label.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\window.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\popup.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\checkbox.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\button.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\popupbutton.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\combobox.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\progressbar.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\slider.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\messagedialog.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\textbox.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\imagepanel.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\imageview.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\vscrollpanel.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\colorwheel.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\colorpicker.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\graph.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\stackedwidget.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\tabheader.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\tabwidget.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\glcanvas.cpp" />
+    <ClCompile Include="E:\Ziqi\external\nanogui\src\serializer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="E:\Ziqi\vs2015\ZERO_CHECK.vcxproj">
+      <Project>0ECCA543-63A5-30C8-9460-F69F162753C7</Project>
+      <Name>ZERO_CHECK</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

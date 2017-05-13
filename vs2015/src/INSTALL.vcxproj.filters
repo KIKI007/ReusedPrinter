@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="E:\Ziqi\vs2015\CMakeFiles\68c9ecaabf1f54942a75e3226be39f5c\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{8744835A-71FB-34FC-9627-BB4E634FC61E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

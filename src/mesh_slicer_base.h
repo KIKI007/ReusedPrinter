@@ -18,9 +18,9 @@
 #include "clipper.hpp"
 #include "settings.h"
 #include "hash_edge.h"
-#include "../external/nanogui/ext/eigen/Eigen/src/Core/Matrix.h"
-#include "../../../../../../../Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector"
-#include "../external/nanogui/ext/eigen/Eigen/StdVector"
+#include <Eigen/Dense>
+#include <vector>
+#include <Eigen/StdVector>
 
 class MeshSlicerBase
 {
