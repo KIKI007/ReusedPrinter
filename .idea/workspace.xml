@@ -12,11 +12,9 @@
     <list default="true" id="a495e7fd-8e8c-490b-a3fb-8666f6bedf6a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-release/src/supporter_bin" afterPath="$PROJECT_DIR$/cmake-build-release/src/supporter_bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-release/CMakeFiles/Makefile2" afterPath="$PROJECT_DIR$/cmake-build-release/CMakeFiles/Makefile2" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/fermat_curve.h" afterPath="$PROJECT_DIR$/src/fermat_curve.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main.cpp" afterPath="$PROJECT_DIR$/src/main.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/menu_function.h" afterPath="$PROJECT_DIR$/src/menu_function.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/mesh_support_base.h" afterPath="$PROJECT_DIR$/src/mesh_support_base.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/mesh_layout_base.h" afterPath="$PROJECT_DIR$/src/mesh_layout_base.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/mesh_layout_opt.h" afterPath="$PROJECT_DIR$/src/mesh_layout_opt.h" />
     </list>
     <list id="e035093c-242f-4886-9763-a220557534fb" name="Rejected commit: Default" comment="" />
     <ignored path="$PROJECT_DIR$/cmake-build-release/" />
@@ -37,55 +35,24 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main.cpp">
+      <file leaf-file-name="fermat_spirals.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/fermat_spirals.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="401">
-              <caret line="241" column="46" lean-forward="false" selection-start-line="241" selection-start-column="46" selection-end-line="241" selection-end-column="46" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="40" column="12" lean-forward="false" selection-start-line="40" selection-start-column="12" selection-end-line="40" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="menu_function.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/menu_function.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-12271">
-              <caret line="349" column="0" lean-forward="false" selection-start-line="349" selection-start-column="0" selection-end-line="349" selection-end-column="0" />
+            <state relative-caret-position="15">
+              <caret line="208" column="0" lean-forward="false" selection-start-line="208" selection-start-column="0" selection-end-line="208" selection-end-column="0" />
               <folding>
-                <element signature="e#193#228#0" expanded="true" />
-                <element signature="e#457#486#0" expanded="true" />
-                <element signature="e#19900#36142#0" expanded="true" />
+                <marker date="1493330196000" expanded="false" signature="116:173" ph="..." />
+                <marker date="1493330196000" expanded="true" signature="15570:16786" ph="{...}" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="fermat_curve.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/fermat_curve.h">
+      <file leaf-file-name="mesh_layout_opt.h" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/mesh_layout_opt.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3985">
-              <caret line="391" column="21" lean-forward="false" selection-start-line="391" selection-start-column="21" selection-end-line="391" selection-end-column="21" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="vector" pinned="false" current-in-tab="false">
-        <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="53">
-              <caret line="1611" column="0" lean-forward="false" selection-start-line="1611" selection-start-column="0" selection-end-line="1611" selection-end-column="0" />
+            <state relative-caret-position="630">
+              <caret line="57" column="16" lean-forward="true" selection-start-line="57" selection-start-column="16" selection-end-line="57" selection-end-column="16" />
               <folding />
             </state>
           </provider>
@@ -94,18 +61,48 @@
       <file leaf-file-name="mesh_slicer_overhang.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/mesh_slicer_overhang.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-825">
+            <state relative-caret-position="240">
               <caret line="16" column="24" lean-forward="false" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mesh_support_base.h" pinned="false" current-in-tab="true">
+      <file leaf-file-name="fermat_curve.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/fermat_curve.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="5220">
+              <caret line="391" column="21" lean-forward="false" selection-start-line="391" selection-start-column="21" selection-end-line="391" selection-end-column="21" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="mesh_slicer_shift.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/mesh_slicer_shift.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="945">
+              <caret line="63" column="0" lean-forward="false" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="mesh_support.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/mesh_support.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="6135">
+              <caret line="409" column="34" lean-forward="false" selection-start-line="409" selection-start-column="4" selection-end-line="409" selection-end-column="34" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="mesh_support_base.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/mesh_support_base.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="24">
-              <caret line="454" column="27" lean-forward="false" selection-start-line="454" selection-start-column="27" selection-end-line="454" selection-end-column="27" />
+            <state relative-caret-position="4095">
+              <caret line="273" column="11" lean-forward="false" selection-start-line="273" selection-start-column="11" selection-end-line="273" selection-end-column="11" />
               <folding>
                 <element signature="e#113#142#0" expanded="true" />
               </folding>
@@ -113,21 +110,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mesh_layout_base.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/mesh_layout_base.h">
+      <file leaf-file-name="scan_line_fill.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scan_line_fill.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-63">
-              <caret line="136" column="21" lean-forward="false" selection-start-line="136" selection-start-column="21" selection-end-line="136" selection-end-column="21" />
+            <state relative-caret-position="1140">
+              <caret line="76" column="25" lean-forward="false" selection-start-line="76" selection-start-column="25" selection-end-line="76" selection-end-column="25" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mesh_layout_opt.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/mesh_layout_opt.h">
+      <file leaf-file-name="scene_organizer.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scene_organizer.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="158">
-              <caret line="119" column="0" lean-forward="false" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
+            <state relative-caret-position="1800">
+              <caret line="120" column="1" lean-forward="false" selection-start-line="120" selection-start-column="1" selection-end-line="120" selection-end-column="1" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="hash_edge.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/hash_edge.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="390">
+              <caret line="26" column="15" lean-forward="false" selection-start-line="26" selection-start-column="15" selection-end-line="26" selection-end-column="15" />
               <folding />
             </state>
           </provider>
@@ -137,7 +144,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>height_map</find>
       <find>clear</find>
       <find>lines</find>
       <find>dist(</find>
@@ -165,8 +171,9 @@
       <find>singleline_curvegroup_construction</find>
       <find>M</find>
       <find>load</find>
-      <find>maximum_pin_layer_height_construction</find>
+      <find>smap</find>
       <find>ClipperOff</find>
+      <find>maximum_pin_layer_height_construction</find>
     </findStrings>
     <replaceStrings>
       <replace>MatrixXi</replace>
@@ -189,19 +196,19 @@
         <option value="$PROJECT_DIR$/src/mesh_slicer.h" />
         <option value="$PROJECT_DIR$/src/mesh_slicer_overhang.h" />
         <option value="$PROJECT_DIR$/src/mesh_slicer_shift.h" />
-        <option value="$PROJECT_DIR$/src/mesh_layout_opt.h" />
         <option value="$PROJECT_DIR$/src/fermat_spirals.h" />
         <option value="$PROJECT_DIR$/src/mesh_support.h" />
         <option value="$PROJECT_DIR$/src/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/src/mesh_layout_base.h" />
         <option value="$PROJECT_DIR$/src/mesh_slicer_base.h" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/src/Settings.h" />
         <option value="$PROJECT_DIR$/src/gcode.h" />
-        <option value="$PROJECT_DIR$/src/menu_function.h" />
         <option value="$PROJECT_DIR$/src/main.cpp" />
         <option value="$PROJECT_DIR$/src/fermat_curve.h" />
         <option value="$PROJECT_DIR$/src/mesh_support_base.h" />
+        <option value="$PROJECT_DIR$/src/menu_function.h" />
+        <option value="$PROJECT_DIR$/src/mesh_layout_base.h" />
+        <option value="$PROJECT_DIR$/src/mesh_layout_opt.h" />
       </list>
     </option>
   </component>
@@ -213,9 +220,8 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
-    <option name="y" value="51" />
     <option name="width" value="1440" />
-    <option name="height" value="799" />
+    <option name="height" value="900" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -479,7 +485,8 @@
       <workItem from="1493330330531" duration="22000" />
       <workItem from="1493330384355" duration="30692000" />
       <workItem from="1493781606395" duration="53132000" />
-      <workItem from="1493930155369" duration="49984000" />
+      <workItem from="1493930155369" duration="52222000" />
+      <workItem from="1494696787718" duration="82000" />
     </task>
     <task id="LOCAL-00001" summary="add clipper">
       <created>1493330500699</created>
@@ -565,23 +572,30 @@
       <option name="project" value="LOCAL" />
       <updated>1494388509044</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="New the fermat curves are connected">
+      <created>1494398189529</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1494398189530</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="133962000" />
+    <option name="totallyTimeSpent" value="136282000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="51" width="1440" height="799" extended-state="0" />
+    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24665257" sideWeight="0.4493976" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891566" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2674897" sideWeight="0.6518675" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26746988" sideWeight="0.6518675" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3253012" sideWeight="0.46934462" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27108434" sideWeight="0.3481325" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32235938" sideWeight="0.55250174" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23182441" sideWeight="0.31501058" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23182441" sideWeight="0.31501058" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24947146" sideWeight="0.49283153" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32650602" sideWeight="0.4947146" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24665257" sideWeight="0.55060244" order="0" side_tool="true" content_ui="tabs" />
@@ -634,7 +648,8 @@
     <MESSAGE value="Good to go" />
     <MESSAGE value="Remove Boost" />
     <MESSAGE value="Add some code for fabrication. Decide to rewrite mesh_support_base.h" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add some code for fabrication. Decide to rewrite mesh_support_base.h" />
+    <MESSAGE value="New the fermat curves are connected" />
+    <option name="LAST_COMMIT_MESSAGE" value="New the fermat curves are connected" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -679,7 +694,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
           <caret line="169" column="0" lean-forward="false" selection-start-line="169" selection-start-column="0" selection-end-line="169" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -687,7 +701,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
           <caret line="84" column="0" lean-forward="false" selection-start-line="84" selection-start-column="0" selection-end-line="84" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -695,7 +708,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
           <caret line="548" column="0" lean-forward="false" selection-start-line="548" selection-start-column="0" selection-end-line="548" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -703,7 +715,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
           <caret line="88" column="0" lean-forward="false" selection-start-line="88" selection-start-column="0" selection-end-line="88" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -711,7 +722,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
           <caret line="100" column="0" lean-forward="false" selection-start-line="100" selection-start-column="0" selection-end-line="100" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -719,7 +729,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
           <caret line="93" column="0" lean-forward="false" selection-start-line="93" selection-start-column="0" selection-end-line="93" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -741,7 +750,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="172">
           <caret line="413" column="0" lean-forward="false" selection-start-line="413" selection-start-column="0" selection-end-line="413" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -757,7 +765,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-90">
           <caret line="125" column="41" lean-forward="false" selection-start-line="125" selection-start-column="20" selection-end-line="125" selection-end-column="41" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -788,27 +795,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="181">
           <caret line="1436" column="0" lean-forward="false" selection-start-line="1436" selection-start-column="0" selection-end-line="1436" selection-end-column="0" />
-          <folding>
-            <marker date="1454547186000" expanded="false" signature="14305:14772" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="15113:15581" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="15927:16400" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="16743:17213" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="17556:18026" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="18341:18713" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="19060:19534" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="19885:20363" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="20708:21178" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="21562:22041" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="22390:22866" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="23216:23693" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="24042:24518" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="24840:25214" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="25557:26027" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="26369:26838" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="27181:27651" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="27686:28278" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="74048:74435" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -816,7 +802,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="181">
           <caret line="335" column="0" lean-forward="false" selection-start-line="335" selection-start-column="0" selection-end-line="335" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -824,15 +809,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
           <caret line="288" column="0" lean-forward="false" selection-start-line="288" selection-start-column="0" selection-end-line="288" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/hash_edge.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="33" column="9" lean-forward="false" selection-start-line="33" selection-start-column="8" selection-end-line="33" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -840,18 +816,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="428">
           <caret line="468" column="0" lean-forward="false" selection-start-line="468" selection-start-column="0" selection-end-line="468" selection-end-column="0" />
-          <folding>
-            <marker date="1454547186000" expanded="false" signature="1712:2180" ph="..." />
-            <marker date="1454547186000" expanded="false" signature="15446:15766" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/testing_models_path.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -859,26 +823,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
           <caret line="3969" column="0" lean-forward="false" selection-start-line="3969" selection-start-column="0" selection-end-line="3969" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/fermat_spirals.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="817">
-          <caret line="208" column="0" lean-forward="false" selection-start-line="208" selection-start-column="0" selection-end-line="208" selection-end-column="0" />
-          <folding>
-            <marker date="1493330196000" expanded="false" signature="116:173" ph="..." />
-            <marker date="1493330196000" expanded="true" signature="15570:16786" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/mesh_support.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1140">
-          <caret line="409" column="34" lean-forward="false" selection-start-line="409" selection-start-column="4" selection-end-line="409" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -886,23 +830,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
           <caret line="182" column="0" lean-forward="false" selection-start-line="182" selection-start-column="0" selection-end-line="182" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scene_organizer.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="120" column="1" lean-forward="false" selection-start-line="120" selection-start-column="1" selection-end-line="120" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scan_line_fill.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="76" column="25" lean-forward="false" selection-start-line="76" selection-start-column="25" selection-end-line="76" selection-end-column="25" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -918,7 +845,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="242">
           <caret line="95" column="3" lean-forward="true" selection-start-line="95" selection-start-column="3" selection-end-line="95" selection-end-column="3" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -926,23 +852,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="6" column="19" lean-forward="false" selection-start-line="6" selection-start-column="19" selection-end-line="6" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/mesh_slicer_shift.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="63" column="0" lean-forward="false" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/mesh_slicer_base.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1125">
-          <caret line="83" column="122" lean-forward="false" selection-start-line="83" selection-start-column="114" selection-end-line="83" selection-end-column="122" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -950,7 +859,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-177">
           <caret line="61" column="21" lean-forward="false" selection-start-line="61" selection-start-column="21" selection-end-line="61" selection-end-column="21" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -958,7 +866,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2685">
           <caret line="179" column="17" lean-forward="false" selection-start-line="179" selection-start-column="12" selection-end-line="179" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -966,33 +873,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="679" column="29" lean-forward="true" selection-start-line="679" selection-start-column="29" selection-end-line="679" selection-end-column="29" />
-          <folding>
-            <element signature="e#86#103#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Settings.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="24" column="15" lean-forward="false" selection-start-line="24" selection-start-column="15" selection-end-line="24" selection-end-column="15" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="241" column="46" lean-forward="false" selection-start-line="241" selection-start-column="46" selection-end-line="241" selection-end-column="46" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/mesh_layout_opt.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="158">
-          <caret line="119" column="0" lean-forward="false" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1000,7 +880,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="53">
           <caret line="1611" column="0" lean-forward="false" selection-start-line="1611" selection-start-column="0" selection-end-line="1611" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1012,57 +891,143 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/menu_function.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-12271">
-          <caret line="349" column="0" lean-forward="false" selection-start-line="349" selection-start-column="0" selection-end-line="349" selection-end-column="0" />
-          <folding>
-            <element signature="e#193#228#0" expanded="true" />
-            <element signature="e#457#486#0" expanded="true" />
-            <element signature="e#19900#36142#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="40" column="12" lean-forward="false" selection-start-line="40" selection-start-column="12" selection-end-line="40" selection-end-column="12" />
-          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="401">
+          <caret line="241" column="46" lean-forward="false" selection-start-line="241" selection-start-column="46" selection-end-line="241" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/testing_models_path.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Settings.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="24" column="15" lean-forward="false" selection-start-line="24" selection-start-column="15" selection-end-line="24" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/menu_function.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="80" column="57" lean-forward="false" selection-start-line="80" selection-start-column="56" selection-end-line="80" selection-end-column="57" />
+          <folding>
+            <element signature="e#193#228#0" expanded="true" />
+            <element signature="e#457#486#0" expanded="true" />
+            <element signature="e#19897#36139#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/mesh_layout_base.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-63">
-          <caret line="136" column="21" lean-forward="false" selection-start-line="136" selection-start-column="21" selection-end-line="136" selection-end-column="21" />
+        <state relative-caret-position="378">
+          <caret line="185" column="5" lean-forward="true" selection-start-line="185" selection-start-column="5" selection-end-line="185" selection-end-column="5" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/mesh_slicer_base.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="502">
+          <caret line="83" column="122" lean-forward="false" selection-start-line="83" selection-start-column="114" selection-end-line="83" selection-end-column="122" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/mesh_slicer_overhang.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-825">
+        <state relative-caret-position="240">
           <caret line="16" column="24" lean-forward="false" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/fermat_curve.h">
+    <entry file="file://$PROJECT_DIR$/src/mesh_slicer_shift.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3985">
-          <caret line="391" column="21" lean-forward="false" selection-start-line="391" selection-start-column="21" selection-end-line="391" selection-end-column="21" />
+        <state relative-caret-position="945">
+          <caret line="63" column="0" lean-forward="false" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/mesh_support.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6135">
+          <caret line="409" column="34" lean-forward="false" selection-start-line="409" selection-start-column="4" selection-end-line="409" selection-end-column="34" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/mesh_support_base.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="24">
-          <caret line="454" column="27" lean-forward="false" selection-start-line="454" selection-start-column="27" selection-end-line="454" selection-end-column="27" />
+        <state relative-caret-position="4095">
+          <caret line="273" column="11" lean-forward="false" selection-start-line="273" selection-start-column="11" selection-end-line="273" selection-end-column="11" />
           <folding>
             <element signature="e#113#142#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scan_line_fill.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1140">
+          <caret line="76" column="25" lean-forward="false" selection-start-line="76" selection-start-column="25" selection-end-line="76" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scene_organizer.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1800">
+          <caret line="120" column="1" lean-forward="false" selection-start-line="120" selection-start-column="1" selection-end-line="120" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/hash_edge.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="26" column="15" lean-forward="false" selection-start-line="26" selection-start-column="15" selection-end-line="26" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/fermat_spirals.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="208" column="0" lean-forward="false" selection-start-line="208" selection-start-column="0" selection-end-line="208" selection-end-column="0" />
+          <folding>
+            <marker date="1493330196000" expanded="false" signature="116:173" ph="..." />
+            <marker date="1493330196000" expanded="true" signature="15570:16786" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/fermat_curve.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5220">
+          <caret line="391" column="21" lean-forward="false" selection-start-line="391" selection-start-column="21" selection-end-line="391" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/mesh_layout_opt.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="630">
+          <caret line="57" column="16" lean-forward="true" selection-start-line="57" selection-start-column="16" selection-end-line="57" selection-end-column="16" />
+          <folding />
         </state>
       </provider>
     </entry>

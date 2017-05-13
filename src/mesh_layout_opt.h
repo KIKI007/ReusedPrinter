@@ -44,6 +44,11 @@ public:
             if (num_pin == A.num_pin && edge_sample_num > A.edge_sample_num) return true;
         }
 
+//        if(num_pin > A.num_pin)
+//            return true;
+//
+//        if(material_save < A.material_save)
+//            return true;
         return false;
     }
 

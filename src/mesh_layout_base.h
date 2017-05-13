@@ -177,7 +177,12 @@ void MeshLayoutBase::support_map_construction()
     slicer.get_bottom_half_overhang(bottom_half);
 
     ClipperLib::Paths downside;
-    for(int layer = 1; layer < slicer.number_layer(); layer++)
+    int layer;
+    if(std::abs(slicer.layer_height(0)) < settings.layer_height)
+        layer = 1;
+    else
+        layer = 0;
+    for(; layer < slicer.number_layer(); layer++)
     {
         ClipperLib::Clipper clipper;
         clipper.AddPaths(downside, ClipperLib::ptSubject, true);
