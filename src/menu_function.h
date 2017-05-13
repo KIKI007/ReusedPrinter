@@ -11,6 +11,8 @@
 
 //I/O
 #include "igl/read_triangle_mesh.h"
+#include "igl/readOBJ.h"
+#include "igl/writeOBJ.h"
 #include "igl/readSTL.h"
 #include "igl/writeSTL.h"
 #include "igl/write_triangle_mesh.h"
@@ -102,7 +104,11 @@ string sub_file(string path, string name, string subfolder, string extend ,strin
 bool loadModel(MatrixXd &V, MatrixXi &F, string file_path)
 {
     Eigen::MatrixXd temp_V, N;
+#ifdef _WIN32
+	bool success = igl::readOBJ(file_path, V, F);
+#elif __APPLE__
     bool success = igl::readSTL(file_path, V, F, N);
+#endif
     if(success)
     {
         NormalizingModel normaler;
@@ -115,7 +121,11 @@ bool writeModelXYZ(MatrixXd V, MatrixXi F, string file_path)
 {
     Settings settings;
     V *= settings.blender_scale_factor;
+#ifdef _WIN32
+	bool sucess = igl::writeOBJ(file_path, V, F);
+#elif __APPLE__
     bool sucess = igl::writeSTL(file_path, V, F);
+#endif
     return sucess;
 }
 
@@ -130,7 +140,11 @@ bool writeModelXZY(MatrixXd V, MatrixXi F, string file_path)
     }
     Settings settings;
     V *= settings.blender_scale_factor;
-    bool sucess = igl::writeSTL(file_path, V, F);
+#ifdef _WIN32
+	bool sucess = igl::writeOBJ(file_path, V, F);
+#elif __APPLE__
+	bool sucess = igl::writeSTL(file_path, V, F);
+#endif
     return sucess;
 }
 
@@ -315,7 +329,11 @@ bool non_move_support(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixX
     organizer.add_mesh(plV, plF, RowVector3d(0, 0 , 1));
     if(output)
     {
+#ifdef _WIN32
+		writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "obj"));
+#elif __APPLE__
         writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+#endif
         void writePlatform(MatrixXd, string);
         writePlatform(platform, name);
     }
@@ -323,14 +341,27 @@ bool non_move_support(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixX
 
     //support
     layouter.get_volume_support(hmap, smap, platform, spV, spF);
-    if(output) writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "stl"));
+	if (output)
+	{
+#ifdef _WIN32
+		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "obj"));
+#elif
+		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "stl"));
+#endif
+	}
     organizer.add_mesh(spV, spF, RowVector3d(1, 0 , 0));
 
     //mesh
     slicer.move_xz(result.dx, result.dz);
     slicer.get_vertices_mat(V);
     slicer.get_faces_mat(F);
-    if(output) writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
+	if (output) {
+#ifdef _WIN32
+		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "obj"));
+#elif
+		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
+#endif
+	}
     organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
 
     organizer.get_mesh(V, F, C);
@@ -359,7 +390,11 @@ bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C,
     organizer.add_mesh(plV, plF, RowVector3d(0, 0 , 1));
     if(output)
     {
-        writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+#ifdef _WIN32
+		writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "obj"));
+#elif __APPLE__
+		writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+#endif
         void writePlatform(MatrixXd, string);
         writePlatform(platform, name);
     }
@@ -369,14 +404,28 @@ bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C,
     layouter.get_opt_hmap(hmap);
     layouter.get_opt_smap(smap);
     layouter.get_volume_support(hmap, smap, platform, spV, spF);
-    if(output) writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "stl"));
+    if(output) 
+	{
+#ifdef _WIN32
+		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "obj"));
+#elif
+		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "stl"));
+#endif
+	}
     organizer.add_mesh(spV, spF, RowVector3d(1, 0 , 0));
 
     //mesh
     slicer.move_xz(result.dx, result.dz);
     slicer.get_vertices_mat(V);
     slicer.get_faces_mat(F);
-    if(output) writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
+    if(output)
+	{
+#ifdef _WIN32
+		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "obj"));
+#elif
+		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
+#endif
+	}
     organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
 
     organizer.get_mesh(V, F, C);
@@ -406,7 +455,11 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
     platform_builder.draw_platform(plV, plF, platform);
     if(output)
     {
-        writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+#ifdef _WIN32
+		writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "obj"));
+#elif __APPLE__
+		writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+#endif
         void writePlatform(MatrixXd, string);
         writePlatform(platform, name);
     }
@@ -417,7 +470,14 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
     layouter.get_opt_hmap(hmap);
     layouter.get_opt_smap(smap);
     layouter.get_volume_support(hmap, smap, platform, spV, spF);
-    if(output) writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+    if(output)
+	{
+#ifdef _WIN32
+		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "obj"));
+#elif
+		writeModelXZY(spV, spF, sub_file(TESTING_MODELS_PATH, name, "layout", "support", "stl"));
+#endif
+	}
     organizer.add_mesh(spV, spF, RowVector3d(1, 0 , 0));
 
     //mesh
@@ -427,7 +487,14 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
     slicer.move_xz(result.dx, result.dz);
     slicer.get_vertices_mat(V);
     slicer.get_faces_mat(F);
-    if(output) writeModelXZY(plV, plF, sub_file(TESTING_MODELS_PATH, name, "layout", "plaform", "stl"));
+    if(output)
+	{
+#ifdef _WIN32
+		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "obj"));
+#elif
+		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
+#endif
+	}
     organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
 
     organizer.get_mesh(V, F, C);

@@ -1,0 +1,42 @@
+﻿  Building Custom Rule E:/Ziqi/external/nanogui/CMakeLists.txt
+  CMake does not need to re-run because E:/Ziqi/vs2015/libigl/nanogui/CMakeFiles/generate.stamp is up-to-date.
+  Running bin2c
+cl : 命令行 warning D9025: 正在重写“/W4”(用“/w”)
+  nanovg.c
+cl : 命令行 warning D9025: 正在重写“/W4”(用“/w”)
+  glad.c
+cl : 命令行 warning D9025: 正在重写“/W4”(用“/w”)
+cl : 命令行 warning D9025: 正在重写“/W4”(用“/w”)
+  nanogui_resources.cpp
+cl : 命令行 warning D9025: 正在重写“/W4”(用“/w”)
+  glutil.cpp
+cl : 命令行 warning D9025: 正在重写“/W4”(用“/w”)
+  common.cpp
+cl : 命令行 warning D9025: 正在重写“/W4”(用“/w”)
+  widget.cpp
+  theme.cpp
+  layout.cpp
+  screen.cpp
+  label.cpp
+  window.cpp
+  popup.cpp
+  checkbox.cpp
+  button.cpp
+  popupbutton.cpp
+  combobox.cpp
+  progressbar.cpp
+  slider.cpp
+  messagedialog.cpp
+  textbox.cpp
+  imagepanel.cpp
+  imageview.cpp
+  vscrollpanel.cpp
+  colorwheel.cpp
+  colorpicker.cpp
+  graph.cpp
+  stackedwidget.cpp
+  tabheader.cpp
+  tabwidget.cpp
+  glcanvas.cpp
+  serializer.cpp
+  nanogui-obj.vcxproj -> E:\Ziqi\vs2015\libigl\nanogui\nanogui-obj.dir\Release\nanogui-obj.lib

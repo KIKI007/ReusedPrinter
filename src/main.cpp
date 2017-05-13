@@ -44,7 +44,7 @@ public:
 
 void init()
 {
-    menu_input.model_name = "arch";
+    menu_input.model_name = "Arch";
     menu_input.layer = 0;
     menu_input.layer_step = 5;
     menu_input.angle = 0;
@@ -56,8 +56,12 @@ void init()
 
 void load_model()
 {
-    void render_mesh(MatrixXd &V, MatrixXi &F, MatrixXd &C);
-    string file_path = file(TESTING_MODELS_PATH, menu_input.model_name, "", "stl");
+	void render_mesh(MatrixXd &V, MatrixXi &F, MatrixXd &C);
+#ifdef _WIN32
+	string file_path = file(TESTING_MODELS_PATH, menu_input.model_name, "", "OBJ");
+#elif
+    string file_path = file(TESTING_MODELS_PATH, menu_input.model_name, "", "STL");
+#endif
     if(loadModel(scene_data.V, scene_data.F, file_path))
     {
         scene_data.slicer.clear();
