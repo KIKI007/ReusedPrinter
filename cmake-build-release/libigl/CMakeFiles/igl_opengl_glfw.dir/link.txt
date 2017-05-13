@@ -1,0 +1,2 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libigl_opengl_glfw.a  CMakeFiles/igl_opengl_glfw.dir/__/__/include/igl/opengl/glfw/map_texture.cpp.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libigl_opengl_glfw.a

@@ -1,0 +1,2 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libigl_triangle.a  CMakeFiles/igl_triangle.dir/__/__/include/igl/triangle/cdt.cpp.o CMakeFiles/igl_triangle.dir/__/__/include/igl/triangle/triangulate.cpp.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libigl_triangle.a

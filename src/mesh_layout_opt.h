@@ -354,6 +354,27 @@ LayoutOptResult MeshLayoutOpt::opt_xy_layout(MatrixXi &hmap, MatrixXi &smap) {
     }
     //settings.toc();
 
+
+    for(int jr = 0; jr < kn; jr++)
+    {
+        for(int ir = 0; ir < n; ir++)
+        {
+            for(int jc = 0; jc < km; jc++)
+               delete[] min_hmap[jr][ir][jc];
+        }
+    }
+
+    for(int jr = 0; jr < kn; jr++)
+    {
+        for(int ir = 0; ir < n; ir++)
+            delete[] min_hmap[jr][ir];
+    }
+
+    for(int jr = 0; jr < kn; jr++)
+        delete[] min_hmap[jr];
+
+    delete[] min_hmap;
+
     return opt_result;
 }
 
