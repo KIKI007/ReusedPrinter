@@ -14,6 +14,7 @@ struct MenuInput
     double angle;
     double layout_dx;
     double layout_dy;
+    double layout_dz;
     string model_name;
     int layout_opt_type;
     bool layout_output;
@@ -50,6 +51,7 @@ void init()
     menu_input.angle = 0;
     menu_input.layout_dy = 0;
     menu_input.layout_dx = 0;
+    menu_input.layout_dz = 0;
     menu_input.layout_output = false;
     menu_input.single_layer = false;
 }
@@ -175,7 +177,7 @@ void move_model()
 {
     MatrixXd V, C;
     MatrixXi F;
-    if(model_move(scene_data.slicer, V, F, C, menu_input.layout_dx, menu_input.layout_dy))
+    if(model_move(scene_data.slicer, V, F, C, menu_input.layout_dx, menu_input.layout_dy, menu_input.layout_dz))
         render_mesh(V, F, C);
 }
 
@@ -224,6 +226,7 @@ int main(int argc, char *argv[])
         viewer.ngui->addGroup("Move Model");
         viewer.ngui->addVariable("+X", menu_input.layout_dx);
         viewer.ngui->addVariable("+Y", menu_input.layout_dy);
+        viewer.ngui->addVariable("+Z", menu_input.layout_dz);
         viewer.ngui->addButton("move", move_model);
         viewer.ngui->addGroup("Virtual Support");
         viewer.ngui->addVariable("Output", menu_input.layout_output);

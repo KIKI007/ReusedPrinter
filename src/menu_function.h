@@ -587,7 +587,7 @@ void test_fermat_curve(igl::viewer::Viewer &viewer)
     return;
 }
 
-bool model_move(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, double dx, double dz)
+bool model_move(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, double dx, double dz, double dy)
 {
     if(slicer.empty()) return false;
     SceneOrganizer organizer;
@@ -596,6 +596,7 @@ bool model_move(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
     MatrixXi plF;
 
     slicer.move_xz(dx, dz);
+    slicer.move_y(dy);
     slicer.get_vertices_mat(V);
     slicer.get_faces_mat(F);
     organizer.add_mesh(V, F, Eigen::RowVector3d(1, 1, 0));

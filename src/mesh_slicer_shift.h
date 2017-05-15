@@ -24,6 +24,8 @@ public:
 
     void move_xz(double dx, double dz);
 
+    void move_y(double dy);
+
     void rotate_yaxis(double angle, Vector2d center);
 
 protected:
@@ -31,6 +33,8 @@ protected:
     void move_xz(IntPoint &p, int dx, int dz);
 
     void move_xz(RowVector3d &p, int dx, int dz);
+
+    void move_y(RowVector3d &p, int dy);
 
     void move_xz(vector<Paths> &slices, int dx, int dz);
 
@@ -147,6 +151,24 @@ void MeshSlicerShift::rotate_yaxis(IntPoint &p, double angle, Vector2d center)
 
     p.X = std::round(pt(0));
     p.Y = std::round(pt(1));
+}
+
+void MeshSlicerShift::move_y(double dy)
+{
+    for(int ir = 0; ir < V.rows(); ir++)
+    {
+        RowVector3d  pv = RowVector3d(V(ir, 0), V(ir, 1), V(ir, 2));
+        move_y(pv, settings.mm2int(dy));
+        V.row(ir) = RowVector3i(std::round(pv(0)), std::round(pv(1)), std::round(pv(2)));
+    }
+    minY += settings.mm2int(dy);
+    maxY += settings.mm2int(dy);
+}
+
+void MeshSlicerShift::move_y(RowVector3d &p, int dy)
+{
+    p(1) += dy;
+    return;
 }
 
 #endif //SUPPORTER_MESH_SLICER_SHIFT_H
