@@ -34,6 +34,7 @@ public:
         extrusion_width = 0.5; //mm
         support_center_factor = 4; //mm
         fermat_cut_width = 0.5; //mm
+        sew_pin_width_factor = 2;
 
         //platform
         pad_size = 12.7; //mm 0.5inch
@@ -57,7 +58,7 @@ public:
         nF_moving = 1800;
         nF_printing_first = 540;
         nF_reversing = 4800;
-        platform_zero_x = -75 + 3.5 - 0.2;
+        platform_zero_x = -75 + 3.5 - 0.2 + 0.9;
         platform_zero_y = 60 - 2 + 1;
 
         group_expand_size = (int)std::ceil( extrusion_width /(pad_size / xy_sample_num_each_pin));
@@ -177,6 +178,7 @@ public:
     double fermat_cut_width;
     int support_center_factor;
     int group_expand_size;
+    int sew_pin_width_factor;
 
     //layout
     int xy_sample_num_each_pin;
@@ -191,7 +193,6 @@ public:
     double nF_printing_rest;
     double nF_moving;
     double nF_reversing;
-
 
 
 public:

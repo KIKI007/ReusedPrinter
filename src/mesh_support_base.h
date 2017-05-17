@@ -223,6 +223,8 @@ public: //utility function
 
     void clear();
 
+    void shrink_support_map(MatrixXi &smap);
+
 protected:
 
     MatrixXi height_map, support_map;
@@ -254,6 +256,7 @@ void MeshSupportBase::set_slicer(MeshSlicerBase &slicer_base)
 void MeshSupportBase::set_map(MatrixXi &hmap, MatrixXi &smap, MatrixXd &plfm) {
     height_map = hmap;
     support_map= smap;
+    shrink_support_map(support_map);
     platform = plfm;
 }
 
@@ -637,6 +640,34 @@ void MeshSupportBase::clear() {
     curve_groups.clear();
 
     slicer.clear();
+}
+
+void MeshSupportBase::shrink_support_map(MatrixXi &smap)
+{
+    int nr = settings.pillar_row;
+    int nc = settings.pillar_column;
+    int K = settings.xy_sample_num_each_pin;
+    int e = settings.sew_pin_width_factor;
+    MatrixXi tmap = MatrixXi::Zero(K * nr, K * nc);
+    for(int ir = 0; ir < settings.pillar_row; ir ++)
+    {
+        for(int ic = 0; ic < settings.pillar_column; ic++)
+        {
+            int r1 = ir * K + e;
+            int r2 = (ir + 1) * K - 1 - e;
+            int c1 = ic * K + e;
+            int c2 = (ic + 1) * K - 1 - e;
+            for(int id = r1; id < r2; id++)
+            {
+                for(int jd = c1; jd < c2; jd++)
+                {
+                    tmap(id, jd) = smap(id, jd);
+                }
+            }
+        }
+    }
+
+    smap = tmap;
 }
 
 #endif //SUPPORTER_MESH_SUPPORT_BASE_H

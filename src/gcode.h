@@ -653,8 +653,11 @@ public:
                     {
                         lines_layer[layer][id].nE = E - 7;
                         first_move_touch = false;
+                        E = E - 7;
                     }
-                    E = code.nE;
+                    else{
+                        E = code.nE;
+                    }
                 }
 
                 //To locate the position of the printing nozzel and find the travel speed;
@@ -669,28 +672,33 @@ public:
 
             }
 
+            if(fermat_curves[layer].empty())
+            {
+                code.set_G5();
+                lines_layer[layer].push_back(code);
+                continue;
+            }
+
             vector<GcodeLine> support;
 
-
-            //real in 7mm material
-            code.set_G1EF(E - 7, 4800);
-            support.push_back(code);
-
-            //set E to the orgin;
-            code.set_G92E0();
-            support.push_back(code);
-
-            //move Z a layer height to avoid collision
-            code.set_G1ZF((layer + 1) * settings.layer_height, 1800);
-            support.push_back(code);
-
             int curve_id = 0;
-            new_speed = false;
-            first_move_touch = true;
-
             for(curve_id = 0; curve_id != fermat_curves[layer].size(); curve_id++)
             {
                 Path path = fermat_curves[layer][curve_id];
+                //real in 7mm material
+                code.set_G1EF(E - 7, 4800);
+                support.push_back(code);
+
+                //set E to the orgin;
+                code.set_G92E0(); E = 0;
+                support.push_back(code);
+
+                //move Z a layer height to avoid collision
+                code.set_G1ZF((layer + 1) * settings.layer_height, 1800);
+                support.push_back(code);
+
+                new_speed = false;
+                first_move_touch = true;
                 for(int id = 1; id < path.size(); id++)
                 {
                     double X1 = settings.int2mm(path[id - 1].X) + settings.platform_zero_x;
@@ -704,26 +712,24 @@ public:
                         //we first move the nozzel
                         code.set_G1_XYF(X1, Y1, settings.nF_moving);
                         support.push_back(code);
-
-                        //if this move from mesh to the support
-                        //we have to reel off 7.1mm material to make sure the new filament can be attached to the support
-                        if(first_move_touch)
-                        {
-                            //move down nozzel
-                            code.set_G1ZF(layer * settings.layer_height, 1800);
-                            support.push_back(code);
-
-                            //reel off material
-                            code.set_G1EF(7.1, 4800);
-                            support.push_back(code);
-
-                            first_move_touch = false;
-                            E = 7.1;
-                        }
-
                         new_speed = true;
                     }
 
+                    //if this move from mesh to the support
+                    //we have to reel off 7.1mm material to make sure the new filament can be attached to the support
+                    if(first_move_touch)
+                    {
+                        //move down nozzel
+                        code.set_G1ZF(layer * settings.layer_height, 1800);
+                        support.push_back(code);
+
+                        //reel off material
+                        code.set_G1EF(7.1, 4800);
+                        support.push_back(code);
+
+                        first_move_touch = false;
+                        E = 7.1;
+                    }
 
                     dL = std::sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1)); //compute the travel distance
                     E += dL * dEdL[layer];
@@ -737,10 +743,10 @@ public:
                 }
             }
             lines_layer[layer].insert(lines_layer[layer].end(), support.begin(), support.end());
-
             code.set_G5();
             lines_layer[layer].push_back(code);
         }
+
     }
 
     void get_dE_D_dL()
