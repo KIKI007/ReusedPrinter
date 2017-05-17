@@ -413,6 +413,13 @@ public:
         nF = F;
     }
 
+    void set_G5()
+    {
+        clear();
+        type = G_Code;
+        nG = 5;
+    }
+
 public:
     unsigned Empty;
     unsigned Comment;
@@ -730,6 +737,9 @@ public:
                 }
             }
             lines_layer[layer].insert(lines_layer[layer].end(), support.begin(), support.end());
+
+            code.set_G5();
+            lines_layer[layer].push_back(code);
         }
     }
 
