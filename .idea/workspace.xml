@@ -10,9 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a495e7fd-8e8c-490b-a3fb-8666f6bedf6a" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-release/src/supporter_bin" afterPath="$PROJECT_DIR$/cmake-build-release/src/supporter_bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/gcode.h" afterPath="$PROJECT_DIR$/src/gcode.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/menu_function.h" afterPath="$PROJECT_DIR$/src/menu_function.h" />
     </list>
     <list id="e035093c-242f-4886-9763-a220557534fb" name="Rejected commit: Default" comment="" />
     <ignored path="$PROJECT_DIR$/cmake-build-release/" />
@@ -36,8 +35,8 @@
       <file leaf-file-name="menu_function.h" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/menu_function.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="79">
-              <caret line="99" column="1" lean-forward="true" selection-start-line="99" selection-start-column="1" selection-end-line="99" selection-end-column="1" />
+            <state relative-caret-position="364">
+              <caret line="118" column="0" lean-forward="true" selection-start-line="118" selection-start-column="0" selection-end-line="118" selection-end-column="0" />
               <folding>
                 <element signature="e#20146#36388#0" expanded="true" />
               </folding>
@@ -517,7 +516,7 @@
       <workItem from="1493781606395" duration="53132000" />
       <workItem from="1493930155369" duration="52222000" />
       <workItem from="1494696787718" duration="8026000" />
-      <workItem from="1494962852769" duration="2157000" />
+      <workItem from="1494962852769" duration="2339000" />
     </task>
     <task id="LOCAL-00001" summary="add clipper">
       <created>1493330500699</created>
@@ -624,11 +623,18 @@
       <option name="project" value="LOCAL" />
       <updated>1494831465163</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="gcode for arch&#10;machine adjustment finished">
+      <created>1494983294014</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1494983294014</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="146383000" />
+    <option name="totallyTimeSpent" value="146565000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
@@ -636,7 +642,7 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24665257" sideWeight="0.4493976" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891566" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26746988" sideWeight="0.6518675" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26746988" sideWeight="0.6518675" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3253012" sideWeight="0.46934462" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27108434" sideWeight="0.3481325" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32168674" sideWeight="0.55250174" order="3" side_tool="false" content_ui="tabs" />
@@ -696,7 +702,8 @@
     <MESSAGE value="New the fermat curves are connected" />
     <MESSAGE value="Add a little support for model doesn't touch to the platform" />
     <MESSAGE value="add move v" />
-    <option name="LAST_COMMIT_MESSAGE" value="add move v" />
+    <MESSAGE value="gcode for arch&#10;machine adjustment finished" />
+    <option name="LAST_COMMIT_MESSAGE" value="gcode for arch&#10;machine adjustment finished" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1080,8 +1087,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/menu_function.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="79">
-          <caret line="99" column="1" lean-forward="true" selection-start-line="99" selection-start-column="1" selection-end-line="99" selection-end-column="1" />
+        <state relative-caret-position="364">
+          <caret line="118" column="0" lean-forward="true" selection-start-line="118" selection-start-column="0" selection-end-line="118" selection-end-column="0" />
           <folding>
             <element signature="e#20146#36388#0" expanded="true" />
           </folding>
