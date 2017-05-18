@@ -694,7 +694,7 @@ public:
                 support.push_back(code);
 
                 //move Z a layer height to avoid collision
-                code.set_G1ZF((layer + 1) * settings.layer_height, 1800);
+                code.set_G1ZF((layer + 3) * settings.layer_height, 1800);
                 support.push_back(code);
 
                 new_speed = false;

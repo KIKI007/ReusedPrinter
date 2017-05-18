@@ -448,9 +448,6 @@ src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../shared/cmake/../../include/igl/w
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../shared/cmake/../../include/igl/writeWRL.h
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../shared/cmake/../../include/igl/write_triangle_mesh.cpp
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../shared/cmake/../../include/igl/write_triangle_mesh.h
-src/CMakeFiles/supporter_bin.dir/main.cpp.o: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector
-src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../external/nanogui/ext/eigen/Eigen/StdVector
-src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../external/nanogui/ext/eigen/Eigen/src/Core/Matrix.h
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../src/Settings.h
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../src/clipper.hpp
 src/CMakeFiles/supporter_bin.dir/main.cpp.o: ../src/fermat_curve.h

@@ -58,7 +58,7 @@ public:
         nF_moving = 1800;
         nF_printing_first = 540;
         nF_reversing = 4800;
-        platform_zero_x = -75 + 3.5 - 0.2 + 0.9;
+        platform_zero_x = -75 + 3.5 - 0.2 + 0.8;
         platform_zero_y = 60 - 2 + 1;
 
         group_expand_size = (int)std::ceil( extrusion_width /(pad_size / xy_sample_num_each_pin));

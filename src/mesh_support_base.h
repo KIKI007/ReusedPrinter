@@ -403,6 +403,7 @@ int MeshSupportBase::convex_hull(PointsCluster &cluster, Path &polygon)
         pointslist[id].pi = plus(pointslist[id].pi , pointslist[0].pi);
 
     std::vector<int> stack;
+
     stack.push_back(0);
 
     for(int id = 1; id < pointslist.size(); id++)
