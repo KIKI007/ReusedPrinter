@@ -464,7 +464,7 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
 
 bool load_file_move_model(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, string name)
 {
-    
+
 }
 
 bool test_convex_hull(MeshSlicerShift &slicer, igl::viewer::Viewer &viewer)
