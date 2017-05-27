@@ -151,7 +151,6 @@ void MeshSlicerBase::contour_construction()
 
     assert(!V.isZero() && layer_slices.empty());
     std::vector< std::vector<Eigen::MatrixXi>> S;
-    std::vector<bool> visited;
 
     incremental_slicing(S);
     layer_slices.resize(S.size());
@@ -164,43 +163,55 @@ void MeshSlicerBase::contour_construction()
         memset(settings.tmp_str, 0, sizeof(settings.tmp_str));
         sprintf(settings.tmp_str, "\t layer %d, total %.3f %%...",id, 100.0f * (double) (id + 1) / S.size());
         settings.print_Ts(settings.tmp_str);
-
-        visited.clear(); visited.resize(S[id].size(), false);
-
         HashEdge hash, reverse_hash;
+        HashVisted visited;
         for(int jd = 0; jd < S[id].size(); jd++)
         {
             Eigen::RowVector2i u = S[id][jd].row(0);
             Eigen::RowVector2i v = S[id][jd].row(1);
             hash.build_connection(u, v, jd);
-            reverse_hash.build_connection(u, v, jd);
+            reverse_hash.build_connection(v, u, jd);
         }
 
         ClipperLib::Paths paths;
         for (int jd = 0; jd < S[id].size(); jd++)
         {
-            if(!visited[jd])
+            Eigen::RowVector2i last = S[id][jd].row(0);
+            Eigen::RowVector2i u = S[id][jd].row(0), v;
+            if(!visited.find(u))
             {
-                Eigen::RowVector2i last = S[id][jd].row(0);
-                Eigen::RowVector2i u = S[id][jd].row(0), v;
-
                 ClipperLib::Path path;
                 bool find_correct = false;
                 int idx = 0;
-
                 do
                 {
+                    bool find_last = false;
                     find_correct = hash.find(u, v, idx);
-                    if(!find_correct || visited[idx]) find_correct = reverse_hash.find(u, v, idx);
-                    if(!find_correct || visited[idx]) {find_correct = false; break;}
+                    if(find_correct && v == last)
+                        find_last = true;
+
+                    if(!find_correct || visited.find(v) || find_last)
+                    {
+                        find_correct = reverse_hash.find(u, v, idx);
+                    }
+
+                    if(!find_correct || visited.find(v)) {
+                        if(find_last)
+                        {
+                            find_correct = hash.find(u, v, idx);
+                        }
+                        else{
+                            find_correct = false; break;
+                        }
+                    }
 
                     path.push_back(ClipperLib::IntPoint(v(0), v(1)));
                     u = v;
-                    visited[idx] = true;
-
+                    visited.build_connection(v);
                 }while(u != last);
 
-                if(find_correct) paths.push_back(path);
+                //if(find_correct)
+                 paths.push_back(path);
             }
         }
         layer_slices[id] = paths;
