@@ -79,7 +79,7 @@ public:
         {
 
             //transform
-            V.row(kd) -=  Eigen::RowVector3d((m(0) + M(0)) / 2 , 0, (m(2) + M(2)) / 2 );
+            V.row(kd) -=  Eigen::RowVector3d((m(0) + M(0)) / 2 , m(1), (m(2) + M(2)) / 2 );
             V.row(kd) +=  Eigen::RowVector3d(11.0 / 2 * settings_.pad_size, 0, 9.0 / 2  * settings_.pad_size);
 
         }
@@ -343,6 +343,7 @@ bool non_move_support(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixX
     slicer.get_faces_mat(F);
 	if (output) {
 		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
+		result.writeInfo(file(TESTING_MODELS_PATH, name, "_info", "dat"));
 	}
     organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
 
@@ -395,6 +396,7 @@ bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C,
     if(output)
 	{
 		writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
+		result.writeInfo(file(TESTING_MODELS_PATH, name, "_info", "dat"));
 	}
     organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
 
@@ -452,6 +454,7 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
     if(output)
 	{
         writeModelXZY(V, F, sub_file(TESTING_MODELS_PATH, name, "layout", "mesh", "stl"));
+		result.writeInfo(file(TESTING_MODELS_PATH, name, "_info", "dat"));
 	}
     organizer.add_mesh(V, F, RowVector3d(1, 1, 0));
 
@@ -464,7 +467,11 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
 
 bool load_file_move_model(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, string name)
 {
-    return true;
+	LayoutOptResult result;
+	result.readeInfo(file(TESTING_MODELS_PATH, name, "_info", "dat"));
+	slicer.rotate_yaxis(result.angle, result.center);
+	slicer.move_xz(result.dx, result.dz);
+	return non_move_support(slicer, V, F, C, false, name);
 }
 
 bool test_convex_hull(MeshSlicerShift &slicer, igl::viewer::Viewer &viewer)
@@ -577,37 +584,12 @@ bool model_move(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
 MatrixXd readMatrix(std::ifstream &infile)
 {
     int cols = 0, rows = 0;
-    double buff[MAXBUFSIZE];
-
-    // Read numbers from file into buffer.
-    while (! infile.eof())
-    {
-        string line;
-        getline(infile, line);
-
-        int temp_cols = 0;
-        std::stringstream stream(line);
-        while(! stream.eof())
-            stream >> buff[cols*rows+temp_cols++];
-
-        if (temp_cols == 0)
-            continue;
-
-        if (cols == 0)
-            cols = temp_cols;
-
-        rows++;
-    }
-
-    infile.close();
-
-    rows--;
-
+	infile >> rows >> cols;
     // Populate matrix with numbers.
     MatrixXd result(rows,cols);
-    for (int i = 0; i < rows; i++)
-        for (int j = 0; j < cols; j++)
-            result(i,j) = buff[ cols*i+j ];
+	for (int i = 0; i < rows; i++)
+		for (int j = 0; j < cols; j++)
+			infile >> result(i, j);
 
     return result;
 };
@@ -630,6 +612,7 @@ void writePlatform(MatrixXd platform, string model_name)
     string file_path = file(TESTING_MODELS_PATH, model_name, "_platform", "plf");
     std::ofstream fout; fout.open(file_path);
     Settings settings;
+	fout << platform.rows() << " " << platform.cols() << endl;
     if(fout.is_open())
     {
         fout << platform << endl;

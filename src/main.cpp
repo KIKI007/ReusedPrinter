@@ -202,6 +202,14 @@ void support_map()
     draw_support_map(scene_data.slicer, menu_input.model_name);
 }
 
+void load_info()
+{
+	MatrixXd V, C;
+	MatrixXi F;
+	if (load_file_move_model(scene_data.slicer, V, F, C, menu_input.model_name))
+		render_mesh(V, F, C);
+}
+
 int main(int argc, char *argv[])
 {
     init();
@@ -230,6 +238,7 @@ int main(int argc, char *argv[])
         viewer.ngui->addButton("move", move_model);
         viewer.ngui->addGroup("Virtual Support");
         viewer.ngui->addVariable("Output", menu_input.layout_output);
+		viewer.ngui->addButton("Load Info", load_info);
         viewer.ngui->addButton("None Layout Opt", none_opt);
         viewer.ngui->addButton("XZ Layout Opt", xz_opt);
         viewer.ngui->addButton("Rotate Layout Opt", rotate);

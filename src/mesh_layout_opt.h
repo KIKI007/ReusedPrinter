@@ -7,6 +7,9 @@
 #ifndef SUPPORTER_MESH_LAYOUT_OPT_H
 #define SUPPORTER_MESH_LAYOUT_OPT_H
 #include <cmath>
+#include <string>
+using std::string;
+using std::endl;
 using Eigen::Vector2d;
 
 class LayoutOptResult
@@ -51,6 +54,37 @@ public:
 //            return true;
         return false;
     }
+
+	void writeInfo(string &path_name)
+	{
+		std::ofstream fout;
+		fout.open(path_name.c_str());
+		fout << material_save << endl;
+		fout << num_pin << endl;
+		fout << edge_sample_num << endl;
+		fout << dx << endl;
+		fout << dz << endl;
+		fout << angle << endl;
+		fout << center.x() << " " << center.y() << endl;
+		fout.close();
+	}
+
+	void readeInfo(string &path_name)
+	{
+		std::ifstream fin;
+		fin.open(path_name.c_str());
+		fin >> material_save;
+		fin >> num_pin;
+		fin >> edge_sample_num;
+		fin >> dx;
+		fin >> dz;
+		fin >> angle;
+		double cx, cy;
+		fin >> cx >> cy;
+		center = Vector2d(cx, cy);
+		fin.close();
+	}
+
 
 public:
 
