@@ -19,7 +19,7 @@ public:
         MAX_DOUBLE = std::numeric_limits<double>::max();
         MIN_DOUBLE = std::numeric_limits<double>::min();
         ZERO_EPS = 1e-5;
-        UNIT = 1e-5;
+        UNIT = 1e-3;
         circle_vertices_num = 32;
 
         //slice

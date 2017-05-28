@@ -205,13 +205,18 @@ void MeshSlicerBase::contour_construction()
                         }
                     }
 
-                    path.push_back(ClipperLib::IntPoint(v(0), v(1)));
+                    path.push_back(ClipperLib::IntPoint(std::round(settings.int2mm(v(0))), std::round(settings.int2mm(v(1)))));
                     u = v;
                     visited.build_connection(v);
                 }while(u != last);
 
-                //if(find_correct)
-                 paths.push_back(path);
+                if(find_correct)
+                {
+                    ClipperLib::Paths spaths;
+                    ClipperLib::SimplifyPolygon(path, spaths);
+                    paths.insert(paths.end(), spaths.begin(), spaths.end());
+                }
+
             }
         }
         layer_slices[id] = paths;
@@ -415,13 +420,13 @@ void MeshSlicerBase::compute_intersection(int fd, int Y, Eigen::MatrixXi &mat) {
 
     if((q[1] - q[0]).dot(dq) >= 0)
     {
-        mat <<  std::round(q[0][0]), std::round(q[0][2]),
-                std::round(q[1][0]), std::round(q[1][2]);
+        mat <<  settings.mm2int(q[0][0]), settings.mm2int(q[0][2]),
+                settings.mm2int(q[1][0]), settings.mm2int(q[1][2]);
     }
     else
     {
-        mat <<  std::round(q[1][0]), std::round(q[1][2]),
-                std::round(q[0][0]), std::round(q[0][2]);
+        mat <<  settings.mm2int(q[1][0]), settings.mm2int(q[1][2]),
+                settings.mm2int(q[0][0]), settings.mm2int(q[0][2]);
     }
     return;
 }
