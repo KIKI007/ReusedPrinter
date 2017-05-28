@@ -50,8 +50,4 @@ cmake-build-debug/
 
 draft/
 
-*.zip
-
 external/
-
-\.idea/
