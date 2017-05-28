@@ -725,6 +725,9 @@
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/triangle/triangle.h">
 			<Option target="triangle"/>
 		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/Settings.h">
+			<Option target="supporter_bin"/>
+		</Unit>
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/clipper.cpp">
 			<Option target="supporter_bin"/>
 		</Unit>
@@ -771,6 +774,9 @@
 			<Option target="supporter_bin"/>
 		</Unit>
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/scene_organizer.h">
+			<Option target="supporter_bin"/>
+		</Unit>
+		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/src/testing_models_path.h">
 			<Option target="supporter_bin"/>
 		</Unit>
 		<Unit filename="/Users/wangziqi/Desktop/USC Spring/Code/Supporter/CMakeLists.txt">

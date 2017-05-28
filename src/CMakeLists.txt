@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(supporter)
 
-add_executable(${PROJECT_NAME}_bin main.cpp
+add_executable(${PROJECT_NAME}_bin
+        Settings.h
+        testing_models_path.h
+        main.cpp
         clipper.hpp
         clipper.cpp
         hash_edge.h
