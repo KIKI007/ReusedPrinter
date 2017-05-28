@@ -55,7 +55,7 @@ public:
         return false;
     }
 
-	void writeInfo(string &path_name)
+	void writeInfo(const string &path_name)
 	{
 		std::ofstream fout;
 		fout.open(path_name.c_str());
@@ -69,7 +69,7 @@ public:
 		fout.close();
 	}
 
-	void readeInfo(string &path_name)
+	void readInfo(const string &path_name)
 	{
 		std::ifstream fin;
 		fin.open(path_name.c_str());

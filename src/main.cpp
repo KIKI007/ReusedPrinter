@@ -218,6 +218,7 @@ int main(int argc, char *argv[])
     {
         viewer.ngui->addGroup("Model Loading");
         viewer.ngui->addVariable("Model Name", menu_input.model_name);
+        viewer.ngui->addVariable("Overhang Width", scene_data.slicer.settings.overhang_offset);
         viewer.ngui->addButton("Load Model", load_model);
 
         viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Mesh Slicer Class");

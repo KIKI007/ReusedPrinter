@@ -422,6 +422,7 @@ void MeshSlicerBase::compute_intersection(int fd, int Y, Eigen::MatrixXi &mat) {
     {
         mat <<  settings.mm2int(q[0][0]), settings.mm2int(q[0][2]),
                 settings.mm2int(q[1][0]), settings.mm2int(q[1][2]);
+
     }
     else
     {

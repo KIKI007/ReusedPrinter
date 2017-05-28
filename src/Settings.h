@@ -61,7 +61,7 @@ public:
         platform_zero_x = -75 + 3.5 - 0.2 + 0.8;
         platform_zero_y = 60 - 2 + 1;
 
-        group_expand_size = (int)std::ceil( extrusion_width /(pad_size / xy_sample_num_each_pin));
+        group_expand_size = 2;
     }
 
 public:

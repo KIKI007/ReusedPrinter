@@ -114,6 +114,7 @@ private:
 
     void set_center()
     {
+        if(polygon.empty()) return;
         int center_x = 0, center_y = 0;
         for(int id = 0; id < polygon.size(); id++)
         {
@@ -332,7 +333,7 @@ void MeshSupportBase::regroup_support_points(int ir, int ic, vector<VecPointsClu
     MatrixXi group = MatrixXi::Zero(r2 - r1 + 1, c2 - c1 + 1);
     VecPointsCluster clusters;
     int group_index = 0;
-
+    clusters.clear();
 
     for(int id = r1; id <= r2; id++)
     {
@@ -394,7 +395,7 @@ int MeshSupportBase::convex_hull(PointsCluster &cluster, Path &polygon)
         polygon.push_back(cluster[id]);
     }
 
-    if(pointslist.size() <= 2 ) {
+    if(pointslist.size() <= 3 ) {
         return pointslist.size();
     }
 
@@ -591,6 +592,8 @@ void MeshSupportBase::singleline_curvegroup_construction(PointsCluster &cluster,
         max_y += settings.mm2int(settings.extrusion_width / 2);
     }
 
+    polygon.clear();
+
     polygon.push_back(IntPoint(min_x,min_y));
     polygon.push_back(IntPoint(max_x,min_y));
     polygon.push_back(IntPoint(max_x,max_y));
@@ -628,8 +631,10 @@ void MeshSupportBase::curve_group_construction()
                     {
                         convex_hull(cluster, polygon);
                     }
-                    CurveGroup group(platform(ir, ic), maximum_height(ir, ic), polygon, is_line);
-                    curve_groups.push_back(group);
+                    if(!polygon.empty()) {
+                        CurveGroup group(platform(ir, ic), maximum_height(ir, ic), polygon, is_line);
+                        curve_groups.push_back(group);
+                    }
                 }
             }
         }

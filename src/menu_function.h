@@ -468,7 +468,7 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
 bool load_file_move_model(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, string name)
 {
 	LayoutOptResult result;
-	result.readeInfo(file(TESTING_MODELS_PATH, name, "_info", "dat"));
+	result.readInfo(file(TESTING_MODELS_PATH, name, "_info", "dat"));
 	slicer.rotate_yaxis(result.angle, result.center);
 	slicer.move_xz(result.dx, result.dz);
 	return non_move_support(slicer, V, F, C, false, name);
