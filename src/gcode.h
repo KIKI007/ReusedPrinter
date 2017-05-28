@@ -539,6 +539,7 @@ public:
                     total_layer = get_layer(lines[id]);
             }
         }
+		total_layer -= 3;
 
         // layer end
         std::vector<int> layer_end;
@@ -546,7 +547,8 @@ public:
         for(id = 0; id < G1_Z.size(); id++)
         {
             int layer = get_layer(lines[G1_Z[id]]);
-            layer_end[layer] = G1_Z[id];
+			if(layer <= total_layer)
+				layer_end[layer] = G1_Z[id];
         }
         for(id = 1; id <= total_layer; id++)
         {

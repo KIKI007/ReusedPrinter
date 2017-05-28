@@ -225,6 +225,8 @@ public: //utility function
 
     void shrink_support_map(MatrixXi &smap);
 
+	void enlarge_slices();
+
 protected:
 
     MatrixXi height_map, support_map;
@@ -249,6 +251,7 @@ void MeshSupportBase::set_slicer(MeshSlicerBase &slicer_base)
     slicer = slicer_base;
 
     slicer_base.get_slices(slices);
+	enlarge_slices();
 
     settings = slicer_base.return_settings();
 }
@@ -491,8 +494,9 @@ void MeshSupportBase::fermat_curves_construction() {
 void MeshSupportBase::fermat_curves_difference_from_model(int layer, Paths &paths) {
 
     Clipper clipper;
+	Paths layer_slices = slices[layer];
     clipper.AddPaths(paths, ptSubject, false);
-    clipper.AddPaths(slices[layer], ptClip, true);
+    clipper.AddPaths(layer_slices, ptClip, true);
     ClipperLib::PolyTree polytree;
     clipper.Execute(ctDifference, polytree, pftPositive, pftPositive);
     Paths open;  ClipperLib::OpenPathsFromPolyTree(polytree, open);
@@ -669,6 +673,19 @@ void MeshSupportBase::shrink_support_map(MatrixXi &smap)
     }
 
     smap = tmap;
+}
+
+void MeshSupportBase::enlarge_slices()
+{
+	for (int id = 0; id < slices.size(); id++)
+	{
+		Paths layer_slices = slices[id];
+		ClipperLib::ClipperOffset offset;
+		offset.AddPaths(layer_slices, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+		offset.Execute(slices[id], settings.mm2int(settings.pad_size/settings.xy_sample_num_each_pin));
+		ClipperLib::SimplifyPolygons(slices[id]);
+	}
+	return;
 }
 
 #endif //SUPPORTER_MESH_SUPPORT_BASE_H
