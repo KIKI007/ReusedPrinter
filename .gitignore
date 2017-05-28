@@ -49,3 +49,5 @@ vs2015/\.vs/
 cmake-build-debug/
 
 draft/
+
+external/
