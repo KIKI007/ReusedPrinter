@@ -667,7 +667,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="171177000" />
+    <option name="totallyTimeSpent" value="171194000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
@@ -739,7 +739,8 @@
     <MESSAGE value="testing gcode" />
     <MESSAGE value="arch fabrication finshed" />
     <MESSAGE value="modify the support structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="modify the support structure" />
+    <MESSAGE value="slicing changing" />
+    <option name="LAST_COMMIT_MESSAGE" value="slicing changing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
