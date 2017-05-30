@@ -1,4 +1,0 @@
-﻿  Building Custom Rule E:/Ziqi/external/nanogui/ext/glew/CMakeLists.txt
-  CMake does not need to re-run because E:/Ziqi/vs2015/libigl/glew/CMakeFiles/generate.stamp is up-to-date.
-  glew.c
-  glew.vcxproj -> E:\Ziqi\vs2015\libigl\glew\Debug\glew.lib

@@ -1,5 +1,0 @@
-﻿  Building Custom Rule E:/Ziqi/external/stb_image/CMakeLists.txt
-  CMake does not need to re-run because E:/Ziqi/vs2015/libigl/stb_image/CMakeFiles/generate.stamp is up-to-date.
-cl : 命令行 warning D9025: 正在重写“/W3”(用“/w”)
-  stb_image.cpp
-  stb_image.vcxproj -> E:\Ziqi\vs2015\libigl\stb_image\Debug\stb_image.lib
