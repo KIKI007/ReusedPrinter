@@ -679,7 +679,7 @@ bool support_previwer(igl::viewer::Viewer &viewer ,
                                slicer.layer_height(kd),
                                settings.int2mm(output[id - 1].Y));
 
-                viewer.data.add_edges(p0, p1, RowVector3d(1, 1, 0));
+                viewer.data.add_edges(p0, p1, RowVector3d(1, 0, 0));
             }
         }
         if(single_layer && kd > 1) break;
