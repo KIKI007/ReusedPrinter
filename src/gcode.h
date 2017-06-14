@@ -5,6 +5,9 @@
 #ifndef EXAMPLE_GCODE_H
 #define EXAMPLE_GCODE_H
 
+//#define SLICING_ENGINE_0
+#define SLICING_ENGINE_1
+
 #include <string>
 #include <cstring>
 #include <iostream>
@@ -316,6 +319,14 @@ public:
             return false;
     }
 
+    bool is_M104()
+    {
+        if(type == M_S_Code && nM == 104)
+            return true;
+        else
+            return false;
+    }
+
     bool is_G1XY()
     {
         if(nG != 1) return false;
@@ -327,7 +338,7 @@ public:
 
     bool is_G92E0()
     {
-        if(nG != 92 || std::abs(nE) < zero_eps)return false;
+        if(nG != 92 || std::abs(nE) > zero_eps)return false;
         if((type & G_Type) && (type & E_Type))
             return true;
         else
@@ -513,6 +524,7 @@ public:
         }
         sta_line = id;
 
+#ifdef SLICING_ENGINE_0
         //layer tail
         for(id = num_lines - 1; id >= 0; id--)
         {
@@ -526,7 +538,21 @@ public:
         {
             tail.push_back(lines[id]);
         }
-
+#else
+        //layer tail
+        for(id = num_lines - 1; id >= 0; id--)
+        {
+            if(lines[id].is_M104())
+            {
+                end_line = id - 1;
+                break;
+            }
+        }
+        for(id = end_line + 1; id < num_lines; id++)
+        {
+            tail.push_back(lines[id]);
+        }
+#endif
         //rest
         int total_layer = 0;
         std::vector<int> G1_Z;
@@ -649,6 +675,8 @@ public:
                 //The first G1E code is to real in the filament
                 //Once we add the support, this code no longer meaning real in 7mm filament
                 //We need to find the previous layer's E and minus 7
+
+#ifdef SLICING_ENGINE_0
                 if(code.is_G1E())
                 {
                     if(first_move_touch && layer > 1)
@@ -661,6 +689,7 @@ public:
                         E = code.nE;
                     }
                 }
+#endif
 
                 //To locate the position of the printing nozzel and find the travel speed;
                 if(code.is_G1XY()) {
@@ -687,13 +716,16 @@ public:
             for(curve_id = 0; curve_id != fermat_curves[layer].size(); curve_id++)
             {
                 Path path = fermat_curves[layer][curve_id];
+
+#ifdef SLICING_ENGINE_0
                 //real in 7mm material
-                code.set_G1EF(E - 7, 4800);
+                code.set_G1EF(E - 7, 1800);
                 support.push_back(code);
 
                 //set E to the orgin;
                 code.set_G92E0(); E = 0;
                 support.push_back(code);
+#endif
 
                 //move Z a layer height to avoid collision
                 code.set_G1ZF((layer + 3) * settings.layer_height, 1800);
@@ -721,16 +753,25 @@ public:
                     //we have to reel off 7.1mm material to make sure the new filament can be attached to the support
                     if(first_move_touch)
                     {
+                        first_move_touch = false;
+
                         //move down nozzel
                         code.set_G1ZF(layer * settings.layer_height, 1800);
                         support.push_back(code);
 
+#ifdef SLICING_ENGINE_0
                         //reel off material
-                        code.set_G1EF(7.1, 4800);
+                        code.set_G1EF(7.1, 1800);
                         support.push_back(code);
-
-                        first_move_touch = false;
                         E = 7.1;
+#else
+                        //reel off material
+                        code.set_G1EF(0.05, 1800);
+                        support.push_back(code);
+                        code.set_G92E0();
+                        support.push_back(code);
+                        E = 0;
+#endif
                     }
 
                     dL = std::sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1)); //compute the travel distance
@@ -743,6 +784,12 @@ public:
                     X = X2; Y = Y2;
                     new_speed = false;
                 }
+#ifndef SLICING_ENGINE_0
+                code.set_G92E0();
+                support.push_back(code);
+                code.set_G1EF(-7, 1800);
+                support.push_back(code);
+#endif
             }
             lines_layer[layer].insert(lines_layer[layer].end(), support.begin(), support.end());
             code.set_G5();
