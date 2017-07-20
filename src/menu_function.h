@@ -90,6 +90,79 @@ private:
     Settings settings_;
 };
 
+class Timer
+{
+public:
+    Timer()
+    {
+
+    }
+
+public:
+
+    void clear()
+    {
+        zero();
+        items.clear();
+        times.clear();
+    }
+
+    void zero()
+    {
+        tot_sec_ = 0;
+        sta_ = 0;
+    }
+
+    void restart(std::string name)
+    {
+        zero();
+        sta_ = clock();
+        items.push_back(name);
+    }
+
+    void pause()
+    {
+        tot_sec_ += (double)(clock() - sta_) / CLOCKS_PER_SEC;
+    }
+
+    void recover()
+    {
+        sta_ = clock();
+    }
+
+    void stop()
+    {
+        tot_sec_ += (double)(clock() - sta_) / CLOCKS_PER_SEC;
+        times.push_back(tot_sec_);
+        zero();
+    }
+
+    void print(string name)
+    {
+        string file(string path, string name, string extend, string ext);
+        string file_path = file(TESTING_MODELS_PATH, name, "_timer", "txt");
+        std::ofstream fout; fout.open(file_path);
+        double tot = 0;
+        for(int id = 0; id < items.size(); id++)
+        {
+            fout << items[id] << "\t" << times[id] << std::endl;
+            tot += times[id];
+        }
+        fout << "Total Time\t" << tot << std::endl;
+        fout.close();
+        return;
+    }
+
+public:
+
+    clock_t sta_;
+
+    double tot_sec_;
+
+    std::vector<string> items;
+
+    std::vector<double> times;
+}timer;
 
 string file(string path, string name, string extend, string ext)
 {
@@ -360,8 +433,11 @@ bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C,
     layouter.set_slicer(slicer);
     SceneOrganizer organizer;
 
+
     LayoutOptResult result;
     layouter.request_layout_xz_opt(result);
+
+
 
     MatrixXd spV, plV;
     MatrixXi spF, plF;
@@ -404,8 +480,12 @@ bool move_xy_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C,
     return true;
 }
 
+
+
 bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, bool output, string name)
 {
+
+
     if(slicer.empty()) return false;
 
     Settings settings;
@@ -414,10 +494,12 @@ bool rotate_opt(MeshSlicerShift &slicer, MatrixXd &V, MatrixXi &F, MatrixXd &C, 
     layouter.set_slicer(slicer);
     SceneOrganizer organizer;
 
+    timer.restart("Rotate Opt");
+
     LayoutOptResult result;
-    settings.tic("Rotate");
     layouter.request_layout_rotate_opt(result);
-    settings.toc();
+    timer.stop();
+
     MatrixXd spV, plV;
     MatrixXi spF, plF;
 
@@ -660,12 +742,14 @@ bool support_previwer(igl::viewer::Viewer &viewer ,
     viewer.data.set_mesh(V, F);
     viewer.data.set_colors(C);
 
+    timer.restart("Fermat Curve");
     MeshSupportBase supporter;
     supporter.set_slicer(slicer);
     supporter.set_map(hmap, smap, platform);
 
     curves.clear();
     supporter.get_fermat_curves(curves);
+    timer.stop();
 
     for(int kd = 0; kd < curves.size(); kd += layer_step) {
         for (int jd = 0; jd < curves[kd].size(); jd++) {
@@ -684,6 +768,8 @@ bool support_previwer(igl::viewer::Viewer &viewer ,
         }
         if(single_layer && kd > 1) break;
     }
+
+    timer.print(model_name);
     return true;
 }
 
@@ -716,7 +802,9 @@ void write_gcode(MeshSlicerBase &slicer, vector<Paths> &curves, string name)
     gcode.move_XY( V.colwise().minCoeff()[0] + settings.platform_zero_x - gcode.min_X,
                    -V.colwise().maxCoeff()[2] + settings.platform_zero_y - gcode.min_Y);
     gcode.add_support(curves);
+
     gcode.print(file(TESTING_MODELS_PATH, name, "_new", "gcode"));
+
 }
 
 #else

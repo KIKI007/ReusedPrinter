@@ -181,7 +181,7 @@ void MeshLayoutOpt::request_layout_rotate_opt(LayoutOptResult &result)
     {
 
         double angle = id * settings.angle_step;
-        std::cout << "Rotate Opt\t" << angle << std::endl;
+        //std::cout << "Rotate Opt\t" << angle << std::endl;
 
         Eigen::MatrixXi smap = support_map;
         Eigen::MatrixXi hmap = height_map;

@@ -54,6 +54,7 @@ void init()
     menu_input.layout_dz = 0;
     menu_input.layout_output = false;
     menu_input.single_layer = false;
+
 }
 
 void load_model()
@@ -67,17 +68,27 @@ void load_model()
     if(loadModel(scene_data.V, scene_data.F, file_path))
     {
         scene_data.slicer.clear();
+
+        timer.clear();
+
+        timer.restart("Slicing");
         scene_data.slicer.set_mesh(scene_data.V, scene_data.F);
+        timer.stop();
+
         SceneOrganizer organizer;
         organizer.add_mesh(scene_data.V, scene_data.F, RowVector3d(1, 1, 0));
+
         GeneratingPlatform platform_builder;
         MatrixXd V, plV, C, platform; MatrixXi F, plF;
+
         Settings settings;
         platform = MatrixXd::Zero(settings.pillar_row, settings.pillar_column);
         platform_builder.draw_platform(plV, plF, platform);
+
         organizer.add_mesh(plV, plF, RowVector3d(0, 0, 1));
         organizer.get_mesh(V, F, C);
         render_mesh(V, F, C);
+
         viewer.core.align_camera_center(scene_data.V ,scene_data.F);
     }
     return;
