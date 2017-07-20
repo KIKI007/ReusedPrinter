@@ -29,24 +29,24 @@ bool MSTGraphNodeComparator(MSTGraphNode &n0, MSTGraphNode &n1)
     return false;
 }
 
-bool ConvexHullPoint_Yi_Increase(ConvexHullPoint& p1, ConvexHullPoint& p2)
-{
-    if(p1.pd.y() < p2.pd.y())
-        return true;
-    if(p1.pd.y() == p2.pd.y() && p1.pd.x() < p2.pd.x())
-        return true;
-    return false;
-}
-
-bool ConvexHullPoint_TurnLeft(ConvexHullPoint& p1, ConvexHullPoint& p2)
-{
-    double cross = p1.pd.x() * p2.pd.y() - p1.pd.y() * p2.pd.x();
-    if(cross > 0)
-        return true;
-    if(cross == 0 && p1.pd.norm() < p2.pd.norm())
-        return true;
-    return false;
-}
+//bool ConvexHullPoint_Yi_Increase(ConvexHullPoint& p1, ConvexHullPoint& p2)
+//{
+//    if(p1.pd.y() < p2.pd.y())
+//        return true;
+//    if(p1.pd.y() == p2.pd.y() && p1.pd.x() < p2.pd.x())
+//        return true;
+//    return false;
+//}
+//
+//bool ConvexHullPoint_TurnLeft(ConvexHullPoint& p1, ConvexHullPoint& p2)
+//{
+//    double cross = p1.pd.x() * p2.pd.y() - p1.pd.y() * p2.pd.x();
+//    if(cross > 0)
+//        return true;
+//    if(cross == 0 && p1.pd.norm() < p2.pd.norm())
+//        return true;
+//    return false;
+//}
 
 
 class MeshSupport
@@ -165,10 +165,11 @@ void MeshSupport::sp_pin_construction(MeshSlicer &slicer,  Eigen::MatrixXd &H)
     if(H.isZero())
     {
         MeshLayout layout;
-        double dx, dz;
+        LayoutOptOutput opt;
         layout.set_slicer(slicer);
-        layout.xy_layout(dx, dz, H);
-        slicer.move_XY(dx, dz);
+        opt = layout.xy_layout();
+        slicer.move_XY(opt.dx, opt.dy);
+        H = opt.platform;
     }
 
     //H = platform = Eigen::MatrixXd::Zero(9, 11);
@@ -792,10 +793,10 @@ void MeshSupport::virtual_support_construction(MeshSlicer &slicer, Eigen::Matrix
 {
     //platform
     MeshLayout layout;
-    double dx, dz;
+    LayoutOptOutput opt;
     layout.set_slicer(slicer);
-    layout.xy_layout(dx, dz, H);
-    slicer.move_XY(dx, dz);
+    opt = layout.xy_layout();
+    slicer.move_XY(opt.dx, opt.dy);
 
     platform = H;
     slicer.get_slices(layer_slices);

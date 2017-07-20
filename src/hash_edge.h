@@ -18,7 +18,7 @@ public:
 
     HashEdge()
     {
-        prime_n = 5003;
+        prime_n = 15017;
         source.resize(prime_n);
         target.resize(prime_n);
         edge.resize(prime_n);
@@ -94,5 +94,64 @@ public:
     std::vector<std::vector<int>> edge;
 };
 
+class HashVisted
+{
+public:
+    HashVisted()
+    {
+        prime_n = 15017;
+        source.resize(prime_n);
+    }
 
+    int compute_key(Eigen::RowVector2i u)
+    {
+        //compute hash key value
+        //return (u[0] * 73856093) ^ (u[1] * 19349663) ^ (u[2] * 83492791) % prime_n;
+        return (((u[0] * 73856093) ^ (u[1] * 19349663)) % prime_n + prime_n) % prime_n;
+    }
+
+    void build_connection(Eigen::RowVector2i u)
+    {
+        int key = compute_key(u);
+        if(source[key].empty())
+            source[key].push_back(u);
+        else
+        {
+            bool duplicate = false;
+            for(int kd = 0;kd < source[key].size(); kd++)
+            {
+                if(source[key][kd] == u)
+                {
+                    duplicate = true;
+                    break;
+                }
+            }
+            if(!duplicate)
+                source[key].push_back(u);
+        }
+    }
+
+
+    bool find(Eigen::RowVector2i u)
+    {
+        int key = compute_key(u);
+        if(source[key].empty())
+            return false;
+        else
+        {
+            for(int kd = 0;kd < source[key].size(); kd++)
+            {
+                if(source[key][kd] == u)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+public:
+    int prime_n;
+    std::vector<std::vector<Eigen::RowVector2i>> source;
+};
 #endif //SUPPORTER_HASH_EDGE_H

@@ -1,0 +1,40 @@
+/Applications/CLion.app/Contents/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Release -G "CodeBlocks - Unix Makefiles" "/Users/wangziqi/Desktop/USC Spring/Code/Supporter"
+-- Boost version: 1.59.0
+-- Found the following Boost libraries:
+--   program_options
+Boost /opt/local/include
+-- Using Cocoa for window creation
+-- NanoGUI: using libc++ and libc++abi.
+-- libigl includes:
+	 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/eigen
+	 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../include
+	 /opt/local/include
+	 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/glfw/include
+	 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/include
+	 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/nanovg/src
+	 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/glfw/include
+	 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/stb_image
+	 /Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/triangle
+-- libigl libraries:
+-- libigl extra libraries:
+	 /System/Library/Frameworks/OpenGL.framework
+	 /System/Library/Frameworks/OpenGL.framework
+	 glfw
+	 nanogui
+	 /System/Library/Frameworks/Cocoa.framework
+	 /System/Library/Frameworks/OpenGL.framework
+	 /System/Library/Frameworks/CoreVideo.framework
+	 /System/Library/Frameworks/IOKit.framework
+	 stb_image
+	 triangle
+-- libigl definitions:
+	 -DIGL_NO_MOSEK
+	 -DIGL_VIEWER_WITH_NANOGUI
+libigl includes: /Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/eigen;/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../include;/opt/local/include;/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/glfw/include;/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/include;/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/nanovg/src;/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/nanogui/ext/glfw/include;/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/stb_image;/Users/wangziqi/Desktop/USC Spring/Code/Supporter/shared/cmake/../../external/triangle
+libigl libraries: 
+libigl extra sources: 
+libigl extra libraries: /System/Library/Frameworks/OpenGL.framework;/System/Library/Frameworks/OpenGL.framework;glfw;nanogui;/System/Library/Frameworks/Cocoa.framework;/System/Library/Frameworks/OpenGL.framework;/System/Library/Frameworks/CoreVideo.framework;/System/Library/Frameworks/IOKit.framework;stb_image;triangle
+libigl definitions: -DIGL_NO_MOSEK;-DIGL_VIEWER_WITH_NANOGUI
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/wangziqi/Desktop/USC Spring/Code/Supporter/cmake-build-release

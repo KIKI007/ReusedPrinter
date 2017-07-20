@@ -5,6 +5,9 @@
 #ifndef EXAMPLE_GCODE_H
 #define EXAMPLE_GCODE_H
 
+//#define SLICING_ENGINE_0
+#define SLICING_ENGINE_1
+
 #include <string>
 #include <cstring>
 #include <iostream>
@@ -13,8 +16,7 @@
 #include <assert.h>
 #include <fstream>
 #include "settings.h"
-#include <boost/algorithm/string.hpp>
-#include "fermat_spirals.h"
+#include "clipper.hpp"
 
 #define MAX_CHAR_NUM_LINE 1024
 
@@ -27,6 +29,10 @@ const unsigned X_Type = 32;
 const unsigned Y_Type = 64;
 const unsigned Z_Type = 128;
 const unsigned Comment_Type = 256;
+
+using std::vector;
+using ClipperLib::Paths;
+using ClipperLib::Path;
 
 class GcodeLine
 {
@@ -58,7 +64,24 @@ public:
         comment = "";
         zero_eps = 1e-6;
     }
+
 public:
+
+    void SplitString(const std::string& s, std::vector<std::string>& v, const std::string& c)
+    {
+        std::string::size_type pos1, pos2;
+        pos2 = s.find(c);
+        pos1 = 0;
+        while(std::string::npos != pos2)
+        {
+            v.push_back(s.substr(pos1, pos2-pos1));
+
+            pos1 = pos2 + c.size();
+            pos2 = s.find(c, pos1);
+        }
+        if(pos1 != s.length())
+            v.push_back(s.substr(pos1));
+    }
 
     void read(std::string &str)
     {
@@ -71,7 +94,8 @@ public:
         {
             if(remove_comment(str)) return;
             std::vector<std::string> split_strs;
-            boost::split(split_strs, str, boost::is_any_of(" "));
+            std::string c = " ";
+            SplitString(str, split_strs, c);
             std::vector<char> signs(split_strs.size());
             std::vector<double> nums(split_strs.size());
             std::string name;
@@ -295,6 +319,14 @@ public:
             return false;
     }
 
+    bool is_M104()
+    {
+        if(type == M_S_Code && nM == 104)
+            return true;
+        else
+            return false;
+    }
+
     bool is_G1XY()
     {
         if(nG != 1) return false;
@@ -306,7 +338,7 @@ public:
 
     bool is_G92E0()
     {
-        if(nG != 92 || std::abs(nE) < zero_eps)return false;
+        if(nG != 92 || std::abs(nE) > zero_eps)return false;
         if((type & G_Type) && (type & E_Type))
             return true;
         else
@@ -373,6 +405,32 @@ public:
         nE = 0;
     }
 
+    void set_G1EF(double E, double F)
+    {
+        clear();
+        type = G_E_F_Code;
+        nG = 1;
+        nE = E;
+        nF = F;
+        return;
+    }
+
+    void set_G1ZF(double Z, double F)
+    {
+        clear();
+        type = G_Z_F_Code;
+        nG = 1;
+        nZ = Z;
+        nF = F;
+    }
+
+    void set_G5()
+    {
+        clear();
+        type = G_Code;
+        nG = 5;
+    }
+
 public:
     unsigned Empty;
     unsigned Comment;
@@ -424,7 +482,7 @@ public:
                 lines.push_back(line);
             }
             layering(lines);
-            remove_G1Z_code_inside_layer();
+            //remove_G1Z_code_inside_layer();
         }
     }
 
@@ -466,6 +524,7 @@ public:
         }
         sta_line = id;
 
+#ifdef SLICING_ENGINE_0
         //layer tail
         for(id = num_lines - 1; id >= 0; id--)
         {
@@ -479,7 +538,21 @@ public:
         {
             tail.push_back(lines[id]);
         }
-
+#else
+        //layer tail
+        for(id = num_lines - 1; id >= 0; id--)
+        {
+            if(lines[id].is_M104())
+            {
+                end_line = id - 1;
+                break;
+            }
+        }
+        for(id = end_line + 1; id < num_lines; id++)
+        {
+            tail.push_back(lines[id]);
+        }
+#endif
         //rest
         int total_layer = 0;
         std::vector<int> G1_Z;
@@ -492,6 +565,7 @@ public:
                     total_layer = get_layer(lines[id]);
             }
         }
+		total_layer -= 3;
 
         // layer end
         std::vector<int> layer_end;
@@ -499,7 +573,8 @@ public:
         for(id = 0; id < G1_Z.size(); id++)
         {
             int layer = get_layer(lines[G1_Z[id]]);
-            layer_end[layer] = G1_Z[id];
+			if(layer <= total_layer)
+				layer_end[layer] = G1_Z[id];
         }
         for(id = 1; id <= total_layer; id++)
         {
@@ -584,59 +659,143 @@ public:
         }
     }
 
-    void add_support(std::vector<std::list<FermatEdge>> &path_layer)
+    void add_support(vector<Paths> &fermat_curves)
     {
-        get_dE_D_dL();
-        double X = 0, Y = 0, F = 0;
-        for(int layer = 1; layer < path_layer.size(); layer++)
+        get_dE_D_dL();                      //get the ratio between dE and dL
+        double X = 0, Y = 0, F = 0, E = 0, dL;  //present status value
+        GcodeLine code;                     //temporary gcode term
+        bool first_move_touch, new_speed;
+        for(int layer = 1; layer < fermat_curves.size(); layer++)
         {
-            std::vector<GcodeLine> support;
-            GcodeLine code;
+            first_move_touch = true;        //to address problem of the filament real in and off
             for(int id = 0; id < lines_layer[layer].size(); id++)
             {
                 code = lines_layer[layer][id];
+
+                //The first G1E code is to real in the filament
+                //Once we add the support, this code no longer meaning real in 7mm filament
+                //We need to find the previous layer's E and minus 7
+
+#ifdef SLICING_ENGINE_0
+                if(code.is_G1E())
+                {
+                    if(first_move_touch && layer > 1)
+                    {
+                        lines_layer[layer][id].nE = E - 7;
+                        first_move_touch = false;
+                        E = E - 7;
+                    }
+                    else{
+                        E = code.nE;
+                    }
+                }
+#endif
+
+                //To locate the position of the printing nozzel and find the travel speed;
                 if(code.is_G1XY()) {
                     X = code.nX;
                     Y = code.nY;
-                    if(code.is_G1EF()) F = code.nF;
+                    if(code.is_G1EF())
+                    {
+                        F = code.nF;
+                    }
                 }
 
             }
 
-            code.set_G92E0();
-            support.push_back(code);
-            double E = 0;
-            std::list<FermatEdge>::iterator it;
-            bool new_speed = true;
-            for(it = path_layer[layer].begin(); it != path_layer[layer].end(); it++)
+            if(fermat_curves[layer].empty())
             {
-                FermatEdge fe = *it;
-                double X1 = fe.p0.x() + settings.platform_zero_x;
-                double Y1 = -fe.p0.y() + settings.platform_zero_y;
-                double X2 = fe.p1.x() + settings.platform_zero_x;
-                double Y2 = -fe.p1.y() + settings.platform_zero_y;
+                code.set_G5();
+                lines_layer[layer].push_back(code);
+                continue;
+            }
 
-                if(std::abs(X1 - X) > settings.ZERO_EPS || std::abs(Y1 - Y) > settings.ZERO_EPS)
-                {
-                    code.set_G1_XYF(X1, Y1, settings.nF_moving);
-                    support.push_back(code);
-                    new_speed = true;
-                }
+            vector<GcodeLine> support;
 
-                double dL = std::sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1));
-                E += dL * dEdL[layer];
-                if(new_speed)
-                {
-                    code.set_G1_XYEF(X2, Y2, E, F);
-                }
-                else code.set_G1_XYE(X2, Y2, E);
+            int curve_id = 0;
+            for(curve_id = 0; curve_id != fermat_curves[layer].size(); curve_id++)
+            {
+                Path path = fermat_curves[layer][curve_id];
+
+#ifdef SLICING_ENGINE_0
+                //real in 7mm material
+                code.set_G1EF(E - 7, 1800);
                 support.push_back(code);
-                X = X2;
-                Y = Y2;
+
+                //set E to the orgin;
+                code.set_G92E0(); E = 0;
+                support.push_back(code);
+#endif
+
+                //move Z a layer height to avoid collision
+                code.set_G1ZF((layer + 3) * settings.layer_height, 1800);
+                support.push_back(code);
+
                 new_speed = false;
+                first_move_touch = true;
+                for(int id = 1; id < path.size(); id++)
+                {
+                    double X1 = settings.int2mm(path[id - 1].X) + settings.platform_zero_x;
+                    double Y1 = -settings.int2mm(path[id - 1].Y) + settings.platform_zero_y;
+                    double X2 = settings.int2mm(path[id].X) + settings.platform_zero_x;
+                    double Y2 = -settings.int2mm(path[id].Y) + settings.platform_zero_y;
+
+                    //if(X1 != X, Y1 != Y), we have to move the printing nozzel
+                    if(std::abs(X1 - X) > settings.ZERO_EPS || std::abs(Y1 - Y) > settings.ZERO_EPS)
+                    {
+                        //we first move the nozzel
+                        code.set_G1_XYF(X1, Y1, settings.nF_moving);
+                        support.push_back(code);
+                        new_speed = true;
+                    }
+
+                    //if this move from mesh to the support
+                    //we have to reel off 7.1mm material to make sure the new filament can be attached to the support
+                    if(first_move_touch)
+                    {
+                        first_move_touch = false;
+
+                        //move down nozzel
+                        code.set_G1ZF(layer * settings.layer_height, 1800);
+                        support.push_back(code);
+
+#ifdef SLICING_ENGINE_0
+                        //reel off material
+                        code.set_G1EF(7.1, 1800);
+                        support.push_back(code);
+                        E = 7.1;
+#else
+                        //reel off material
+                        code.set_G1EF(0.05, 1800);
+                        support.push_back(code);
+                        code.set_G92E0();
+                        support.push_back(code);
+                        E = 0;
+#endif
+                    }
+
+                    dL = std::sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1)); //compute the travel distance
+                    E += dL * dEdL[layer];
+
+                    if(new_speed) code.set_G1_XYEF(X2, Y2, E, F); //the new_speed means to set the travel speed as same as the mesh
+                    else code.set_G1_XYE(X2, Y2, E);
+                    support.push_back(code);
+
+                    X = X2; Y = Y2;
+                    new_speed = false;
+                }
+#ifndef SLICING_ENGINE_0
+                code.set_G92E0();
+                support.push_back(code);
+                code.set_G1EF(-7, 1800);
+                support.push_back(code);
+#endif
             }
             lines_layer[layer].insert(lines_layer[layer].end(), support.begin(), support.end());
+            code.set_G5();
+            lines_layer[layer].push_back(code);
         }
+
     }
 
     void get_dE_D_dL()

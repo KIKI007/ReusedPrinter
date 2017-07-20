@@ -25,21 +25,16 @@ public:
         //slice
         layer_height = 0.2;
 
-        //sampling
-        sample_distance = 2;
-
         //rendering
         maximum_model_heigh = 40; //mm
+        blender_scale_factor = 0.03; //mm
 
         //support generation
         overhang_offset = 0.2; //mm
-        extrusion_width = 0.6; //mm
-        support_center_area = 0.25; //mm
+        extrusion_width = 0.5; //mm
+        support_center_factor = 4; //mm
         fermat_cut_width = 0.5; //mm
-
-        face_overhang_angle = 50 * PI / 180;
-        expected_sample_num = 2000;
-        printing_max_angle = 45 * PI / 180;
+        sew_pin_width_factor = 2;
 
         //platform
         pad_size = 12.7; //mm 0.5inch
@@ -51,16 +46,22 @@ public:
         pillar_column = 11;
 
         //layout
-        xy_sample_num_each_pin = 1 << 4;
+        xy_sample_num_each_pin = 50;
+        sample_width = mm2int(pad_size / xy_sample_num_each_pin);
         maximum_height_map = pillar_standard_height * 100;
+        angle_sample_num = 360;
+        angle_step = PI / angle_sample_num * 2;
+        edge_region_num = xy_sample_num_each_pin / 10;
 
         //gcode
         nF_printing_rest = 1800;
         nF_moving = 1800;
         nF_printing_first = 540;
         nF_reversing = 4800;
-        platform_zero_x = -60;
-        platform_zero_y = 50;
+        platform_zero_x = -75 + 3.5 - 0.2 + 0.8;
+        platform_zero_y = 60 - 2 + 1;
+
+        group_expand_size = 2;
     }
 
 public:
@@ -98,6 +99,16 @@ public:
     {
         return (double)INT * UNIT / 2;
     }
+
+public:
+
+    int pin_x(int ir){return ir * sample_width;}
+
+    int pin_y(int ic){return ic * sample_width;}
+
+    int pin_center_x(int ir) {return ir * sample_width + sample_width / 2;}
+
+    int pin_center_y(int ic) {return ic * sample_width + sample_width / 2;}
 
 public:
 
@@ -157,32 +168,32 @@ public:
     double platform_zero_x;
     double platform_zero_y;
 
-    //sampling
-    double sample_distance;
-
     //rendering
     double maximum_model_heigh; //to shrink the model inside the rendering space
+    double blender_scale_factor;
 
     //support generation
     double overhang_offset;
     double extrusion_width;
-    double support_center_area;
     double fermat_cut_width;
-
-    double face_overhang_angle;
-    double expected_sample_num;
-    double printing_max_angle;
-
+    int support_center_factor;
+    int group_expand_size;
+    int sew_pin_width_factor;
 
     //layout
     int xy_sample_num_each_pin;
+    int sample_width;
+    int angle_sample_num;
+    double angle_step;
     double maximum_height_map;
+    int edge_region_num;
 
     //gcode
     double nF_printing_first;
     double nF_printing_rest;
     double nF_moving;
     double nF_reversing;
+
 
 public:
     char tmp_str[1024];

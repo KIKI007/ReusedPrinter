@@ -1,0 +1,56 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/stb_image.cpp
+stb_image.h
+/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/stb_image.h
+stb_image_write.h
+/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/stb_image_write.h
+
+/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/stb_image.h
+stb_image.h
+/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/stb_image.h
+stdio.h
+-
+stdarg.h
+-
+stddef.h
+-
+stdlib.h
+-
+string.h
+-
+math.h
+-
+stdio.h
+-
+assert.h
+-
+stdint.h
+-
+emmintrin.h
+-
+intrin.h
+-
+arm_neon.h
+-
+
+/Users/wangziqi/Desktop/USC Spring/Code/Supporter/external/stb_image/stb_image_write.h
+stdio.h
+-
+stdarg.h
+-
+stdlib.h
+-
+string.h
+-
+math.h
+-
+assert.h
+-
+

@@ -66,6 +66,7 @@ set(LIBIGL_EXTERNAL "${LIBIGL_ROOT}/external")
 set(NANOGUI_DIR "${LIBIGL_EXTERNAL}/nanogui")
 
 ### Eigen ###
+### Eigen ###
 if(NOT EIGEN_INCLUDE_DIR)
   set(EIGEN_INCLUDE_DIR "${NANOGUI_DIR}/ext/eigen")
 endif()
